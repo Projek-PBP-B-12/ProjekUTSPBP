@@ -42,5 +42,3 @@ Jika pengguna merasa tidak sanggup menghabiskan makanan tersebut, mereka dapat m
 ## Tautan deployment PWS
 
 ## Tautan Figma
-
-## Sumber Tautan API
