@@ -1,0 +1,21 @@
+name: Push to PWS GitHub Workflow
+
+on:
+  push:
+    branches:
+      - pws-branch
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to PWS
+        run: |
+          git remote add pws https://${{ secrets.PWS_USERNAME }}:${{ secrets.PWS_PASSWORD }}@pws.cs.ui.ac.id/justin.evan/titiklapar
+          git push --force pws pws-branch
