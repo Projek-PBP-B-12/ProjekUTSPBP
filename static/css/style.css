@@ -1,0 +1,885 @@
+/*
+ * TitikLapar — gaya landing page.
+ *
+ * Susunan: variabel, reset, ikon, layout, navbar, tombol, hero,
+ * kartu makanan, notifikasi, lalu penyesuaian layar.
+ * Ubah warna dan font melalui variabel pada bagian 1.
+ */
+
+/* Font navbar lokal: tidak memerlukan koneksi ke Google Fonts. */
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans-medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans-semibold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/plus-jakarta-sans-bold.ttf') format('truetype');
+}
+
+/* 1. Variabel warna dan tipografi */
+
+:root {
+  --ink: #273934;
+  --muted: #61736e;
+  --teal: #176e72;
+  --lime: #c7de73;
+  --border: #d5ded6;
+  --font-nav: 'Plus Jakarta Sans', Arial, Helvetica, sans-serif;
+}
+
+/* 2. Reset dan elemen dasar */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f8f0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible {
+  outline: 3px solid #789b23;
+  outline-offset: 5px;
+}
+
+/* 3. Ikon SVG */
+
+.icon-definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 4. Container dan layout utama */
+
+.container {
+  width: min(1248px, calc(100% - 96px));
+  margin-inline: auto;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 5. Header, logo, dan navbar */
+
+.site-header {
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 1px solid #e4e8df;
+}
+
+.navbar {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding-inline: 40px 0;
+  font-family: var(--font-nav);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.brand-dot {
+  width: 27px;
+  height: 27px;
+  background: var(--lime);
+  border-radius: 50%;
+}
+
+.nav-links,
+.nav-actions {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links {
+  gap: 32px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  color: var(--teal);
+}
+
+.nav-actions {
+  gap: 12px;
+}
+
+/* 6. Tombol dan variasinya */
+
+.button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 30px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button-primary {
+  background: var(--teal);
+  color: white;
+}
+
+.button-primary:hover {
+  background: #125b5e;
+}
+
+.button-outline {
+  background: white;
+  color: var(--teal);
+  border-color: var(--border);
+}
+
+.button-outline:hover {
+  background: #f0f6f4;
+}
+
+.nav-actions .button {
+  min-width: 136px;
+  font-weight: 600;
+}
+
+/* 7. Hero: latar, judul, dan ajakan */
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      ellipse at 83% 22%,
+      #dbe8a6 0%,
+      #dbe8a6 12%,
+      transparent 36%
+    ),
+    radial-gradient(
+      ellipse at 9% 96%,
+      #b7d2d0 0%,
+      #c3d9d5 14%,
+      transparent 44%
+    ),
+    #f8f8f0;
+}
+
+.hero-inner {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: 48px;
+  padding-block: clamp(80px, 10vh, 120px);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.decorative-leaf {
+  position: absolute;
+  width: 72px;
+  height: 96px;
+  top: -70px;
+  left: -20px;
+  color: #c7de73;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  z-index: -1;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--teal);
+  background: #e3f1ef;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .6px;
+}
+
+.eyebrow span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+h1 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(48px, 5.3vw, 76px);
+  font-weight: 400;
+  line-height: .99;
+  letter-spacing: -2px;
+}
+
+.hero-description {
+  max-width: 510px;
+  margin: 26px 0 22px;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1.55;
+  letter-spacing: .2px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 17px;
+}
+
+.start-button {
+  min-width: 184px;
+}
+
+.free-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.free-note .icon,
+.trust-list .icon {
+  color: var(--teal);
+}
+
+/* 8. Daftar manfaat */
+
+.trust-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin: 23px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.trust-list li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.trust-list .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 9. Kartu kulkas dan status makanan */
+
+.hero-visual {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  padding-bottom: 64px;
+}
+
+.fridge-card {
+  position: relative;
+  width: 520px;
+  max-width: calc(100% - 24px);
+  padding: 26px 24px 24px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 25px 45px rgba(39,57,52,.12);
+}
+
+.saved-badge {
+  position: absolute;
+  top: -20px;
+  right: -52px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--lime);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 8px 18px #a4b95622;
+  white-space: nowrap;
+}
+
+.saved-badge .icon {
+  width: 19px;
+  height: 19px;
+}
+
+.fridge-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fridge-label {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 1px;
+}
+
+.fridge-heading h2 {
+  margin: 0;
+  font: 400 29px/1.1 Georgia, 'Times New Roman', serif;
+}
+
+.stored-badge {
+  padding: 9px 13px;
+  background: #e5ecd9;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.food-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.food-item {
+  min-height: 85px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.food-item h3,
+.reminder h3,
+.notification h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.food-item p,
+.reminder p,
+.notification p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.status {
+  width: 140px;
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-soon {
+  color: #9c550f;
+  background: #fff0da;
+}
+
+.status-active {
+  color: var(--teal);
+  background: #e0f0ef;
+}
+
+.status-later {
+  background: #e5ecd9;
+}
+
+/* 10. Pengingat kedaluwarsa */
+
+.reminder {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff0d9;
+}
+
+.day-badge {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #a56012;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* 11. Kartu notifikasi */
+
+.phone-card {
+  position: absolute;
+  bottom: 0;
+  right: -4px;
+  width: 390px;
+  padding: 13px 15px 15px;
+  background: #2c3c35;
+  color: #fff;
+  border-radius: 32px;
+  transform: rotate(-2deg);
+  box-shadow: 0 25px 35px #27393418;
+}
+
+.phone-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 1px 13px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.phone-status > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phone-status .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.battery {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 9px;
+  border: 1px solid #fff;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.battery::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: -3px;
+  width: 2px;
+  height: 3px;
+  background: white;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 92px;
+  padding: 20px;
+  background: white;
+  color: var(--ink);
+  border-radius: 6px;
+}
+
+.notification-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.notification h3 {
+  font-size: 12px;
+}
+
+.notification p {
+  font-size: 11px;
+}
+
+.notification-time {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.phone-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.phone-action {
+  flex: 1;
+  padding: 11px 8px;
+  text-align: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.postpone {
+  color: var(--teal);
+  background: #bfd2d0;
+}
+
+.share {
+  color: var(--ink);
+  background: var(--lime);
+}
+
+/* 12. Posisi gulir tautan bagian */
+
+#cara-kerja,
+#fitur,
+#berbagi {
+  scroll-margin-top: 24px;
+}
+
+/* 13. Responsif: laptop dan tablet besar (maksimal 1100px) */
+
+@media (max-width: 1100px) {
+  .container {
+    width: calc(100% - 64px);
+  }
+
+  .navbar {
+    padding-inline: 0;
+  }
+
+  .nav-links {
+    gap: 22px;
+  }
+
+  .nav-actions .button {
+    min-width: 100px;
+  }
+
+  .hero-inner {
+    gap: 32px;
+  }
+
+  h1 {
+    font-size: 58px;
+  }
+
+  .hero-description {
+    font-size: 17px;
+  }
+
+  .fridge-card {
+    padding: 22px 18px;
+  }
+
+  .saved-badge {
+    right: -16px;
+  }
+
+  .food-item {
+    gap: 12px;
+    padding-inline: 14px;
+  }
+
+  .status {
+    width: 105px;
+  }
+
+  .phone-card {
+    width: 330px;
+    right: -8px;
+  }
+
+  .notification {
+    padding: 18px 12px;
+    gap: 10px;
+  }
+
+}
+
+/* 14. Responsif: tablet dan ponsel (maksimal 800px) */
+
+@media (max-width: 800px) {
+  .container {
+    width: calc(100% - 40px);
+  }
+
+  .navbar {
+    min-height: 100px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-block: 16px;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .nav-actions .button {
+    min-width: 78px;
+    min-height: 38px;
+    padding: 9px 16px;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 65px;
+    padding-block: 90px 65px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 550px;
+    margin-inline: auto;
+  }
+
+  h1 {
+    font-size: clamp(45px, 8.5vw, 66px);
+  }
+
+  .hero-description {
+    max-width: 500px;
+  }
+
+  .hero-visual {
+    max-width: 530px;
+    margin-inline: auto;
+  }
+
+  .fridge-card {
+    width: 480px;
+  }
+
+  .food-item {
+    justify-content: space-between;
+  }
+
+  .status {
+    width: 140px;
+  }
+
+  .phone-card {
+    width: 360px;
+    right: 0;
+  }
+
+  .hero {
+    background:
+      radial-gradient(ellipse at 100% 60%,
+      #dbe8a6, transparent 55%),
+      radial-gradient(ellipse at 0% 20%,
+      #c3d9d5, transparent 50%),
+      #f8f8f0;
+  }
+
+}
+
+/* 15. Responsif: ponsel kecil (maksimal 420px) */
+
+@media (max-width: 420px) {
+  .brand {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .brand-dot {
+    width: 23px;
+    height: 23px;
+  }
+
+  .nav-actions {
+    gap: 7px;
+  }
+
+  .nav-actions .button {
+    min-width: 64px;
+    padding-inline: 12px;
+  }
+
+  .nav-links {
+    gap: 24px;
+  }
+
+  h1 {
+    font-size: 43px;
+    letter-spacing: -1.3px;
+  }
+
+  .hero-description {
+    font-size: 16px;
+  }
+
+  .hero-actions {
+    gap: 12px;
+  }
+
+  .start-button {
+    min-width: 156px;
+    padding-inline: 20px;
+  }
+
+  .free-note {
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .trust-list {
+    gap: 12px;
+    font-size: 10px;
+  }
+
+  .trust-list li {
+    gap: 4px;
+  }
+
+  .fridge-card {
+    max-width: calc(100% - 10px);
+    padding-inline: 14px;
+  }
+
+  .saved-badge {
+    right: -8px;
+    font-size: 10px;
+  }
+
+  .food-item {
+    padding-inline: 10px;
+    gap: 8px;
+  }
+
+  .food-item h3 {
+    font-size: 12px;
+  }
+
+  .food-item p {
+    font-size: 10px;
+  }
+
+  .status {
+    width: 95px;
+    font-size: 11px;
+  }
+
+  .phone-card {
+    width: min(315px, calc(100% - 4px));
+    right: 0;
+  }
+
+  .notification {
+    gap: 8px;
+  }
+
+  .notification h3 {
+    font-size: 11px;
+  }
+
+  .notification p {
+    font-size: 10px;
+  }
+
+  .notification-time {
+    font-size: 9px;
+  }
+
+}
+
+/* 16. Aksesibilitas: preferensi gerakan */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .button {
+    transition: none;
+  }
+
+}
