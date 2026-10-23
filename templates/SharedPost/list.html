@@ -19,6 +19,14 @@
             <p>{{ post.description|linebreaksbr }}</p>
             {% if post.food_item.owner_id == request.user.id %}
                 <a href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+                <form
+                    method="post"
+                    action="{% url 'sharedpost:delete' post.pk %}"
+                    onsubmit="return confirm('Yakin ingin menghapus penawaran ini?');"
+                >
+                    {% csrf_token %}
+                    <button type="submit">Hapus penawaran</button>
+                </form>
             {% endif %}
         </article>
         <hr>

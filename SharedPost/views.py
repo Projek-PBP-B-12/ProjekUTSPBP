@@ -6,10 +6,34 @@ from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 
 from FoodItem.models import FoodItem
 from .forms import SharedPostForm
 from .models import SharedPost
+
+
+@login_required
+@require_POST
+def delete_shared_post(request, pk):
+    with transaction.atomic():
+        post = get_object_or_404(
+            SharedPost.objects.select_for_update(),
+            pk=pk,
+            food_item__owner=request.user,
+        )
+
+        food = FoodItem.objects.select_for_update().get(
+            pk=post.food_item_id,
+        )
+
+        if post.is_active and food.status == "OFFERED":
+            food.status = "STORED"
+            food.save(update_fields=["status", "updated_at"])
+
+        post.delete()
+
+    return redirect("sharedpost:list")
 
 
 @login_required
