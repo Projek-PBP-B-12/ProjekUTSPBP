@@ -6,11 +6,13 @@ from .views import (
     update_shared_post,
     delete_shared_post,
     complete_shared_post,
+    shared_post_detail,
 )
 
 app_name = "sharedpost"
 
 urlpatterns = [
+    path("<int:pk>/", shared_post_detail, name="detail"),
     path("<int:pk>/complete/", complete_shared_post, name="complete"),
     path("<int:pk>/delete/", delete_shared_post, name="delete"),
     path("<int:pk>/edit/", update_shared_post, name="update"),

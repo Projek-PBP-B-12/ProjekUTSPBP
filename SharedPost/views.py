@@ -3,15 +3,47 @@ from django.shortcuts import render
 # Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 
 from FoodItem.models import FoodItem
 from .forms import SharedPostForm
 from .models import SharedPost
+
+
+@login_required
+def shared_post_detail(request, pk):
+    post = get_object_or_404(
+        SharedPost.objects.select_related(
+            "food_item__owner",
+            "location",
+        ),
+        pk=pk,
+    )
+
+    is_owner = post.food_item.owner_id == request.user.id
+    is_available = (
+        post.is_active
+        and post.food_item.status == "OFFERED"
+        and not post.food_item.is_expired
+    )
+
+    if not is_owner and not is_available:
+        raise Http404("Penawaran sudah tidak tersedia.")
+
+    return render(
+        request,
+        "SharedPost/detail.html",
+        {
+            "post": post,
+            "is_owner": is_owner,
+            "is_available": is_available,
+        },
+    )
 
 
 @login_required
@@ -125,6 +157,18 @@ def shared_post_list(request):
         food_item__status="OFFERED",
         food_item__expiration_date__gte=timezone.localdate(),
     )
+
+    filters = request.GET if request.method == "GET" else request.POST
+    query = filters.get("q", "").strip()[:150]
+    if query:
+        posts = posts.filter(
+            Q(food_item__name__icontains=query)
+            | Q(location__area_name__icontains=query)
+        )
+    if filters.get("category"):
+        posts = posts.filter(food_item__category=filters["category"])
+    if filters.get("mine") == "1":
+        posts = posts.filter(food_item__owner=request.user)
 
     template = (
         "SharedPost/partials/post_list.html"

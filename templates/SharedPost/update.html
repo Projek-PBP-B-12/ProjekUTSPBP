@@ -1,13 +1,3 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Penawaran | TitikLapar</title>
-</head>
-<body>
-    {% include "SharedPost/partials/update_form.html" %}
-
-    <a href="{% url 'sharedpost:list' %}">Batal</a>
-</body>
-</html>
+{% extends "SharedPost/base.html" %}
+{% block title %}Edit Penawaran{% endblock %}
+{% block content %}<header class="page-heading"><div><h1>Edit Penawaran</h1><p>Pastikan petunjuk pengambilan selalu sesuai.</p></div></header>{% include "SharedPost/partials/update_form.html" %}{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "SharedPost/base.html" %}
+
+{% block title %}{{ post.food_item.name }}{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+<a class="detail-back" href="{% url 'sharedpost:list' %}">
+    <span class="detail-back-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+             stroke-linejoin="round" focusable="false">
+            <path d="m12 5-7 7 7 7M5 12h14" />
+        </svg>
+    </span>
+    <span>Kembali ke papan berbagi</span>
+</a>
+
+<article class="offer-detail">
+    <div class="food-placeholder detail-photo category-{{ post.food_item.category|lower }}">
+        <span class="placeholder-symbol" aria-hidden="true">◒</span>
+        <span class="placeholder-label">{{ post.food_item.get_category_display }}</span>
+        {% if post.food_item.image_url %}
+            <img class="food-photo" src="{{ post.food_item.image_url }}"
+                 alt="{{ post.food_item.name }}" decoding="async" referrerpolicy="no-referrer">
+        {% endif %}
+        {% if is_owner %}<span class="owner-badge">● Penawaran saya</span>{% endif %}
+    </div>
+
+    <div class="detail-content">
+        <div class="detail-meta">
+            <span class="category-pill">{{ post.food_item.get_category_display }}</span>
+            {% if is_available %}
+                <span class="available">Tersedia</span>
+            {% else %}
+                <span class="unavailable">Tidak tersedia</span>
+            {% endif %}
+        </div>
+
+        <h1>{{ post.food_item.name }}</h1>
+        <p class="detail-donor">Dibagikan oleh <strong>{{ post.food_item.owner.username }}</strong></p>
+
+        <dl class="detail-facts">
+            <div><dt>Area pengambilan</dt><dd>⌖ {{ post.location.area_name }}</dd></div>
+            <div><dt>Tanggal kedaluwarsa</dt><dd>{{ post.food_item.expiration_date|date:"j F Y" }}</dd></div>
+            <div><dt>Dipublikasikan</dt><dd>{{ post.created_at|date:"j F Y" }}</dd></div>
+        </dl>
+
+        <section class="pickup-instructions" aria-labelledby="pickup-title">
+            <h2 id="pickup-title">Petunjuk pengambilan</h2>
+            <p>{{ post.description }}</p>
+        </section>
+
+        {% if not is_available %}
+            <p class="detail-notice">Penawaran ini sudah tidak tersedia untuk diambil.</p>
+        {% elif is_owner %}
+            <a class="button primary" href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+        {% endif %}
+    </div>
+</article>
+</div>
+{% endblock %}
