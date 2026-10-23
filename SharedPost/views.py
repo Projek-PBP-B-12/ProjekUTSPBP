@@ -114,6 +114,8 @@ def shared_post_list(request):
 
 @login_required
 def update_shared_post(request, pk):
+    is_htmx = request.headers.get("HX-Request") == "true"
+
     with transaction.atomic():
         post = get_object_or_404(
             SharedPost.objects.select_for_update(),
@@ -131,6 +133,13 @@ def update_shared_post(request, pk):
 
             if form.is_valid():
                 form.save()
+                if is_htmx:
+                    response = HttpResponse(
+                        '<p role="status">Penawaran berhasil diperbarui.</p>'
+                    )
+                    response["HX-Trigger"] = "postUpdated"
+                    return response
+
                 return redirect("sharedpost:list")
         else:
             form = SharedPostForm(
@@ -138,8 +147,14 @@ def update_shared_post(request, pk):
                 user=request.user,
             )
 
+    template = (
+        "SharedPost/partials/update_form.html"
+        if is_htmx
+        else "SharedPost/update.html"
+    )
+
     return render(
         request,
-        "SharedPost/update.html",
-        {"form": form, "post": post},
+        template,
+        {"form": form, "post": post, "is_htmx": is_htmx},
     )

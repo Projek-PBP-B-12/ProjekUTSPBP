@@ -6,14 +6,7 @@
     <title>Edit Penawaran | TitikLapar</title>
 </head>
 <body>
-    <h1>Edit Penawaran</h1>
-
-    <form method="post" action="{% url 'sharedpost:update' post.pk %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button type="submit">Simpan perubahan</button>
-    </form>
+    {% include "SharedPost/partials/update_form.html" %}
 
     <a href="{% url 'sharedpost:list' %}">Batal</a>
 </body>

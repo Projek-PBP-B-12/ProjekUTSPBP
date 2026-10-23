@@ -6,7 +6,10 @@
             <p>Kedaluwarsa: {{ post.food_item.expiration_date }}</p>
             <p>{{ post.description|linebreaksbr }}</p>
             {% if post.food_item.owner_id == request.user.id %}
-                <a href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+                <a href="{% url 'sharedpost:update' post.pk %}"
+                   hx-get="{% url 'sharedpost:update' post.pk %}"
+                   hx-target="#post-form"
+                   hx-swap="innerHTML">Edit penawaran</a>
                 <form
                     method="post"
                     action="{% url 'sharedpost:delete' post.pk %}"

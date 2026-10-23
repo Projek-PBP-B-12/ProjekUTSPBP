@@ -1,0 +1,17 @@
+<h2>Edit Penawaran</h2>
+
+<form
+    method="post"
+    action="{% url 'sharedpost:update' post.pk %}"
+    {% if is_htmx %}
+        hx-post="{% url 'sharedpost:update' post.pk %}"
+        hx-target="#post-form"
+        hx-swap="innerHTML"
+        hx-disabled-elt="find button"
+    {% endif %}
+>
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Simpan perubahan</button>
+</form>

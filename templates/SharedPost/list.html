@@ -19,7 +19,7 @@
 
     <div id="post-list" aria-live="polite"
          hx-get="{% url 'sharedpost:list' %}"
-         hx-trigger="postCreated from:body"
+         hx-trigger="postCreated from:body, postUpdated from:body"
          hx-swap="innerHTML">
         {% include "SharedPost/partials/post_list.html" %}
     </div>
