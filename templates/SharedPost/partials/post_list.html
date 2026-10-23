@@ -12,6 +12,18 @@
                    hx-swap="innerHTML">Edit penawaran</a>
                 <form
                     method="post"
+                    action="{% url 'sharedpost:complete' post.pk %}"
+                    hx-post="{% url 'sharedpost:complete' post.pk %}"
+                    hx-target="#post-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Tandai makanan ini sudah diambil?"
+                    hx-disabled-elt="find button"
+                >
+                    {% csrf_token %}
+                    <button type="submit">Sudah diambil</button>
+                </form>
+                <form
+                    method="post"
                     action="{% url 'sharedpost:delete' post.pk %}"
                     hx-post="{% url 'sharedpost:delete' post.pk %}"
                     hx-target="#post-list"

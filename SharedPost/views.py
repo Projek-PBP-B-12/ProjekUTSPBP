@@ -16,6 +16,33 @@ from .models import SharedPost
 
 @login_required
 @require_POST
+def complete_shared_post(request, pk):
+    with transaction.atomic():
+        post = get_object_or_404(
+            SharedPost.objects.select_for_update(),
+            pk=pk,
+            food_item__owner=request.user,
+            is_active=True,
+        )
+
+        food = FoodItem.objects.select_for_update().get(
+            pk=post.food_item_id,
+        )
+
+        post.is_active = False
+        post.save(update_fields=["is_active", "updated_at"])
+
+        food.status = "CONSUMED"
+        food.save(update_fields=["status", "updated_at"])
+
+    if request.headers.get("HX-Request") == "true":
+        return shared_post_list(request)
+
+    return redirect("sharedpost:list")
+
+
+@login_required
+@require_POST
 def delete_shared_post(request, pk):
     with transaction.atomic():
         post = get_object_or_404(
