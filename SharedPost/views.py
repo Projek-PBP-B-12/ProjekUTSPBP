@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 from FoodItem.models import FoodItem
 from .forms import SharedPostForm
@@ -60,4 +61,37 @@ def shared_post_list(request):
         request,
         "SharedPost/list.html",
         {"posts": posts},
+    )
+
+
+@login_required
+def update_shared_post(request, pk):
+    with transaction.atomic():
+        post = get_object_or_404(
+            SharedPost.objects.select_for_update(),
+            pk=pk,
+            food_item__owner=request.user,
+            is_active=True,
+        )
+
+        if request.method == "POST":
+            form = SharedPostForm(
+                request.POST,
+                instance=post,
+                user=request.user,
+            )
+
+            if form.is_valid():
+                form.save()
+                return redirect("sharedpost:list")
+        else:
+            form = SharedPostForm(
+                instance=post,
+                user=request.user,
+            )
+
+    return render(
+        request,
+        "SharedPost/update.html",
+        {"form": form, "post": post},
     )

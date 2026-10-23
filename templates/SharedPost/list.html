@@ -17,6 +17,9 @@
             <p>Area: {{ post.location.area_name }}</p>
             <p>Kedaluwarsa: {{ post.food_item.expiration_date }}</p>
             <p>{{ post.description|linebreaksbr }}</p>
+            {% if post.food_item.owner_id == request.user.id %}
+                <a href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+            {% endif %}
         </article>
         <hr>
     {% empty %}
