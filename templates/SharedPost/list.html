@@ -1,37 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Papan Berbagi | TitikLapar</title>
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
 </head>
 <body>
     <h1>Papan Berbagi</h1>
 
     <a href="{% url 'sharedpost:create' %}">Bagikan makanan</a>
 
-    {% for post in posts %}
-        <article>
-            <h2>{{ post.food_item.name }}</h2>
-            <p>Donor: {{ post.food_item.owner.username }}</p>
-            <p>Area: {{ post.location.area_name }}</p>
-            <p>Kedaluwarsa: {{ post.food_item.expiration_date }}</p>
-            <p>{{ post.description|linebreaksbr }}</p>
-            {% if post.food_item.owner_id == request.user.id %}
-                <a href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
-                <form
-                    method="post"
-                    action="{% url 'sharedpost:delete' post.pk %}"
-                    onsubmit="return confirm('Yakin ingin menghapus penawaran ini?');"
-                >
-                    {% csrf_token %}
-                    <button type="submit">Hapus penawaran</button>
-                </form>
-            {% endif %}
-        </article>
-        <hr>
-    {% empty %}
-        <p>Belum ada penawaran makanan yang tersedia.</p>
-    {% endfor %}
+    <div id="post-list" aria-live="polite">
+        {% include "SharedPost/partials/post_list.html" %}
+    </div>
 </body>
 </html>

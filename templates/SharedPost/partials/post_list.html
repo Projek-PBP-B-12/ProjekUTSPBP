@@ -1,0 +1,27 @@
+    {% for post in posts %}
+        <article>
+            <h2>{{ post.food_item.name }}</h2>
+            <p>Donor: {{ post.food_item.owner.username }}</p>
+            <p>Area: {{ post.location.area_name }}</p>
+            <p>Kedaluwarsa: {{ post.food_item.expiration_date }}</p>
+            <p>{{ post.description|linebreaksbr }}</p>
+            {% if post.food_item.owner_id == request.user.id %}
+                <a href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+                <form
+                    method="post"
+                    action="{% url 'sharedpost:delete' post.pk %}"
+                    hx-post="{% url 'sharedpost:delete' post.pk %}"
+                    hx-target="#post-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Yakin ingin menghapus penawaran ini?"
+                    hx-disabled-elt="find button"
+                >
+                    {% csrf_token %}
+                    <button type="submit">Hapus penawaran</button>
+                </form>
+            {% endif %}
+        </article>
+        <hr>
+    {% empty %}
+        <p>Belum ada penawaran makanan yang tersedia.</p>
+    {% endfor %}

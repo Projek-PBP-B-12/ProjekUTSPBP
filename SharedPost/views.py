@@ -33,6 +33,9 @@ def delete_shared_post(request, pk):
 
         post.delete()
 
+    if request.headers.get("HX-Request") == "true":
+        return shared_post_list(request)
+
     return redirect("sharedpost:list")
 
 
@@ -81,9 +84,15 @@ def shared_post_list(request):
         food_item__expiration_date__gte=timezone.localdate(),
     )
 
+    template = (
+        "SharedPost/partials/post_list.html"
+        if request.headers.get("HX-Request") == "true"
+        else "SharedPost/list.html"
+    )
+
     return render(
         request,
-        "SharedPost/list.html",
+        template,
         {"posts": posts},
     )
 
