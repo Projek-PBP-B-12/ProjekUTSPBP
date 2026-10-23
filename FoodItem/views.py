@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from datetime import datetime
+from django.contrib import messages
 
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import *
 
@@ -88,5 +91,31 @@ def get_food_items(request: HttpRequest):
     return JsonResponse(data, safe=False)
 
 @require_POST
-def create_food_item(request: HttpRequest):
+def delete_food_item(request: HttpRequest, fooditem_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Authentication required."},
+            status=401,
+        )
+
+    fooditem = get_object_or_404(FoodItem, pk=fooditem_id)
+
+    if fooditem.owner == request.user or request.user.is_superuser:
+        fooditem.delete()
+        return JsonResponse(
+            {"message": "Makanan berhasil dihapus!"},
+            status=200,
+        )
+    
+    return JsonResponse(
+        {"message": "Request not permitted."},
+        status=401,
+    )
+
+@login_required
+def add_food_item(request: HttpRequest):
+    ...
+
+@login_required
+def change_food_item(request: HttpRequest):
     ...

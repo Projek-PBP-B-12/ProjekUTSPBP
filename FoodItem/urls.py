@@ -6,5 +6,7 @@ app_name = "FoodItem"
 
 urlpatterns = [
     path("api/get/", get_food_items, name="get_food_items"),
-    path("api/create/", create_food_item, name="create_food_item"),
+    path("api/delete/<int:fooditem_id>", delete_food_item, name="create_food_item"),
+    path("add/", add_food_item, name="add_food_item"),
+    path("change/<int:fooditem_id>", change_food_item, name="change_food_item"),
 ]
