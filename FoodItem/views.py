@@ -112,7 +112,7 @@ def delete_food_item(request: HttpRequest, fooditem_id):
     
     return JsonResponse(
         {"message": "Request not permitted."},
-        status=401,
+        status=403,
     )
 
 @login_required
@@ -135,5 +135,23 @@ def add_food_item(request: HttpRequest):
     return render(request, "form.html", global_context | context)
 
 @login_required
-def change_food_item(request: HttpRequest):
-    ...
+def change_food_item(request: HttpRequest, fooditem_id):
+    fooditem = get_object_or_404(FoodItem, pk=fooditem_id)
+    form = FoodItemForm(request.POST or None, instance=fooditem)
+
+    if fooditem.owner == request.user or request.user.is_superuser:
+
+        if request.method == "POST" and form.is_valid():
+            form.save()
+            return redirect("landing_page")
+
+        context = {
+            "form" : form,
+            "page_title": "Ubah Makanan",
+            "submit_button_text": "Ubah Makanan",
+            "post_form_url": reverse("FoodItem:change_food_item", kwargs={"fooditem_id": fooditem_id}),
+            "cancel_button_url": reverse("landing_page")
+        }
+        return render(request, "form.html", global_context | context)
+
+    return HttpResponse("Action not permitted.", status=403)
