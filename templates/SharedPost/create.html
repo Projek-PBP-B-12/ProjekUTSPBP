@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bagikan Makanan | TitikLapar</title>
+</head>
+<body>
+    <h1>Bagikan Makanan</h1>
+    <p>Pilih makanan dan tuliskan petunjuk pengambilannya.</p>
+
+    <form method="post" action="{% url 'sharedpost:create' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Bagikan</button>
+    </form>
+</body>
+</html>

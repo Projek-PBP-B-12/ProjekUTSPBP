@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papan Berbagi | TitikLapar</title>
+</head>
+<body>
+    <h1>Papan Berbagi</h1>
+
+    <a href="{% url 'sharedpost:create' %}">Bagikan makanan</a>
+
+    {% for post in posts %}
+        <article>
+            <h2>{{ post.food_item.name }}</h2>
+            <p>Donor: {{ post.food_item.owner.username }}</p>
+            <p>Area: {{ post.location.area_name }}</p>
+            <p>Kedaluwarsa: {{ post.food_item.expiration_date }}</p>
+            <p>{{ post.description|linebreaksbr }}</p>
+        </article>
+        <hr>
+    {% empty %}
+        <p>Belum ada penawaran makanan yang tersedia.</p>
+    {% endfor %}
+</body>
+</html>
