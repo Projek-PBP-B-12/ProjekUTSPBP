@@ -32,3 +32,9 @@ class FoodItemForm(ModelForm):
 
     def clean_category(self):
         return strip_tags(self.cleaned_data["category"]).strip()
+
+    def clean_purchase_date(self):
+        return self.cleaned_data.get("purchase_date") or timezone.localdate()
+
+    def clean_expiration_date(self):
+        return self.cleaned_data.get("expiration_date") or timezone.localdate()
