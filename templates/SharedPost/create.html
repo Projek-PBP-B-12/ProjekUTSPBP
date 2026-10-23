@@ -6,14 +6,6 @@
     <title>Bagikan Makanan | TitikLapar</title>
 </head>
 <body>
-    <h1>Bagikan Makanan</h1>
-    <p>Pilih makanan dan tuliskan petunjuk pengambilannya.</p>
-
-    <form method="post" action="{% url 'sharedpost:create' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button type="submit">Bagikan</button>
-    </form>
+    {% include "SharedPost/partials/create_form.html" %}
 </body>
 </html>

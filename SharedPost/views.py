@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
+from django.http import HttpResponse
 
 from FoodItem.models import FoodItem
 from .forms import SharedPostForm
@@ -63,14 +64,28 @@ def create_shared_post(request):
                 food.status = "OFFERED"
                 food.save(update_fields=["status", "updated_at"])
 
+                if request.headers.get("HX-Request") == "true":
+                    response = HttpResponse(
+                        '<p role="status">Penawaran berhasil ditambahkan.</p>'
+                    )
+                    response["HX-Trigger"] = "postCreated"
+                    return response
+
                 return redirect("sharedpost:list")
     else:
         form = SharedPostForm(user=request.user)
 
+    is_htmx = request.headers.get("HX-Request") == "true"
+    template = (
+        "SharedPost/partials/create_form.html"
+        if is_htmx
+        else "SharedPost/create.html"
+    )
+
     return render(
         request,
-        "SharedPost/create.html",
-        {"form": form},
+        template,
+        {"form": form, "is_htmx": is_htmx},
     )
 
 @login_required

@@ -10,9 +10,17 @@
 <body>
     <h1>Papan Berbagi</h1>
 
-    <a href="{% url 'sharedpost:create' %}">Bagikan makanan</a>
+    <a href="{% url 'sharedpost:create' %}"
+       hx-get="{% url 'sharedpost:create' %}"
+       hx-target="#post-form"
+       hx-swap="innerHTML">Bagikan makanan</a>
 
-    <div id="post-list" aria-live="polite">
+    <div id="post-form" aria-live="polite"></div>
+
+    <div id="post-list" aria-live="polite"
+         hx-get="{% url 'sharedpost:list' %}"
+         hx-trigger="postCreated from:body"
+         hx-swap="innerHTML">
         {% include "SharedPost/partials/post_list.html" %}
     </div>
 </body>
