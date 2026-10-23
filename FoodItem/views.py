@@ -1,15 +1,18 @@
 from django.shortcuts import render
 from datetime import datetime
 from django.contrib import messages
-
+from django.urls import reverse
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import *
+from .forms import *
 
 # Create your views here.
+
+global_context = {}
 
 @require_GET
 def get_food_items(request: HttpRequest):
@@ -114,7 +117,22 @@ def delete_food_item(request: HttpRequest, fooditem_id):
 
 @login_required
 def add_food_item(request: HttpRequest):
-    ...
+    form = FoodItemForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        fooditem = form.save(commit=False)
+        fooditem.owner = request.user
+        fooditem.save()
+        return redirect("landing_page")
+    
+    context = {
+        "form" : form,
+        "page_title": "Tambah Makanan",
+        "submit_button_text": "Tambah Makanan",
+        "post_form_url": reverse("FoodItem:add_food_item"),
+        "cancel_button_url": reverse("landing_page")
+    }
+    return render(request, "form.html", global_context | context)
 
 @login_required
 def change_food_item(request: HttpRequest):
