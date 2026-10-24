@@ -133,7 +133,7 @@ def add_food_item(request: HttpRequest):
         "post_form_url": reverse("FoodItem:add_food_item"),
         "cancel_button_url": reverse("landing_page")
     }
-    return render(request, "form.html", global_context | context)
+    return render(request, "FoodItem/form.html", global_context | context)
 
 @login_required
 def change_food_item(request: HttpRequest, fooditem_id):
@@ -153,6 +153,6 @@ def change_food_item(request: HttpRequest, fooditem_id):
             "post_form_url": reverse("FoodItem:change_food_item", kwargs={"fooditem_id": fooditem_id}),
             "cancel_button_url": reverse("landing_page")
         }
-        return render(request, "form.html", global_context | context)
+        return render(request, "FoodItem/form.html", global_context | context)
 
     return HttpResponse("Action not permitted.", status=403)
