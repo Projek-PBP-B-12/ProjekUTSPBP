@@ -12,6 +12,7 @@ class FoodItemForm(ModelForm):
             "purchase_date",
             "expiration_date",
             "status",
+            "image_url",
         ]
 
         labels = {
@@ -20,6 +21,7 @@ class FoodItemForm(ModelForm):
             "purchase_date": "Tanggal Beli",
             "expiration_date": "Tanggal Kedaluwarsa",
             "status": "Status",
+            "image_url": "URL Foto",
         }
 
         widgets = {

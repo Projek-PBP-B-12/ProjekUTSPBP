@@ -36,6 +36,7 @@ class FoodItem(models.Model):
     purchase_date = models.DateField(blank=True)
     expiration_date = models.DateField(blank=True)
     status = models.CharField(max_length=10, choices=FOOD_STATUSES, default="STORED")
+    image_url = models.URLField(blank=True, max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
