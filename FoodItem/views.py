@@ -156,3 +156,72 @@ def change_food_item(request: HttpRequest, fooditem_id):
         return render(request, "FoodItem/form.html", global_context | context)
 
     return HttpResponse("Action not permitted.", status=403)
+
+@require_POST
+def make_food_item_status_stored(request: HttpRequest, fooditem_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Authentication required."},
+            status=401,
+        )
+
+    fooditem = get_object_or_404(FoodItem, pk=fooditem_id)
+
+    if fooditem.owner == request.user or request.user.is_superuser:
+        fooditem.status = "STORED"
+        fooditem.save()
+        return JsonResponse(
+            {"message": "Status makanan berhasil diubah menjadi Stored!"},
+            status=200,
+        )
+
+    return JsonResponse(
+        {"message": "Request not permitted."},
+        status=403,
+    )
+
+@require_POST
+def make_food_item_status_consumed(request: HttpRequest, fooditem_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Authentication required."},
+            status=401,
+        )
+
+    fooditem = get_object_or_404(FoodItem, pk=fooditem_id)
+
+    if fooditem.owner == request.user or request.user.is_superuser:
+        fooditem.status = "CONSUMED"
+        fooditem.save()
+        return JsonResponse(
+            {"message": "Status makanan berhasil diubah menjadi Consumed!"},
+            status=200,
+        )
+
+    return JsonResponse(
+        {"message": "Request not permitted."},
+        status=403,
+    )
+
+@require_POST
+def make_food_item_status_offered(request: HttpRequest, fooditem_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Authentication required."},
+            status=401,
+        )
+
+    fooditem = get_object_or_404(FoodItem, pk=fooditem_id)
+
+    if fooditem.owner == request.user or request.user.is_superuser:
+        fooditem.status = "OFFERED"
+        fooditem.save()
+        return JsonResponse(
+            {"message": "Status makanan berhasil diubah menjadi Offered!"},
+            status=200,
+        )
+
+    return JsonResponse(
+        {"message": "Request not permitted."},
+        status=403,
+    )
