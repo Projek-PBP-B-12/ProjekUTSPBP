@@ -47,7 +47,7 @@ def get_food_items(request: HttpRequest):
         items = items.filter(name__icontains=name)
 
     if category:
-        items = items.filter(category=category)
+        items = items.filter(category=category.upper())
 
     if purchase_date:
         items = items.filter(purchase_date=purchase_date)
@@ -56,7 +56,7 @@ def get_food_items(request: HttpRequest):
         items = items.filter(expiration_date=expiration_date)
 
     if status:
-        items = items.filter(status=status)
+        items = items.filter(status=status.upper())
 
     if created_at:
         items = items.filter(created_at__date=created_at)
@@ -67,7 +67,7 @@ def get_food_items(request: HttpRequest):
     if expiration_state:
         items = [
             item for item in items
-            if item.expiration_state == expiration_state
+            if item.expiration_state == expiration_state.upper()
         ]
 
     data = [
