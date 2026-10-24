@@ -25,7 +25,7 @@ def get_food_items(request: HttpRequest):
     view_public = request.GET.get("view-public", "").lower() == "true"
 
     if view_public:
-        items = FoodItem.objects.filter(status="OFFERED")
+        items = FoodItem.objects.filter(status="OFFERED").exclude(owner=request.user)
     else:
         items = request.user.food_items.all()
 
