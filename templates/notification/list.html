@@ -1,0 +1,215 @@
+{% load static tz %}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ page_title }} | TitikLapar</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Lora:wght@400&amp;display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="{% static 'css/notification.css' %}">
+    <script src="{% static 'js/notification.js' %}" defer></script>
+</head>
+
+<body class="notification-page">
+    <div class="notif-shell">
+
+        <!-- Sidebar -->
+        <aside class="notif-sidebar">
+            <a
+                class="notif-brand"
+                href="{% url 'landing_page' %}"
+                aria-label="TitikLapar, halaman utama"
+            >
+                <span class="notif-brand-dot" aria-hidden="true"></span>
+                <span>TitikLapar</span>
+            </a>
+
+            <nav class="notif-navigation" aria-label="Navigasi aplikasi">
+                <a class="notif-nav-item" href="{% url 'landing_page' %}">
+                    Beranda
+                </a>
+
+                <span class="notif-nav-item" aria-disabled="true">
+                    Makananku
+                </span>
+
+                <a class="notif-nav-item" href="{% url 'FoodItem:add_food_item' %}">
+                    Tambah makanan
+                </a>
+
+                <a class="notif-nav-item" href="{% url 'sharedpost:list' %}">
+                    Papan berbagi
+                </a>
+
+                <span class="notif-nav-item" aria-disabled="true">
+                    Peta berbagi
+                </span>
+
+                <a
+                    class="notif-nav-item notif-nav-item-active"
+                    href="{% url 'notification:show_notification' %}"
+                    aria-current="page"
+                >
+                    Notifikasi
+                </a>
+
+                <span class="notif-nav-item" aria-disabled="true">
+                    Profil
+                </span>
+            </nav>
+        </aside>
+
+        <!-- Konten utama -->
+        <main class="notif-main">
+            <header class="notif-header">
+                <div class="notif-heading">
+                    <h1 class="notif-page-title">
+                        {{ page_title }}
+                    </h1>
+
+                    <p class="notif-page-summary">
+                        {{ page_summary }}
+                    </p>
+                </div>
+
+                <span
+                    id="notif-unread-count"
+                    class="notif-badge"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {{ unread_count }} belum dibaca
+                </span>
+            </header>
+
+            <section aria-label="Daftar pengingat makanan">
+                <!-- Pesan keberhasilan atau kegagalan -->
+                <p
+                    id="notif-feedback"
+                    class="notif-feedback"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <ul class="notif-card-grid">
+                    {% for notification in notifications %}
+                        <li
+                            class="notif-card{% if not notification.is_read %} notif-card-unread{% endif %}"
+                        >
+                            <article class="notif-card-content">
+
+                                <!-- Kategori dan status -->
+                                <header class="notif-card-header">
+                                    <span class="notif-card-category">
+                                        <span
+                                            class="notif-card-dot"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Pengingat makanan
+                                    </span>
+
+                                    <span
+                                        class="notif-card-status{% if notification.is_read %} notif-card-status-read{% endif %}"
+                                    >
+                                        {% if notification.is_read %}
+                                            Sudah dibaca
+                                        {% else %}
+                                            Belum dibaca
+                                        {% endif %}
+                                    </span>
+                                </header>
+
+                                <!-- Judul dan isi pesan -->
+                                <div class="notif-card-body">
+                                    <h2 class="notif-card-title">
+                                        {{ notification.title }}
+                                    </h2>
+
+                                    <p class="notif-card-message">
+                                        {{ notification.message }}
+                                    </p>
+                                </div>
+
+                                <!-- Waktu dan makanan terkait -->
+                                <footer class="notif-card-footer">
+                                    <time
+                                        class="notif-card-time"
+                                        datetime="{{ notification.created_at|date:'c' }}"
+                                    >
+                                        {{ notification.created_at|timezone:"Asia/Jakarta"|date:"d/m/Y, H.i" }}
+                                    </time>
+
+                                    {% if notification.food_item %}
+                                        <span class="notif-card-food">
+                                            {{ notification.food_item.name }}
+                                        </span>
+                                    {% endif %}
+                                </footer>
+
+                                <!-- Tombol status baca -->
+                                <div class="notif-card-actions">
+                                    {% if notification.is_read %}
+                                        <button
+                                            class="notif-read-button"
+                                            type="button"
+                                            disabled
+                                        >
+                                            Sudah dibaca
+                                        </button>
+                                    {% else %}
+                                        <form
+                                            class="notif-read-form"
+                                            method="post"
+                                            action="{% url 'notification:mark_read' notification.pk %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                class="notif-read-button"
+                                                type="submit"
+                                            >
+                                                Tandai sudah dibaca
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+
+                            </article>
+                        </li>
+                    {% empty %}
+                        <li class="notif-card-empty">
+                            <span
+                                class="notif-empty-mark"
+                                aria-hidden="true"
+                            ></span>
+
+                            <h2 class="notif-empty-title">
+                                Belum ada notifikasi
+                            </h2>
+
+                            <p class="notif-empty-message">
+                                Pengingat tentang makananmu akan muncul di sini.
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <p class="notif-read-note">
+                    Status “Belum dibaca” menunjukkan pesan baru.
+                    Membuka pesan tidak mengubah status makanan.
+                </p>
+            </section>
+        </main>
+
+    </div>
+</body>
+</html>
