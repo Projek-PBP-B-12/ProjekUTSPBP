@@ -11,7 +11,6 @@ class FoodItemForm(ModelForm):
             "category",
             "purchase_date",
             "expiration_date",
-            "status",
             "image_url",
         ]
 
@@ -20,7 +19,6 @@ class FoodItemForm(ModelForm):
             "category": "Kategori",
             "purchase_date": "Tanggal Beli",
             "expiration_date": "Tanggal Kedaluwarsa",
-            "status": "Status",
             "image_url": "URL Foto",
         }
 
