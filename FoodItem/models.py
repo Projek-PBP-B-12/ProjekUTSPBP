@@ -18,9 +18,9 @@ FOOD_CATEGORIES = [
 ]
 
 FOOD_STATUSES = [
-    ("STORED", "Stored"),
-    ("CONSUMED", "Consumed"),
-    ("OFFERED", "Offered to public"),
+    ("STORED", "STORED"),
+    ("CONSUMED", "CONSUMED"),
+    ("OFFERED", "OFFERED"),
 ]
 
 class FoodItem(models.Model):
