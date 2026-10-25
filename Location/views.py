@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render,get_object_or_404
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import ProtectedError
 from .services import GeocodingError, geocode_address
+from django.contrib.auth.decorators import login_required
 
 from .forms import LocationForm
 from .models import Location
@@ -89,3 +90,10 @@ def delete_location(request:HttpRequest, pk):
     except ProtectedError:
         return JsonResponse({"message": "Lokasi masih dipakai di penawaran"}, status=409)
     return JsonResponse({"message": "Location deleted."})
+
+
+# TODO: ganti dengan data penawaran asli (SharedPost) 
+
+@login_required
+def map_page(request):
+    return render(request, "Location/map.html", {"pins": []})
