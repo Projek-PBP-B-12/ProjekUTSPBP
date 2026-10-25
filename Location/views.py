@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import ProtectedError
 from .services import GeocodingError, geocode_address
+from django.contrib.auth.decorators import login_required
 
 from .forms import LocationForm
 from .models import Location
@@ -89,3 +90,77 @@ def delete_location(request:HttpRequest, pk):
     except ProtectedError:
         return JsonResponse({"message": "Lokasi masih dipakai di penawaran"}, status=409)
     return JsonResponse({"message": "Location deleted."})
+
+#
+# Lalu tempel kode di bawah ini di bagian paling bawah Location/views.py.
+
+# TODO: ganti dengan data penawaran asli (SharedPost) setelah disepakati dengan Justin.
+# Bentuk tiap item sengaja sama dengan kontrak JSON yang dibahas, supaya
+# template dan JavaScript tidak perlu berubah saat sumber datanya diganti.
+DUMMY_PINS = [
+    {
+        "id": 1,
+        "title": "Roti gandum, masih utuh",
+        "category": "Roti",
+        "description": "Beli dua, satu belum dibuka. Ambil di lobi kos putri.",
+        "photo_url": None,
+        "area_name": "Kukusan",
+        "latitude": "-6.366000",
+        "longitude": "106.818200",
+        "distance_km": 0.35,
+        "detail_url": "#",
+    },
+    {
+        "id": 2,
+        "title": "Sayur sop siap dimasak",
+        "category": "Sayuran",
+        "description": "Wortel, kol, dan buncis. Sudah dicuci bersih.",
+        "photo_url": None,
+        "area_name": "Kukusan",
+        "latitude": "-6.368900",
+        "longitude": "106.821500",
+        "distance_km": 0.8,
+        "detail_url": "#",
+    },
+    {
+        "id": 3,
+        "title": "Susu kedelai 2 botol",
+        "category": "Minuman",
+        "description": "Masih tersegel dan selalu disimpan dingin.",
+        "photo_url": None,
+        "area_name": "Beji",
+        "latitude": "-6.371500",
+        "longitude": "106.817000",
+        "distance_km": 1.2,
+        "detail_url": "#",
+    },
+    {
+        "id": 4,
+        "title": "Nasi putih masih hangat",
+        "category": "Nasi",
+        "description": "Sisa nasi dari acara kecil, masih bersih dan layak.",
+        "photo_url": None,
+        "area_name": "Kukusan",
+        "latitude": "-6.364200",
+        "longitude": "106.822800",
+        "distance_km": 0.5,
+        "detail_url": "#",
+    },
+    {
+        "id": 5,
+        "title": "Apel merah 6 buah",
+        "category": "Buah",
+        "description": "Dibeli terlalu banyak, masih segar dan mulus semua.",
+        "photo_url": None,
+        "area_name": "Beji",
+        "latitude": "-6.362500",
+        "longitude": "106.814500",
+        "distance_km": 0.95,
+        "detail_url": "#",
+    },
+]
+
+
+@login_required
+def map_page(request):
+    return render(request, "Location/map.html", {"pins": DUMMY_PINS})
