@@ -22,6 +22,7 @@ from TitikLapar.views import landing_page
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', landing_page, name='landing_page'),
+    path('location/', include('Location.urls')),
     path("berbagi/", include("SharedPost.urls")),
     path("fooditem/", include("FoodItem.urls")),
 ]
