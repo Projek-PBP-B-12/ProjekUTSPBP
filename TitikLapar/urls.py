@@ -24,4 +24,5 @@ urlpatterns = [
     path('', landing_page, name='landing_page'),
     path('fooditem/', include("FoodItem.urls")),
     path('berbagi/', include("SharedPost.urls")),
+    path("notification/", include("notification.urls")),
 ]
