@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_GET, require_POST
+from django.db.models import ProtectedError
+from .services import GeocodingError, geocode_address
 
 from .forms import LocationForm
 from .models import Location
@@ -18,6 +20,21 @@ def location_to_dict(location):
         },
     }
 
+
+@require_GET
+def search_locations(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return auth_required()
+    query = request.GET.get("q", "").strip()[:150]
+    if len(query) < 3:
+        return JsonResponse({"message": "Kata kunci minimal 3 karakter."}, status=400)
+    try:
+        results = geocode_address(query)
+    except GeocodingError as exc:
+        return JsonResponse({"message": str(exc)}, status=502)
+    return JsonResponse(results, safe=False)
+
+# Berisi lokasi yang sudah disimpan user
 def get_locations(request: HttpRequest):
     if not request.user.is_authenticated:
         return auth_required()
@@ -52,7 +69,7 @@ def create_location(request):
 @require_POST
 def update_location(request: HttpRequest, pk):
     if not request.user.is_authenticated:
-            return auth_required()
+        return auth_required()
     
     location = get_object_or_404(Location, pk=pk, owner=request.user)
     form = LocationForm(request.POST, instance=location)
@@ -62,10 +79,13 @@ def update_location(request: HttpRequest, pk):
     return JsonResponse(location_to_dict(location), status=201)
 
 @require_POST
-def delete_location(request, pk):
+def delete_location(request:HttpRequest, pk):
     if not request.user.is_authenticated:
         return auth_required()
     
     location = get_object_or_404(Location, pk=pk, owner=request.user)
-    location.delete()
+    try:
+        location.delete()
+    except ProtectedError:
+        return JsonResponse({"message": "Lokasi masih dipakai di penawaran"}, status=409)
     return JsonResponse({"message": "Location deleted."})
