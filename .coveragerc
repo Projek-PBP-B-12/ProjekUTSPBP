@@ -1,0 +1,11 @@
+[run]
+source = SharedPost
+branch = True
+omit =
+    */tests.py
+    */test_*.py
+    */migrations/*
+    */management/*
+
+[report]
+show_missing = True

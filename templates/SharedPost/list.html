@@ -1,0 +1,13 @@
+{% extends "SharedPost/base.html" %}
+{% block content %}
+<header class="page-heading"><div><span class="mobile-eyebrow">● FORUM DONASI</span><h1>Papan Berbagi</h1><p>Temukan makanan gratis yang masih layak di area sekitarmu.</p></div><a class="button primary" href="{% url 'sharedpost:create' %}" hx-get="{% url 'sharedpost:create' %}" hx-target="#post-form" hx-swap="innerHTML">+ Buat Penawaran</a></header>
+<p class="page-quote">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
+<div id="post-form" aria-live="polite"></div>
+<form id="board-filters" class="filters" method="get" action="{% url 'sharedpost:list' %}" hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
+<label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Cari makanan atau lokasi..." aria-label="Cari makanan atau lokasi"></label>
+<label class="filter-select"><span>Kategori</span><select name="category"><option value="">Semua kategori</option><option value="GRAIN">Roti & biji-bijian</option><option value="VEGETABLE">Sayuran</option><option value="BEVERAGE">Minuman</option><option value="FRUIT">Buah</option><option value="OTHER">Lainnya</option></select></label>
+<fieldset class="scope-tabs"><legend class="sr-only">Pemilik penawaran</legend><label><input type="radio" name="mine" value="0" {% if request.GET.mine != '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua Penawaran</span></label><label><input type="radio" name="mine" value="1" {% if request.GET.mine == '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label></fieldset>
+</form>
+<div id="board-feedback" class="feedback" role="status" aria-live="polite"></div>
+<div id="post-list" aria-live="polite" hx-get="{% url 'sharedpost:list' %}" hx-include="#board-filters" hx-trigger="postCreated from:body, postUpdated from:body" hx-swap="innerHTML">{% include "SharedPost/partials/post_list.html" %}</div>
+{% endblock %}

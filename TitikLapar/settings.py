@@ -37,13 +37,15 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "justin-evan-titiklapar.pws.cs.ui.ac.
 # Application definition
 
 INSTALLED_APPS = [
+    'FoodItem',
+    'Location',
+    'SharedPost',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'FoodItem',
 ]
 
 MIDDLEWARE = [
