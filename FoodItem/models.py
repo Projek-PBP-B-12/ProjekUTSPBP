@@ -33,9 +33,10 @@ class FoodItem(models.Model):
     
     name = models.CharField(max_length=150)
     category = models.CharField(max_length=20, choices=FOOD_CATEGORIES, default="OTHER")
-    purchase_date = models.DateField()
-    expiration_date = models.DateField()
+    purchase_date = models.DateField(blank=True)
+    expiration_date = models.DateField(blank=True)
     status = models.CharField(max_length=10, choices=FOOD_STATUSES, default="STORED")
+    image_url = models.URLField(blank=True, max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
