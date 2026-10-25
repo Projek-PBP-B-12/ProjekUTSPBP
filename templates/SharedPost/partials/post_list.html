@@ -1,0 +1,16 @@
+<p class="result-count">{{ posts|length }} penawaran aktif</p>
+<div class="post-grid">
+{% for post in posts %}
+<article class="post-card {% if post.food_item.owner_id == request.user.id %}owned{% endif %}">
+<div class="food-placeholder category-{{ post.food_item.category|lower }}" ><span class="placeholder-symbol" aria-hidden="true">{% if post.food_item.category == 'FRUIT' %}◉{% elif post.food_item.category == 'BEVERAGE' or post.food_item.category == 'DAIRY' %}▥{% else %}◒{% endif %}</span><span class="placeholder-label">{{ post.food_item.get_category_display }}</span>
+{% if post.food_item.image_url %}
+<img class="food-photo" src="{{ post.food_item.image_url }}" alt="{{ post.food_item.name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+{% endif %}{% if post.food_item.owner_id == request.user.id %}<span class="owner-badge">● Penawaran saya</span>{% endif %}</div>
+<div class="card-body"><div class="card-meta"><span class="category-pill">{{ post.food_item.get_category_display }}</span><span class="expiry">{% if post.food_item.days_until_expiration == 0 %}Hari ini{% else %}{{ post.food_item.days_until_expiration }} hari lagi{% endif %}</span></div><h2>{{ post.food_item.name }}</h2><p class="card-description">{{ post.description }}</p><p class="donor">Dari {{ post.food_item.owner.username }}</p><div class="card-footer"><span class="area">⌖ {{ post.location.area_name }}</span><span class="available">Tersedia</span></div>
+<a class="button secondary detail-link" href="{% url 'sharedpost:detail' post.pk %}">Lihat detail</a>
+{% if post.food_item.owner_id == request.user.id %}
+<div class="owner-actions"><form method="post" action="{% url 'sharedpost:complete' post.pk %}" hx-post="{% url 'sharedpost:complete' post.pk %}" hx-target="#post-list" hx-include="#board-filters" hx-swap="innerHTML" hx-confirm="Tandai makanan ini sudah diambil?" hx-disabled-elt="find button">{% csrf_token %}<button class="button primary" type="submit">Tandai Sudah Diambil</button></form>
+<div class="action-pair"><a class="button secondary" href="{% url 'sharedpost:update' post.pk %}" hx-get="{% url 'sharedpost:update' post.pk %}" hx-target="#post-form" hx-swap="innerHTML">✎ Edit</a><form method="post" action="{% url 'sharedpost:delete' post.pk %}" hx-post="{% url 'sharedpost:delete' post.pk %}" hx-target="#post-list" hx-include="#board-filters" hx-swap="innerHTML" hx-confirm="Yakin ingin menghapus penawaran ini?" hx-disabled-elt="find button">{% csrf_token %}<button class="button danger" type="submit">Hapus</button></form></div></div>
+{% endif %}</div></article>
+{% empty %}<section class="empty-state"><span class="empty-symbol" aria-hidden="true">◒</span><h2>Belum ada penawaran yang tersedia</h2><p>Coba pencarian lain, atau bagikan makanan yang masih layak dari inventorimu.</p></section>{% endfor %}
+</div>
