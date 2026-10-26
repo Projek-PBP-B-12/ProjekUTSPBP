@@ -6,7 +6,7 @@
 {% block page_summary %}Catat informasi dasar.{% endblock %}
 
 {% block content %}
-<form method="post" action="{{ post_form_url }}" style="display: flex; flex-direction: column; background-color: white; padding: 20px; border: 1px solid #dde4da; border-radius: 9px;">
+<form method="post" action="{{ post_form_url }}" class="card" style="display: flex; flex-direction: column;">
     {% csrf_token %}
     {% for field in form %}
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -19,9 +19,9 @@
         {% endfor %}
         <div style="margin-bottom: 12px;"></div>
     {% endfor %}
-    <div style="display: flex; gap: 10px; margin-top: 30px;">
-        <button type="submit">{{ submit_button_text }}</button>
-        <a href="{{ cancel_button_url }}">Batal</a>
+    <div style="display: flex; gap: 10px; margin-top: 17px;">
+        <button type="submit" class="button primary">{{ submit_button_text }}</button>
+        <a class="button secondary" href="{{ cancel_button_url }}">Batal</a>
     </div>
 </form>
 {% endblock %}
