@@ -1,6 +1,7 @@
 import requests
 from django.core.cache import cache
 import hashlib
+from math import asin, cos, radians, sin, sqrt
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 
@@ -73,3 +74,11 @@ def geocode_address(query, limit=5):
 
     cache.set(cache_key, results, CACHE_SECONDS)
     return results
+
+EARTH_RADIUS_KM = 6371.0088
+
+def distance_km(lat1, lon1, lat2, lon2):
+    # Jarak antara dua koordinat (rumus haversine), dalam kilometer
+    lat1, lon1, lat2, lon2 = (radians(float(v)) for v in (lat1, lon1, lat2, lon2))
+    a = sin((lat2 - lat1) / 2) ** 2 + cos(lat1) * cos(lat2) * sin((lon2 - lon1) / 2) ** 2
+    return 2 * EARTH_RADIUS_KM * asin(sqrt(a))
