@@ -39,7 +39,18 @@
                     <span class="badge badge-red">Sudah Kedaluarsa</span>
                 </td>
                 <td>
-                    <a href="#" class="detail-link">Detail ➞</a>
+                    <a href="#"
+                        class="detail-link"
+                        data-name="Bawang"
+                        data-category="Vegetable"
+                        data-purchase-date="24 Sep 2026"
+                        data-expiration-date="25 Sep 2026"
+                        data-status="STORED"
+                        data-expiration-state="EXPIRED"
+                        data-image-url=""
+                        data-change-url="/">
+                        Detail ➞
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -72,4 +83,97 @@
     </table>
 
 </div>
+
+<!-- Modal -->
+<div id="food-detail-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-food-name">Nama Makanan</h2>
+            </div>
+
+            <button id="modal-close" class="modal-x-close" aria-label="Tutup">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="detail-row">
+                <span>Kategori</span>
+                <strong id="modal-food-category">-</strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Tanggal Beli</span>
+                <strong id="modal-purchase-date">-</strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Tanggal Kedaluwarsa</span>
+                <strong id="modal-expiration-date">-</strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Status</span>
+                <strong id="modal-status">-</strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Status Kedaluarsa</span>
+                <strong id="modal-expiration-state">-</strong>
+            </div>
+
+            <div class="detail-row">
+                <span>Foto</span>
+                <img src="" style="width: 50%;" id="modal-image-url">
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a href="#" id="modal-change-url" class="button primary">Ubah</a>
+            <button id="modal-close" class="button secondary">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById("food-detail-modal");
+
+    const closeButtons = modal.querySelectorAll("#modal-close");
+
+    document.querySelectorAll(".detail-link").forEach(link => {
+        link.addEventListener("click", event => {
+            event.preventDefault();
+
+            document.getElementById("modal-food-name").textContent = link.dataset.name;
+            document.getElementById("modal-food-category").textContent = link.dataset.category;
+            document.getElementById("modal-purchase-date").textContent = link.dataset.purchaseDate;
+            document.getElementById("modal-expiration-date").textContent = link.dataset.expirationDate;
+            document.getElementById("modal-status").textContent = link.dataset.status;
+            document.getElementById("modal-expiration-state").textContent = link.dataset.expirationState;
+            document.getElementById("modal-image-url").src = link.dataset.imageUrl;
+            
+            document.getElementById("modal-change-url").href = link.dataset.changeUrl;
+
+            modal.classList.add("show");
+        });
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            modal.classList.remove("show");
+        });
+    });
+
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            modal.classList.remove("show");
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            modal.classList.remove("show");
+        }
+    })
+</script>
+
 {% endblock %}
