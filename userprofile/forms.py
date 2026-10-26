@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 class RegistrationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -16,3 +16,17 @@ class RegistrationForm(UserCreationForm):
         self.fields["username"].widget.attrs.update(
             {"autocomplete": "username", "autocapitalize": "none", "spellcheck": "false"}
         )
+
+class LoginForm(AuthenticationForm):
+    error_messages = {
+        "invalid_login": "Nama pengguna atau kata sandi tidak sesuai.",
+        "inactive": "Akun ini tidak dapat digunakan untuk masuk.",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].label = "Nama pengguna"
+        self.fields["username"].widget.attrs.update(
+            {"autocomplete": "username", "autocapitalize": "none", "spellcheck": "false"}
+        )
+        self.fields["password"].label = "Kata sandi"

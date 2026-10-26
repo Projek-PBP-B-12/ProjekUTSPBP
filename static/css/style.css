@@ -74,7 +74,8 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-a:focus-visible {
+a:focus-visible,
+button:focus-visible {
   outline: 3px solid #789b23;
   outline-offset: 5px;
 }
@@ -177,8 +178,14 @@ main {
   border: 1px solid transparent;
   border-radius: 7px;
   font-size: 13px;
+  font-family: inherit;
   font-weight: 700;
+  cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
+}
+
+.logout-form {
+  margin: 0;
 }
 
 .button:hover {
@@ -210,6 +217,7 @@ main {
 }
 
 /* 7. Hero: latar, judul, dan ajakan */
+
 .site-messages p {
   margin-block: 20px;
   padding: 16px 20px;

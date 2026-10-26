@@ -186,6 +186,21 @@
   text-align: center;
 }
 
+.account-switch {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.account-switch a {
+  color: var(--teal);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 @media (max-width: 800px) {
   .registration-nav {
     min-height: 76px;
