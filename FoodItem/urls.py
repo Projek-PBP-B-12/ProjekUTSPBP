@@ -12,4 +12,5 @@ urlpatterns = [
     path("api/change/<int:fooditem_id>/status/offered", make_food_item_status_offered, name="make_food_item_status_offered"),
     path("add/", add_food_item, name="add_food_item"),
     path("change/<int:fooditem_id>", change_food_item, name="change_food_item"),
+    path("makananku/", makananku, name="makananku"),
 ]

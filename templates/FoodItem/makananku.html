@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/fooditem.css' %}">
+{% endblock %}
+
+{% block title %}Makananku{% endblock %}
+{% block page_title %}Makananku{% endblock %}
+
+{% block page_summary %}Pantau inventori pribadi, diurutkan dari tanggal kedaluarsa terdekat.{% endblock %}
+
+{% block page_action %}<a href="{% url 'FoodItem:add_food_item' %}" class="button primary">＋ Tambah Makanan</a>{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; margin: 0 0 40px; justify-content: space-between;">
+        <h2 style="margin: 0; color: var(--title-color)">Inventori Pribadi</h2>
+        <p style="margin: 0; color: var(--faded-color)">3 Makanan</p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>MAKANAN</th>
+                <th>DIBELI</th>
+                <th>KEDALUARSA</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width: 30%;">
+                    <div class="food-title">Bawang</div>
+                    <div class="food-category">Vegetable</div>
+                </td>
+                <td style="color: var(--faded-color)">24 Sep 2026</td>
+                <td>
+                    <span class="badge badge-red">Sudah Kedaluarsa</span>
+                </td>
+                <td>
+                    <a href="#" class="detail-link">Detail ➞</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 30%;">
+                    <div class="food-title">Bayam</div>
+                    <div class="food-category">Vegetable</div>
+                </td>
+                <td style="color: var(--faded-color)">24 Sep 2026</td>
+                <td>
+                    <span class="badge badge-orange">Besok</span>
+                </td>
+                <td>
+                    <a href="#" class="detail-link">Detail ➞</a>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 30%;">
+                    <div class="food-title">Pisang</div>
+                    <div class="food-category">Fruit</div>
+                </td>
+                <td style="color: var(--faded-color)">24 Sep 2026</td>
+                <td>
+                    <span class="badge badge-green">5 hari</span>
+                </td>
+                <td>
+                    <a href="#" class="detail-link">Detail ➞</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

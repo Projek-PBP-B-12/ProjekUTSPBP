@@ -225,3 +225,7 @@ def make_food_item_status_offered(request: HttpRequest, fooditem_id):
         {"message": "Request not permitted."},
         status=403,
     )
+
+def makananku(request: HttpRequest):
+    context = {}
+    return render(request, "FoodItem/makananku.html", global_context | context)
