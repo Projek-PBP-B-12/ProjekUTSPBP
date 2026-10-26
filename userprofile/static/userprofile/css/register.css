@@ -1,0 +1,222 @@
+.registration-nav {
+  padding-inline: 0;
+}
+
+.back-link {
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.back-link span {
+  margin-left: 10px;
+}
+
+.registration-main {
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 5% 90%, #c3d9d5, transparent 45%),
+    radial-gradient(ellipse at 95% 8%, #e3edbd, transparent 40%),
+    #f8f8f0;
+}
+
+.registration-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(40px, 6vw, 90px);
+  padding-block: 56px;
+}
+
+.registration-intro h1 {
+  font-size: clamp(40px, 4.5vw, 64px);
+  line-height: 1.08;
+}
+
+.intro-description {
+  max-width: 410px;
+  margin: 26px 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.registration-note {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+  margin-top: 38px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.note-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--lime);
+  font-size: 24px;
+}
+
+.registration-card {
+  padding: clamp(24px, 3vw, 42px);
+  border: 1px solid #e2e7db;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 16px 48px #2739340d;
+}
+
+.card-kicker {
+  margin: 0 0 14px;
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.registration-card h2 {
+  margin: 0;
+  font: 400 36px/1.2 Georgia, 'Times New Roman', serif;
+  letter-spacing: -1px;
+}
+
+.card-description {
+  margin: 12px 0 28px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.form-field {
+  margin-block: 20px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fcfdf9;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.form-field input:focus-visible,
+.register-submit:focus-visible {
+  outline: 3px solid #789b23;
+  outline-offset: 3px;
+}
+
+.form-field input[aria-invalid="true"] {
+  border-color: #a33024;
+}
+
+.field-help,
+.errorlist {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.field-help {
+  color: var(--muted);
+}
+
+.field-help ul,
+.errorlist {
+  margin-bottom: 0;
+  padding-left: 18px;
+}
+
+.field-help ul {
+  margin-top: 0;
+}
+
+.errorlist,
+.form-summary {
+  color: #a33024;
+}
+
+.form-summary {
+  padding: 12px 14px;
+  border: 1px solid #ecc9c2;
+  border-radius: 8px;
+  background: #fff6f3;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.form-summary p {
+  margin: 0;
+}
+
+.register-submit {
+  width: 100%;
+  justify-content: space-between;
+  min-height: 48px;
+  margin-top: 4px;
+  padding-inline: 18px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.register-submit span {
+  font-size: 20px;
+}
+
+.registration-footnote {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .registration-nav {
+    min-height: 76px;
+  }
+
+  .registration-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 560px;
+    padding-block: 36px;
+  }
+
+  .registration-intro h1 {
+    font-size: 42px;
+  }
+
+  .registration-intro .eyebrow {
+    margin-bottom: 18px;
+    font-size: 10px;
+  }
+
+  .intro-description {
+    margin-bottom: 0;
+    font-size: 16px;
+  }
+
+  .registration-note {
+    display: none;
+  }
+
+  .back-link {
+    font-size: 12px;
+  }
+}
