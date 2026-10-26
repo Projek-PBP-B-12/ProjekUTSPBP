@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Peta Berbagi · TitikLapar{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="{% static 'css/location.css' %}">
+{% endblock %}
+
+{% block page_title %}Peta Berbagi{% endblock %}
+{% block page_summary %}Jelajahi penawaran di sekitar. Pin menunjukkan area umum.{% endblock %}
+
+{% block content %}
+<form class="map-search" id="map-search-form" data-search-url="{% url 'Location:search_locations' %}">
+  <label class="map-search-label" for="map-search-input">Cari lokasi</label>
+  <input class="map-search-input" id="map-search-input" type="search" placeholder="Masukkan alamat atau nama tempat" autocomplete="off">
+  <p class="map-search-hint" id="map-search-hint" aria-live="polite">Tulis nama yang mudah dikenali.</p>
+</form>
+
+<div class="map-canvas" id="map" role="application" aria-label="Peta penawaran makanan"></div>
+{{ pins|json_script:"pins-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{% static 'js/location.js' %}"></script>
+{% endblock %}

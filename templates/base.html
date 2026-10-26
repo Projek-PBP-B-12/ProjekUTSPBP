@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}TitikLapar{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="app-body">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="sidebar-brand" href="#"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <!-- Warna select muncul ketika udah ada pindah page (logic nya belum di-apply) -->
+      <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
+        <a class="sidebar-item" href="#">Beranda</a>
+        <a class="sidebar-item" href="#">Makananku</a>
+        <a class="sidebar-item" href="#">Tambah makanan</a>
+        <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}">Peta berbagi</a>
+        <a class="sidebar-item" href="#">Notifikasi</a>
+        <a class="sidebar-item" href="#">Profil</a>
+      </nav>
+    </aside>
+
+    <main class="app-main">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+          <p class="page-summary">{% block page_summary %}{% endblock %}</p>
+        </div>
+        <div class="page-action">{% block page_action %}{% endblock %}</div>
+      </header>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

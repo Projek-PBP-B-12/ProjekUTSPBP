@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'userprofile',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +151,7 @@ WHITENOISE_USE_FINDERS = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'userprofile:login'
+LOGIN_REDIRECT_URL = 'userprofile:profile'
+LOGOUT_REDIRECT_URL = 'landing_page'
