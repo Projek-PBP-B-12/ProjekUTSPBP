@@ -115,6 +115,9 @@
                                             aria-hidden="true"
                                         ></span>
                                         Pengingat makanan
+                                        {% if notification.reminder_days %}
+                                            · {{ notification.get_reminder_days_display }}
+                                        {% endif %}
                                     </span>
 
                                     <span
@@ -137,6 +140,13 @@
                                     <p class="notif-card-message">
                                         {{ notification.message }}
                                     </p>
+
+                                    {% if notification.expiry_date %}
+                                        <p class="notif-card-message">
+                                            Perkiraan kedaluwarsa:
+                                            {{ notification.expiry_date|date:"d/m/Y" }}
+                                        </p>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Waktu dan makanan terkait -->
