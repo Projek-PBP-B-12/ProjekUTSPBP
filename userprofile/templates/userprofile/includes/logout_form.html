@@ -1,0 +1,4 @@
+<form class="logout-form" method="post" action="{% url 'userprofile:logout' %}">
+  {% csrf_token %}
+  <button class="button button-primary" type="submit">Keluar</button>
+</form>

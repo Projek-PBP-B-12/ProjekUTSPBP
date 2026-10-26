@@ -28,23 +28,23 @@
         <a href="#fitur">Fitur</a>
         <a href="#berbagi">Forum Donasi</a>
       </div>
-      <!-- Ganti URL berikut dengan route autentikasi aplikasi kamu. -->
       <div class="nav-actions">
-        <a class="button button-outline" href="login.html">Login</a>
-        <a class="button button-primary" href="{% url 'userprofile:register' %}">Daftar</a>
+        {% if user.is_authenticated %}
+          <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
+          {% include 'userprofile/includes/logout_form.html' %}
+        {% else %}
+          <a class="button button-outline" href="{% url 'userprofile:login' %}">Login</a>
+          <a class="button button-primary" href="{% url 'userprofile:register' %}">Daftar</a>
+        {% endif %}
       </div>
     </nav>
   </header>
 
   <main>
     {% if messages %}
-    <div class="site-messages container" role="status">
-      {% for message in messages %}
-      <p>
-        {{ message }}
-      </p>
-      {% endfor %}
-    </div>
+      <div class="site-messages container" role="status">
+        {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+      </div>
     {% endif %}
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-inner container">
@@ -54,7 +54,11 @@
           <h1 id="hero-title">Selamatkan<br>makanan sebelum<br>terlupakan.</h1>
           <p class="hero-description">TitikLapar membantu mahasiswa mencatat isi kulkas bersama, mengingat batas simpan, lalu membagikan makanan yang masih layak ke tetangga kos.</p>
           <div class="hero-actions">
-            <a class="button button-primary start-button" href="{% url 'userprofile:register' %}">Mulai Sekarang</a>
+            {% if user.is_authenticated %}
+              <a class="button button-primary start-button" href="{% url 'userprofile:profile' %}">Buka Profilku</a>
+            {% else %}
+              <a class="button button-primary start-button" href="{% url 'userprofile:register' %}">Mulai Sekarang</a>
+            {% endif %}
             <span class="free-note"><svg class="icon"><use href="#icon-check"/></svg>Gratis untuk mulai</span>
           </div>
           <ul class="trust-list" aria-label="Keunggulan TitikLapar">
