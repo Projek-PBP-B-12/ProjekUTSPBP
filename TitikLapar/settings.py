@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(BASE_DIR / ".env")
 
 # Cross-Site Request Forgery
 CSRF_TRUSTED_ORIGINS = []
@@ -132,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "Asia/Jakarta"
 
 USE_I18N = True
 
