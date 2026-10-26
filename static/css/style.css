@@ -210,6 +210,15 @@ main {
 }
 
 /* 7. Hero: latar, judul, dan ajakan */
+.site-messages p {
+  margin-block: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--teal);
+  background: #e3f1ef;
+  line-height: 1.5;
+}
 
 .hero {
   flex: 1;
