@@ -1,0 +1,288 @@
+/*
+ * Tampilan halaman website setelah login.
+ *
+ */
+
+/* Variabel  */
+
+:root {
+  /* Color */
+  --color-text-primary: #20302b;
+  --color-text-secondary: #52635d;
+  --color-text-inverse: #ffffff;
+  --color-action-primary: #176d70;
+  --color-action-hover: #6ea0a2;
+  --color-accent-lime: #c8da73;
+  --color-border-default: #d7ded5;
+  --color-surface-canvas: #f7f7f0;
+  --color-surface-card: #ffffff;
+  --color-surface-soft: #e6ecd9;
+  --teal: #176e72;
+
+  /* Radius */
+  --radius-8: 8px;
+  --radius-12: 12px;
+
+  /* Font family. Text style Figma: Heading = Lora 400 32/38,
+     Label = Inter 600 13/18, Body = Inter 400 14/21, Caption = Inter 400 12/17 */
+  --font-heading: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', Arial, Helvetica, sans-serif;
+
+  --sidebar-width: 240px;
+}
+
+/* 2. Dasar */
+
+* {
+  box-sizing: border-box;
+}
+
+.app-body {
+  margin: 0;
+  background: var(--color-surface-canvas);
+  color: var(--color-text-primary);
+  font: 400 14px/21px var(--font-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 3. Layout */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app-main {
+  min-width: 0;
+  padding: 48px;
+}
+
+/* 4. Sidebar */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 36px 22px;
+  background: var(--color-surface-card);
+  border-right: 1px solid var(--color-border-default);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 40px;
+  font: 600 13px/18px var(--font-body);
+}
+
+.brand-dot {
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-accent-lime);
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 8px;
+  margin-top: 44px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-inline: 13px;
+  border-radius: var(--radius-8);
+  color: var(--color-text-secondary);
+  font: 600 13px/18px var(--font-body);
+  white-space: nowrap;
+}
+
+.sidebar-item:hover {
+  background: var(--color-action-hover);
+  color: var(--color-text-inverse);
+}
+
+.sidebar-item-active,
+.sidebar-item-active:hover {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+}
+
+.sidebar-item:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 2px;
+}
+
+/* 5. Header halaman */
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.page-title {
+  margin: 0;
+  font: 400 32px/38px var(--font-heading);
+}
+
+.page-summary {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+}
+
+.page-summary:empty,
+.page-action:empty {
+  display: none;
+}
+
+/* 6. Tombol (dipakai ulang dari landing page, dengan variabel) */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 30px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-8);
+  font: 600 13px/18px var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s, filter 0.2s;
+}
+
+.button-primary {
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+}
+
+.button-primary:hover {
+  filter: brightness(0.9);
+}
+
+.button-outline {
+  background: var(--color-surface-card);
+  color: var(--color-action-primary);
+  border-color: var(--color-border-default);
+}
+
+.button-outline:hover {
+  background: var(--color-surface-soft);
+}
+
+/* 7. Responsif */
+
+@media (max-width: 800px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    padding: 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .sidebar-brand {
+    padding-inline: 0;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    margin-top: 16px;
+    overflow-x: auto;
+  }
+
+  .sidebar-item {
+    flex-shrink: 0;
+  }
+
+  .app-main {
+    padding: 24px 20px;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+}
+
+/* 8. Aksesibilitas: preferensi gerakan */
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+
+
+
+.card {
+  background-color: white;
+  padding: 30px;
+  border: 1px solid #dde4da;
+  border-radius: 9px;
+}
+
+.label-form, label {
+  display: block;
+  margin-bottom: 6px;
+  font: 600 13px / 18px var(--font-body);
+}
+
+.help-text, small {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font: 400 12px / 17px var(--font-body);
+}
+
+input, select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-8);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font: 400 14px / 21px var(--font-body);
+}
+
+.button {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 9px 19px;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.4;
+  font-weight: 100;
+}
+
+.button.primary {
+  background: var(--teal);
+  color: white;
+}
+
+.button.secondary {
+  background: white;
+  border-color: #bbcfc5;
+  color: var(--teal);
+}

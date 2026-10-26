@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Daftar akun — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/register.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container registration-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <a class="back-link" href="{% url 'landing_page' %}">Kembali ke beranda <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main class="registration-main">
+    <div class="registration-layout container">
+      <section class="registration-intro" aria-labelledby="intro-title">
+        <p class="eyebrow"><span></span>MULAI DARI KULKASMU</p>
+        <h1 id="intro-title">Lebih sedikit sisa.<br>Lebih banyak<br>cerita berbagi.</h1>
+        <p class="intro-description">Satu akun untuk mencatat makananmu dan terhubung dengan tetangga yang ingin berbagi.</p>
+        <div class="registration-note">
+          <span class="note-mark" aria-hidden="true">↗</span>
+          <p>Langkah kecil dari dapurmu bisa berarti besar bagi orang lain.</p>
+        </div>
+      </section>
+
+      <section class="registration-card" aria-labelledby="register-title">
+        <p class="card-kicker">SELAMAT DATANG DI TITIKLAPAR</p>
+        <h2 id="register-title">Buat akunmu.</h2>
+        <p class="card-description">Mulai dengan nama pengguna dan kata sandi.</p>
+        <form method="post" action="{% url 'userprofile:register' %}">
+          {% csrf_token %}
+          {% if form.errors %}
+            <div class="form-summary" role="alert">
+              <p>Periksa kembali isianmu.</p>
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+          {% for field in form %}
+            <div class="form-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}
+                <div class="field-help" id="{{ field.auto_id }}_helptext">{{ field.help_text|safe }}</div>
+              {% endif %}
+              {{ field.errors }}
+            </div>
+          {% endfor %}
+          <button class="button button-primary register-submit" type="submit">Buat akun <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="account-switch">Sudah punya akun? <a href="{% url 'userprofile:login' %}">Login di sini</a></p>
+        <p class="registration-footnote">Gratis untuk mulai. Selamatkan makanan, satu langkah setiap hari.</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

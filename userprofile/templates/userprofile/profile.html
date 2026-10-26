@@ -1,0 +1,66 @@
+{% load static l10n %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Profilku — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container profile-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <div class="nav-actions">
+        <a class="button button-outline" href="{% url 'landing_page' %}">Beranda</a>
+        {% include 'userprofile/includes/logout_form.html' %}
+      </div>
+    </nav>
+  </header>
+  <main class="profile-main">
+    <div class="profile-layout container">
+      <header class="profile-heading">
+        <p class="eyebrow"><span></span>RUANG PRIBADIMU</p>
+        <h1>Profilku.</h1>
+        <p>Identitas dan informasi kontak untuk cerita berbagi yang lebih dekat.</p>
+      </header>
+      <div class="profile-columns">
+        <section class="identity-card" aria-labelledby="identity-title">
+          <span class="profile-avatar" aria-hidden="true">{{ user.username|first|upper }}</span>
+          <p class="profile-kicker">AKUN TITIKLAPAR</p>
+          <h2 id="identity-title">{{ user.username }}</h2>
+          <p class="joined-date">Bergabung {{ user.date_joined|date:"d/m/Y" }}</p>
+          <div class="identity-note"><span aria-hidden="true">↗</span><p>Langkah kecilmu bisa membantu makanan sampai ke orang yang membutuhkan.</p></div>
+        </section>
+        <div class="profile-details">
+          <section class="detail-card" aria-labelledby="contact-title">
+            <p class="profile-kicker">TETAP TERHUBUNG</p>
+            <h2 id="contact-title">Kontak berbagi</h2>
+            <p class="section-description">Kontak untuk berkomunikasi saat berbagi makanan.</p>
+            <dl class="profile-values">
+              <div><dt>Nomor WhatsApp</dt><dd>{{ profile.whatsapp_number|default:"Belum diisi" }}</dd></div>
+              <div><dt>ID Line</dt><dd>{{ profile.line_id|default:"Belum diisi" }}</dd></div>
+            </dl>
+          </section>
+          <section class="detail-card" aria-labelledby="location-title">
+            <p class="profile-kicker">AREA PILIHANMU</p>
+            <h2 id="location-title">Lokasi bawaan</h2>
+            <p class="section-description">Titik awal peta pribadimu, terpisah dari lokasi pengambilan makanan.</p>
+            {% if profile and profile.default_latitude != None and profile.default_longitude != None %}
+              <dl class="profile-values coordinates">
+                <div><dt>Lintang</dt><dd>{{ profile.default_latitude|unlocalize }}</dd></div>
+                <div><dt>Bujur</dt><dd>{{ profile.default_longitude|unlocalize }}</dd></div>
+              </dl>
+            {% else %}
+              <p class="empty-location">Belum diisi</p>
+            {% endif %}
+          </section>
+          <p class="profile-privacy">Halaman ini hanya menampilkan profil akun yang sedang kamu gunakan.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

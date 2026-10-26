@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Login — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/register.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container registration-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <a class="back-link" href="{% url 'landing_page' %}">Kembali ke beranda <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+  <main class="registration-main">
+    <div class="registration-layout container">
+      <section class="registration-intro" aria-labelledby="intro-title">
+        <p class="eyebrow"><span></span>SELAMAT DATANG KEMBALI</p>
+        <h1 id="intro-title">Cerita berbagi<br>dimulai<br>dari sini.</h1>
+        <p class="intro-description">Masuk ke akunmu dan lanjutkan langkah kecil untuk mengurangi makanan yang terbuang.</p>
+        <div class="registration-note">
+          <span class="note-mark" aria-hidden="true">↗</span>
+          <p>Makanan yang masih baik bisa menjadi kabar baik untuk tetangga.</p>
+        </div>
+      </section>
+      <section class="registration-card" aria-labelledby="login-title">
+        <p class="card-kicker">AKUN TITIKLAPAR</p>
+        <h2 id="login-title">Masuk ke akunmu.</h2>
+        <p class="card-description">Gunakan nama pengguna dan kata sandi saat mendaftar.</p>
+        <form method="post" action="{% url 'userprofile:login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          {% if form.errors %}
+            <div class="form-summary" role="alert">
+              {% if form.non_field_errors %}{{ form.non_field_errors }}{% else %}<p>Periksa kembali isianmu.</p>{% endif %}
+            </div>
+          {% endif %}
+          {% for field in form %}
+            <div class="form-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {{ field.errors }}
+            </div>
+          {% endfor %}
+          <button class="button button-primary register-submit" type="submit">Masuk <span aria-hidden="true">↗</span></button>
+        </form>
+        <p class="account-switch">Belum punya akun? <a href="{% url 'userprofile:register' %}">Daftar sekarang</a></p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -37,15 +37,17 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "justin-evan-titiklapar.pws.cs.ui.ac.
 # Application definition
 
 INSTALLED_APPS = [
-    'Location',
-    'SharedPost',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'FoodItem',
+    'Location',
+    'SharedPost',
+    'userprofile',
     'notification',
 ]
 
@@ -177,3 +179,7 @@ WHITENOISE_USE_FINDERS = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'userprofile:login'
+LOGIN_REDIRECT_URL = 'userprofile:profile'
+LOGOUT_REDIRECT_URL = 'landing_page'

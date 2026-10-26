@@ -11,17 +11,20 @@ class FoodItemForm(ModelForm):
             "category",
             "purchase_date",
             "expiration_date",
-            "status",
             "image_url",
         ]
 
         labels = {
             "name": "Nama Makanan",
             "category": "Kategori",
-            "purchase_date": "Tanggal Beli",
-            "expiration_date": "Tanggal Kedaluwarsa",
-            "status": "Status",
-            "image_url": "URL Foto",
+            "purchase_date": "Tanggal Beli (opsional)",
+            "expiration_date": "Tanggal Kedaluwarsa (opsional)",
+            "image_url": "URL Foto (opsional)",
+        }
+
+        help_texts = {
+            "purchase_date": "Jika kosong, akan digunakan tanggal hari ini.",
+            "expiration_date": "Jika kosong, akan digunakan tanggal hari ini.",
         }
 
         widgets = {

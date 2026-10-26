@@ -80,7 +80,7 @@ def get_food_items(request: HttpRequest):
                 "category": item.get_category_display(),
                 "purchase_date": str(item.purchase_date),
                 "expiration_date": str(item.expiration_date),
-                "status": item.get_status_display(),
+                "status": item.status,
                 "image_url": item.image_url,
                 "days_until_expiration": item.days_until_expiration,
                 "is_expired": item.is_expired,

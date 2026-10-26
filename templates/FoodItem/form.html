@@ -1,23 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }}</title>
-</head>
-<body>
-    <h1>{{ page_title }}</h1>
-    <form method="post" action="{{ post_form_url }}">
-        {% csrf_token %}
-        {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% for error in field.errors %}
-                <p style="color: red;">{{ error }}</p>
-            {% endfor %}
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block page_summary %}Catat informasi dasar.{% endblock %}
+
+{% block content %}
+<form method="post" action="{{ post_form_url }}" class="card" style="display: flex; flex-direction: column;">
+    {% csrf_token %}
+    {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+            <p style="color: red;">{{ error }}</p>
         {% endfor %}
-        <button type="submit">{{ submit_button_text }}</button>
-        <a href="{{ cancel_button_url }}">Batal</a>
-    </form>
-</body>
-</html>
+        <div style="margin-bottom: 12px;"></div>
+    {% endfor %}
+    <div style="display: flex; gap: 10px; margin-top: 17px;">
+        <button type="submit" class="button primary">{{ submit_button_text }}</button>
+        <a class="button secondary" href="{{ cancel_button_url }}">Batal</a>
+    </div>
+</form>
+{% endblock %}

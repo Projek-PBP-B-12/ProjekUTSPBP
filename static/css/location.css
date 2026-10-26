@@ -1,0 +1,111 @@
+/*
+ * Style halaman Peta Berbagi.
+ * Memakai variabel dari app.css (load lewat base.html).
+ */
+
+/* 1. Kolom pencarian */
+
+.map-search {
+    margin-bottom: 24px;
+}
+
+.map-search-label {
+  display: block;
+  margin-bottom: 6px;
+  font: 600 13px/18px var(--font-body);
+}
+
+.map-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-8);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font: 400 14px/21px var(--font-body);
+}
+
+.map-search-input:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 2px;
+}
+
+.map-search-hint {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font: 400 12px/17px var(--font-body);
+}
+
+/* 2. Peta */
+
+.map-canvas {
+  height: 590px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-12);
+  overflow: hidden;
+}
+
+/* 3. Pin bernomor */
+
+.map-pin {
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--color-surface-card);
+  border-radius: 50%;
+  background: var(--color-action-primary);
+  color: var(--color-text-inverse);
+  font: 600 13px/18px var(--font-body);
+}
+
+.map-pin:hover {
+  background: var(--color-action-hover);
+}
+
+/* 4. Popup penawaran.
+   Selektor diawali .map-popup supaya menang atas gaya bawaan Leaflet. */
+
+.map-popup .leaflet-popup-content-wrapper {
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.map-popup .leaflet-popup-content {
+  margin: 0;
+  font: 400 14px/21px var(--font-body);
+}
+
+.map-popup .leaflet-popup-close-button {
+  top: 4px;
+  right: 4px;
+}
+
+.map-popup .map-popup-photo {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-12);
+  background: var(--color-surface-soft);
+}
+
+.map-popup .map-popup-title {
+  margin: 12px 0 0;
+  font: 600 13px/18px var(--font-body);
+}
+
+.map-popup .map-popup-distance {
+  margin: 4px 0 0;
+  color: var(--color-action-primary);
+  font: 400 12px/17px var(--font-body);
+}
+
+.map-popup .map-popup-desc {
+  margin: 8px 0 12px;
+  color: var(--color-text-secondary);
+}
+
+.map-popup .map-popup-claim {
+  width: 100%;
+  color: var(--color-text-inverse);
+}
