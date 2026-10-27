@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Edit profil — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/register.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container profile-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <div class="nav-actions">
+        <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
+        {% include 'userprofile/includes/logout_form.html' %}
+      </div>
+    </nav>
+  </header>
+  <main class="profile-main">
+    <div class="profile-layout container">
+      <header class="profile-heading">
+        <p class="eyebrow"><span></span>SEDIKIT INFO, LEBIH MUDAH BERBAGI</p>
+        <h1>Atur profilmu.</h1>
+        <p>Lengkapi cara menghubungimu dan titik awal peta yang kamu pilih.</p>
+      </header>
+      <div class="profile-columns">
+        <aside class="identity-card edit-guide" aria-labelledby="guide-title">
+          <p class="profile-kicker">UNTUK {{ user.username }}</p>
+          <h2 id="guide-title">Kamu yang mengatur.</h2>
+          <div class="guide-item"><span aria-hidden="true">01</span><div><h3>Kontak untuk berbagi</h3><p>WhatsApp dan ID Line dapat dilihat pengguna TitikLapar yang sudah login. Isi kontak yang ingin kamu bagikan.</p></div></div>
+          <div class="guide-item"><span aria-hidden="true">02</span><div><h3>Lokasi tetap pribadi</h3><p>Koordinat ini untuk pusat peta pribadimu. Lokasi pengambilan makanan diatur pada posting berbagi.</p></div></div>
+          <p class="profile-privacy">Semua isian opsional. Kosongkan kontak untuk menghapusnya; kosongkan kedua koordinat untuk menghapus lokasi bawaan.</p>
+        </aside>
+        <form class="profile-details edit-form" method="post" action="{% url 'userprofile:profile_edit' %}" novalidate>
+          {% csrf_token %}
+          {% if form.errors %}
+            <div class="form-summary" role="alert"><p>Profil belum disimpan. Periksa kembali isianmu.</p>{{ form.non_field_errors }}</div>
+          {% endif %}
+          <section class="detail-card" aria-labelledby="edit-contact-title">
+            <p class="profile-kicker">TETAP TERHUBUNG</p>
+            <h2 id="edit-contact-title">Kontak berbagi</h2>
+            <p class="section-description">Pilih cara yang nyaman untuk berkomunikasi.</p>
+            {% include 'userprofile/includes/profile_field.html' with field=form.whatsapp_number only %}
+            {% include 'userprofile/includes/profile_field.html' with field=form.line_id only %}
+          </section>
+          <section class="detail-card" aria-labelledby="edit-location-title">
+            <p class="profile-kicker">AREA PILIHANMU</p>
+            <h2 id="edit-location-title">Lokasi bawaan</h2>
+            <p class="section-description">Masukkan koordinat area pilihanmu. Kamu tidak perlu memberikan akses GPS.</p>
+            {% include 'userprofile/includes/profile_field.html' with field=form.default_latitude only %}
+            {% include 'userprofile/includes/profile_field.html' with field=form.default_longitude only %}
+          </section>
+          <div class="profile-actions edit-actions">
+            <button class="button button-primary" type="submit">Simpan perubahan</button>
+            <a class="button button-outline" href="{% url 'userprofile:profile' %}">Batal</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

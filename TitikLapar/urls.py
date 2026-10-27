@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('userprofile.urls')),
     path('', landing_page, name='landing_page'),
+    path('fooditem/', include('FoodItem.urls')),
+    path('berbagi/', include('SharedPost.urls')),
     path('location/', include('Location.urls')),
-    path("berbagi/", include("SharedPost.urls")),
-    path("fooditem/", include("FoodItem.urls")),
+    path('notification/', include('notification.urls')),
 ]

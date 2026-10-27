@@ -1,3 +1,7 @@
 {% extends "SharedPost/base.html" %}
-{% block title %}Buat Penawaran{% endblock %}
-{% block content %}<header class="page-heading"><div><h1>Bagikan Makanan</h1><p>Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p></div></header>{% include "SharedPost/partials/create_form.html" %}{% endblock %}
+{% block title %}Buat Penawaran · TitikLapar{% endblock %}
+{% block page_title %}Bagikan Makanan{% endblock %}
+{% block page_summary %}Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.{% endblock %}
+{% block content %}
+    {% include "SharedPost/partials/create_form.html" %}
+{% endblock %}
