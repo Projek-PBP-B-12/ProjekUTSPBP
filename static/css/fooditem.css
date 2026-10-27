@@ -1,0 +1,160 @@
+:root {
+    --title-color: #1a1a1a;
+    --faded-color: #555555;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.table th, .table td {
+    border-bottom: 1px solid #dde4da;
+}
+
+.table th {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--faded-color);
+    padding-bottom: 16px;
+    
+}
+
+.table td {
+    padding: 20px 0;
+    vertical-align: middle;
+}
+
+.food-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--title-color);
+    margin: 0;
+}
+
+.food-category {
+    font-size: 13px;
+    color: var(--faded-color);
+    margin-top: 4px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-orange {
+    background-color: #ffefe0;
+    color: #92400e;
+}
+
+.badge-green {
+    background-color: #e4eee0;
+    color: #2e4a2b;
+}
+
+.badge-red {
+    background-color: #fec2c2;
+    color: #9b2828;
+}
+
+.detail-link {
+    color: #1d6b62;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    float: left;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+.hide {
+    display: none !important;
+}
+
+
+
+
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--card-color, white);
+    color: var(--title-color, #222);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.modal-header h2 {
+    margin: 0 0 6px;
+    color: var(--title-color);
+}
+
+.modal-x-close {
+    border: none;
+    background: transparent;
+    color: var(--faded-color);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.detail-row span {
+    color: var(--faded-color);
+}
+
+.detail-row strong {
+    text-align: right;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+}

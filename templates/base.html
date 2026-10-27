@@ -16,8 +16,8 @@
       <a class="sidebar-brand" href="#"><span class="brand-dot"></span><span>TitikLapar</span></a>
       <!-- Warna select muncul ketika udah ada pindah page (logic nya belum di-apply) -->
       <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
-        <a class="sidebar-item" href="{% url 'landing_page' %}">Beranda</a>
-        <a class="sidebar-item" href="#">Makananku</a>
+        <a class="sidebar-item" href="#">Beranda</a>
+        <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:makananku' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}">Makananku</a>
         <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'sharedpost' %} sidebar-item-active{% endif %}" href="{% url 'sharedpost:list' %}"{% if request.resolver_match.namespace == 'sharedpost' %} aria-current="page"{% endif %}>Papan berbagi</a>
         <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}">Peta berbagi</a>
