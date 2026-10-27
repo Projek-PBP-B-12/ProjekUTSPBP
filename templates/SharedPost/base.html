@@ -1,21 +1,28 @@
+{% extends "base.html" %}
 {% load static %}
-<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}Papan Berbagi{% endblock %} · TitikLapar</title>
-<link rel="stylesheet" href="{% static 'css/sharedpost.css' %}">
-<script src="{% static 'js/htmx.min.js' %}" defer></script>
-<script src="{% static 'js/sharedpost-ui.js' %}" defer></script>
-</head>
-<body>
-<header class="mobile-header"><a class="brand" href="/"> <span class="brand-dot"></span>TitikLapar</a><button class="menu-toggle" aria-controls="sidebar" aria-expanded="false" type="button">☰ <span>Menu</span></button></header>
+
+{% block title %}Papan Berbagi · TitikLapar{% endblock %}
+{% block body_class %}sharedpost-page{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/sharedpost.css' %}">
+{% endblock %}
+
+{% block body_top %}
+<header class="mobile-header">
+    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
+    <button class="menu-toggle" aria-controls="sidebar" aria-expanded="false" type="button">☰ <span>Menu</span></button>
+</header>
 <button class="sidebar-backdrop" aria-label="Tutup menu" hidden></button>
-<aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
-<a class="brand" href="/"><span class="brand-dot"></span>TitikLapar</a>
-<button class="menu-close" type="button" aria-label="Tutup menu">×</button>
-<nav><a href="/">Beranda</a><a class="active" href="{% url 'sharedpost:list' %}" aria-current="page">Papan berbagi</a></nav>
-<p class="sidebar-note">Sedikit berbagi,<br>banyak berarti.</p>
-</aside>
-<main class="main-content">{% block content %}{% endblock %}</main>
-</body></html>
+{% endblock %}
+
+{% block sidebar_controls %}
+    <button class="menu-close" type="button" aria-label="Tutup menu">×</button>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
+    <script src="{% static 'js/sharedpost-ui.js' %}" defer></script>
+{% endblock %}
