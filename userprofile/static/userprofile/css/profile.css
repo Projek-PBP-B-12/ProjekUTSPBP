@@ -58,7 +58,7 @@
   font: 400 28px/1.25 Georgia, 'Times New Roman', serif;
 }
 
-.identity-card h2 { font-size: 30px; }
+.identity-card h2 { font-size: clamp(24px, 2.5vw, 30px); }
 
 .joined-date { color: var(--muted); font-size: 13px; line-height: 1.7; }
 
@@ -103,6 +103,22 @@
 }
 
 .profile-privacy { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 0; }
+
+.profile-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.profile-text-link { display: inline-block; margin-top: 20px; color: var(--teal); font-size: 13px; text-decoration: underline; text-underline-offset: 4px; line-height: 1.6; }
+.profile-details .site-messages p { margin: 0; }
+.edit-form { min-width: 0; }
+.edit-guide .profile-privacy { border-top: 1px solid #cdd7bd; padding-top: 22px; }
+.guide-item { display: flex; gap: 14px; margin-block: 28px; }
+.guide-item > span { flex: 0 0 30px; white-space: nowrap; color: var(--teal); font: 24px Georgia, 'Times New Roman', serif; }
+.guide-item > div { min-width: 0; }
+.guide-item h3 { margin: 0 0 8px; font-size: 14px; }
+.guide-item p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.optional-label { margin-left: 8px; color: var(--muted); font-size: 11px; font-weight: 400; }
+.edit-form .form-field:last-child { margin-bottom: 0; }
+.edit-actions { margin-top: 0; }
+.contact-button { margin-top: 24px; gap: 16px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 800px) {
   .profile-nav { min-height: 80px; }
