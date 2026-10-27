@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Kontak berbagi — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container profile-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <div class="nav-actions">
+        <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
+        {% include 'userprofile/includes/logout_form.html' %}
+      </div>
+    </nav>
+  </header>
+  <main class="profile-main">
+    <div class="profile-layout container">
+      <header class="profile-heading">
+        <p class="eyebrow"><span></span>DARI TETANGGA, UNTUK TETANGGA</p>
+        <h1>Mulai percakapan.</h1>
+        <p>Hubungi pemilik makanan untuk menyepakati pengambilan.</p>
+      </header>
+      <div class="profile-columns">
+        <section class="identity-card" aria-labelledby="donor-title">
+          <span class="profile-avatar" aria-hidden="true">{{ contact.username|first|upper }}</span>
+          <p class="profile-kicker">KONTAK BERBAGI</p>
+          <h2 id="donor-title">{{ contact.username }}</h2>
+          <div class="identity-note"><span aria-hidden="true">↗</span><p>Sapa dengan ramah, lalu sepakati waktu dan tempat pengambilan bersama.</p></div>
+        </section>
+        <div class="profile-details">
+          <section class="detail-card" aria-labelledby="donor-contact-title">
+            <p class="profile-kicker">TETAP TERHUBUNG</p>
+            <h2 id="donor-contact-title">Pilihan kontak</h2>
+            <dl class="profile-values">
+              <div><dt>Nomor WhatsApp</dt><dd>{{ contact.whatsapp_number|default:"Belum diisi" }}</dd></div>
+              <div><dt>ID Line</dt><dd>{{ contact.line_id|default:"Belum diisi" }}</dd></div>
+            </dl>
+            {% if whatsapp_url %}<a class="button button-primary contact-button" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp <span aria-hidden="true">↗</span><span class="sr-only"> (buka tab baru)</span></a>{% endif %}
+            {% if contact.line_id %}<p class="section-description">Cari ID di atas melalui fitur tambah teman di aplikasi Line.</p>{% endif %}
+            {% if not contact.whatsapp_number and not contact.line_id %}<p class="empty-location">Pengguna ini belum menambahkan kontak berbagi.</p>{% endif %}
+          </section>
+          <p class="profile-privacy">Kontak diisi oleh pemilik akun. Kesepakatan dan pengambilan dilakukan langsung antar pengguna.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

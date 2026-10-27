@@ -32,17 +32,20 @@
           <p class="profile-kicker">AKUN TITIKLAPAR</p>
           <h2 id="identity-title">{{ user.username }}</h2>
           <p class="joined-date">Bergabung {{ user.date_joined|date:"d/m/Y" }}</p>
+          <div class="profile-actions"><a class="button button-primary" href="{% url 'userprofile:profile_edit' %}">Edit profil</a></div>
           <div class="identity-note"><span aria-hidden="true">↗</span><p>Langkah kecilmu bisa membantu makanan sampai ke orang yang membutuhkan.</p></div>
         </section>
         <div class="profile-details">
+          {% if messages %}<div class="site-messages" role="status">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
           <section class="detail-card" aria-labelledby="contact-title">
             <p class="profile-kicker">TETAP TERHUBUNG</p>
             <h2 id="contact-title">Kontak berbagi</h2>
-            <p class="section-description">Kontak untuk berkomunikasi saat berbagi makanan.</p>
+            <p class="section-description">Kontak ini dapat dilihat pengguna TitikLapar yang sudah login.</p>
             <dl class="profile-values">
               <div><dt>Nomor WhatsApp</dt><dd>{{ profile.whatsapp_number|default:"Belum diisi" }}</dd></div>
               <div><dt>ID Line</dt><dd>{{ profile.line_id|default:"Belum diisi" }}</dd></div>
             </dl>
+            <a class="profile-text-link" href="{% url 'userprofile:donor_contact' user.pk %}">Lihat tampilan kontak berbagi <span aria-hidden="true">↗</span></a>
           </section>
           <section class="detail-card" aria-labelledby="location-title">
             <p class="profile-kicker">AREA PILIHANMU</p>
@@ -58,6 +61,12 @@
             {% endif %}
           </section>
           <p class="profile-privacy">Halaman ini hanya menampilkan profil akun yang sedang kamu gunakan.</p>
+          <section class="detail-card account-settings" aria-labelledby="account-settings-title">
+            <p class="profile-kicker">PENGATURAN AKUN</p>
+            <h2 id="account-settings-title">Hapus akun</h2>
+            <p class="section-description">Hapus akun beserta kontak dan lokasi bawaan secara permanen. Kamu akan diminta mengonfirmasi sebelum data dihapus.</p>
+            <a class="button button-danger-outline" href="{% url 'userprofile:delete_account' %}">Tinjau penghapusan akun</a>
+          </section>
         </div>
       </div>
     </div>

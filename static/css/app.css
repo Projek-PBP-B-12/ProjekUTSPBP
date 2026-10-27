@@ -17,6 +17,7 @@
   --color-surface-canvas: #f7f7f0;
   --color-surface-card: #ffffff;
   --color-surface-soft: #e6ecd9;
+  --teal: #176e72;
 
   /* Radius */
   --radius-8: 8px;
@@ -225,4 +226,63 @@ a {
   .button {
     transition: none;
   }
+}
+
+
+
+.card {
+  background-color: white;
+  padding: 30px;
+  border: 1px solid #dde4da;
+  border-radius: 9px;
+}
+
+.label-form, label {
+  display: block;
+  margin-bottom: 6px;
+  font: 600 13px / 18px var(--font-body);
+}
+
+.help-text, small {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font: 400 12px / 17px var(--font-body);
+}
+
+input, select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-8);
+  background: var(--color-surface-card);
+  color: var(--color-text-primary);
+  font: 400 14px / 21px var(--font-body);
+}
+
+.button {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 9px 19px;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.4;
+  font-weight: 100;
+}
+
+.button.primary {
+  background: var(--teal);
+  color: white;
+}
+
+.button.secondary {
+  background: white;
+  border-color: #bbcfc5;
+  color: var(--teal);
 }
