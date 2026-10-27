@@ -1,4 +1,4 @@
-"""Build CSS SharedPost menggunakan standalone Tailwind CLI 4.3.3."""
+"""Build CSS halaman menggunakan standalone Tailwind CLI 4.3.3."""
 import argparse
 import hashlib
 from pathlib import Path
@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--compiler", type=Path, default=WINDOWS_CLI)
     parser.add_argument("--watch", action="store_true")
+    parser.add_argument("--page", choices=("sharedpost", "dashboard"), default="sharedpost")
     args = parser.parse_args()
     compiler = args.compiler.resolve()
     if not compiler.is_file():
@@ -23,8 +24,8 @@ def main():
         if digest != WINDOWS_SHA256:
             parser.error("Checksum compiler tidak cocok dengan versi yang digunakan proyek.")
     command = [
-        str(compiler), "-i", "assets/css/sharedpost.tailwind.css",
-        "-o", "static/css/sharedpost.css", "--minify",
+        str(compiler), "-i", f"assets/css/{args.page}.tailwind.css",
+        "-o", f"static/css/{args.page}.css", "--minify",
     ]
     if args.watch:
         command.append("--watch")

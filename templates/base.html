@@ -13,10 +13,9 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       {% block sidebar_controls %}{% endblock %}
-      <a class="sidebar-brand" href="#"><span class="brand-dot"></span><span>TitikLapar</span></a>
-      <!-- Warna select muncul ketika udah ada pindah page (logic nya belum di-apply) -->
+      <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
       <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
-        <a class="sidebar-item" href="#">Beranda</a>
+        <a class="sidebar-item{% if request.resolver_match.view_name == 'landing_page' %} sidebar-item-active{% endif %}" href="{% url 'landing_page' %}"{% if request.resolver_match.view_name == 'landing_page' %} aria-current="page"{% endif %}>Beranda</a>
         <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:makananku' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}">Makananku</a>
         <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'sharedpost' %} sidebar-item-active{% endif %}" href="{% url 'sharedpost:list' %}"{% if request.resolver_match.namespace == 'sharedpost' %} aria-current="page"{% endif %}>Papan berbagi</a>
@@ -24,6 +23,7 @@
         <a class="sidebar-item{% if request.resolver_match.namespace == 'notification' %} sidebar-item-active{% endif %}" href="{% url 'notification:show_notification' %}"{% if request.resolver_match.namespace == 'notification' %} aria-current="page"{% endif %}>Notifikasi</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'userprofile' %} sidebar-item-active{% endif %}" href="{% url 'userprofile:profile' %}"{% if request.resolver_match.namespace == 'userprofile' %} aria-current="page"{% endif %}>Profil</a>
       </nav>
+      {% block sidebar_footer %}{% endblock %}
     </aside>
 
     <main class="app-main">

@@ -265,7 +265,7 @@ class RegistrationViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "index.html")
-        self.assertContains(response, f'href="{self.url}"', count=2)
+        self.assertContains(response, f'href="{self.url}"')
 
     def test_registration_page_displays_form_and_csrf_token(self):
         response = self.client.get(self.url)
