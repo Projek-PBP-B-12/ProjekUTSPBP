@@ -1,3 +1,7 @@
 {% extends "SharedPost/base.html" %}
-{% block title %}Edit Penawaran{% endblock %}
-{% block content %}<header class="page-heading"><div><h1>Edit Penawaran</h1><p>Pastikan petunjuk pengambilan selalu sesuai.</p></div></header>{% include "SharedPost/partials/update_form.html" %}{% endblock %}
+{% block title %}Edit Penawaran · TitikLapar{% endblock %}
+{% block page_title %}Edit Penawaran{% endblock %}
+{% block page_summary %}Pastikan petunjuk pengambilan selalu sesuai.{% endblock %}
+{% block content %}
+    {% include "SharedPost/partials/update_form.html" %}
+{% endblock %}

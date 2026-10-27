@@ -26,7 +26,7 @@
       <div class="nav-links">
         <a href="#cara-kerja">Cara kerja</a>
         <a href="#fitur">Fitur</a>
-        <a href="#berbagi">Forum Donasi</a>
+        <a href="{% url 'sharedpost:list' %}">Forum Donasi</a>
       </div>
       <div class="nav-actions">
         {% if user.is_authenticated %}

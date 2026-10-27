@@ -1,6 +1,13 @@
 {% extends "SharedPost/base.html" %}
+{% block page_title %}Papan Berbagi{% endblock %}
+{% block page_summary %}Temukan makanan gratis yang masih layak di area sekitarmu.{% endblock %}
+{% block page_action %}
+<a class="button primary" href="{% url 'sharedpost:create' %}"
+   hx-get="{% url 'sharedpost:create' %}" hx-target="#post-form" hx-swap="innerHTML">+ Buat Penawaran</a>
+{% endblock %}
+
 {% block content %}
-<header class="page-heading"><div><span class="mobile-eyebrow">● FORUM DONASI</span><h1>Papan Berbagi</h1><p>Temukan makanan gratis yang masih layak di area sekitarmu.</p></div><a class="button primary" href="{% url 'sharedpost:create' %}" hx-get="{% url 'sharedpost:create' %}" hx-target="#post-form" hx-swap="innerHTML">+ Buat Penawaran</a></header>
+
 <p class="page-quote">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
 <div id="post-form" aria-live="polite"></div>
 <form id="board-filters" class="filters" method="get" action="{% url 'sharedpost:list' %}" hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
