@@ -61,6 +61,12 @@
             {% endif %}
           </section>
           <p class="profile-privacy">Halaman ini hanya menampilkan profil akun yang sedang kamu gunakan.</p>
+          <section class="detail-card account-settings" aria-labelledby="account-settings-title">
+            <p class="profile-kicker">PENGATURAN AKUN</p>
+            <h2 id="account-settings-title">Hapus akun</h2>
+            <p class="section-description">Hapus akun beserta kontak dan lokasi bawaan secara permanen. Kamu akan diminta mengonfirmasi sebelum data dihapus.</p>
+            <a class="button button-danger-outline" href="{% url 'userprofile:delete_account' %}">Tinjau penghapusan akun</a>
+          </section>
         </div>
       </div>
     </div>

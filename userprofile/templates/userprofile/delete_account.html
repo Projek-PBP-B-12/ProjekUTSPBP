@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176e72">
+  <title>Hapus akun — TitikLapar</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/register.css' %}">
+  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar container profile-nav" aria-label="Navigasi utama">
+      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
+      <div class="nav-actions">
+        <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
+        {% include 'userprofile/includes/logout_form.html' %}
+      </div>
+    </nav>
+  </header>
+  <main class="profile-main">
+    <div class="profile-layout container">
+      <header class="profile-heading">
+        <p class="eyebrow"><span></span>PENGATURAN AKUN</p>
+        <h1>Hapus akun?</h1>
+        <p>Periksa dampaknya sebelum melanjutkan. Tindakan ini tidak dapat dibatalkan melalui aplikasi.</p>
+      </header>
+      <div class="profile-columns">
+        <section class="identity-card deletion-summary" aria-labelledby="delete-impact-title">
+          <p class="profile-kicker">YANG AKAN TERHAPUS</p>
+          <h2 id="delete-impact-title">Akun dan profilmu.</h2>
+          <ul class="deletion-effects">
+            <li>Akun <strong>{{ user.username }}</strong> beserta data login.</li>
+            <li>Profil, termasuk WhatsApp, ID Line, dan lokasi bawaan yang tersimpan.</li>
+          </ul>
+          <p class="profile-privacy">Setelah berhasil, kamu akan keluar dan kembali ke beranda. Kontakmu tidak lagi tersedia melalui halaman kontak berbagi.</p>
+        </section>
+        <section class="detail-card" aria-labelledby="delete-confirm-title">
+          <p class="profile-kicker">KONFIRMASI PEMILIK AKUN</p>
+          <h2 id="delete-confirm-title">Konfirmasi penghapusan</h2>
+          <p class="section-description">Masukkan kata sandi akun <strong>{{ user.username }}</strong> untuk melanjutkan.</p>
+          <form method="post" action="{% url 'userprofile:delete_account' %}" novalidate>
+            {% csrf_token %}
+            {% if form.errors %}<div class="form-summary" role="alert"><p>Akun belum dihapus. Periksa konfirmasimu.</p>{{ form.non_field_errors }}</div>{% endif %}
+            <div class="form-field">
+              <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+              {{ form.password }}
+              {{ form.password.errors }}
+            </div>
+            <div class="confirmation-field">
+              {{ form.confirm }}
+              <label for="{{ form.confirm.id_for_label }}">{{ form.confirm.label }}</label>
+            </div>
+            {{ form.confirm.errors }}
+            <div class="profile-actions deletion-actions">
+              <a class="button button-outline" href="{% url 'userprofile:profile' %}">Batal</a>
+              <button class="button button-danger" type="submit">Hapus akun permanen</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
