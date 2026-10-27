@@ -42,21 +42,25 @@
                 <td>
                     <span id="expiration-badge" class="badge">-</span>
                 </td>
-                <td>
-                    <a href="#"
-                        class="detail-link"
-                        data-name=""
-                        data-category=""
-                        data-purchase-date=""
-                        data-expiration-date=""
-                        data-status=""
-                        data-expiration-state=""
-                        data-image-url=""
-                        data-change-url=""
-                        data-stored-url=""
-                        data-consumed-url="">
-                        Detail ➞
-                    </a>
+                <td style="width: 17%; white-space: nowrap;">
+                    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                        <a href="#" id="delete-link" class="detail-link hide">Hapus 🗑︎</a>
+                        <a href="#"
+                            id="detail-link"
+                            class="detail-link"
+                            data-name=""
+                            data-category=""
+                            data-purchase-date=""
+                            data-expiration-date=""
+                            data-status=""
+                            data-expiration-state=""
+                            data-image-url=""
+                            data-change-url=""
+                            data-stored-url=""
+                            data-consumed-url="">
+                            Detail ➞
+                        </a>
+                    </div>
                 </td>
             </tr>
             </template>
@@ -125,7 +129,7 @@
     const closeButtons = modal.querySelectorAll("#modal-close");
 
     document.addEventListener("click", event => {
-        const link = event.target.closest(".detail-link");
+        const link = event.target.closest("#detail-link");
 
         if (!link) return;
 
@@ -258,7 +262,25 @@
             clone.querySelector("#expiration-badge").textContent = "Sudah Dikonsumsi";
         }
 
-        const detailLinkElement = clone.querySelector(".detail-link");
+        if (expiration_state == "CONSUMED" || expiration_state == "EXPIRED") {
+            clone.querySelector("#delete-link").classList.remove("hide");
+            clone.getElementById("delete-link").onclick = async (event) => {
+                event.preventDefault();
+                try {
+                    const response = await fetch("{% url 'FoodItem:delete_food_item' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId), {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    });
+                    const result = await response.json().catch(() => ({}));
+                }
+                catch (error) {
+                    console.error('Error delete makanan: ', error);
+                }
+                fetchFoodItems();
+            }
+        }
+
+        const detailLinkElement = clone.querySelector("#detail-link");
 
         detailLinkElement.dataset.name = name;
         detailLinkElement.dataset.category = category;
