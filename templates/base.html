@@ -21,7 +21,7 @@
         <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'sharedpost' %} sidebar-item-active{% endif %}" href="{% url 'sharedpost:list' %}"{% if request.resolver_match.namespace == 'sharedpost' %} aria-current="page"{% endif %}>Papan berbagi</a>
         <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}">Peta berbagi</a>
-        <a class="sidebar-item" href="#">Notifikasi</a>
+        <a class="sidebar-item{% if request.resolver_match.namespace == 'notification' %} sidebar-item-active{% endif %}" href="{% url 'notification:show_notification' %}"{% if request.resolver_match.namespace == 'notification' %} aria-current="page"{% endif %}>Notifikasi</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'userprofile' %} sidebar-item-active{% endif %}" href="{% url 'userprofile:profile' %}"{% if request.resolver_match.namespace == 'userprofile' %} aria-current="page"{% endif %}>Profil</a>
       </nav>
     </aside>
