@@ -5,9 +5,9 @@
 {% block page_header %}{% endblock %}
 
 {% block content %}
-<div class="detail-container">
-<a class="detail-back" href="{% url 'sharedpost:list' %}">
-    <span class="detail-back-icon" aria-hidden="true">
+<div class="detail-container sp:mx-auto sp:w-full sp:min-w-0 sp:max-w-[1100px]">
+<a class="detail-back sp:mb-6 sp:inline-flex sp:max-w-full sp:items-center sp:gap-2.5 sp:rounded-full sp:py-1.5 sp:pr-3 sp:pl-1.5 sp:text-[13px] sp:font-normal sp:text-brand sp:transition-colors" href="{% url 'sharedpost:list' %}">
+    <span class="detail-back-icon sp:inline-flex sp:size-7 sp:shrink-0 sp:items-center sp:justify-center sp:rounded-full sp:border sp:border-solid sp:border-[#cbdcd1] sp:bg-white sp:transition-colors" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
              stroke-linejoin="round" focusable="false">
@@ -17,19 +17,19 @@
     <span>Kembali ke papan berbagi</span>
 </a>
 
-<article class="offer-detail">
-    <div class="food-placeholder detail-photo category-{{ post.food_item.category|lower }}">
-        <span class="placeholder-symbol" aria-hidden="true">◒</span>
-        <span class="placeholder-label">{{ post.food_item.get_category_display }}</span>
+<article class="offer-detail sp:grid sp:grid-cols-1 sp:overflow-hidden sp:rounded-3xl sp:border sp:border-solid sp:border-line sp:bg-white sp:min-[1001px]:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+    <div class="food-placeholder detail-photo category-{{ post.food_item.category|lower }} sp:relative sp:flex sp:items-center sp:justify-center sp:overflow-hidden sp:h-[clamp(220px,40vw,340px)] sp:min-[1001px]:h-auto sp:min-[1001px]:min-h-[420px]">
+        <span class="placeholder-symbol sp:-rotate-12 sp:text-[92px] sp:leading-none sp:opacity-60" aria-hidden="true">◒</span>
+        <span class="placeholder-label sp:absolute sp:right-4 sp:bottom-3 sp:text-[11px] sp:tracking-[2px] sp:uppercase sp:opacity-70">{{ post.food_item.get_category_display }}</span>
         {% if post.food_item.image_url %}
-            <img class="food-photo" src="{{ post.food_item.image_url }}"
+            <img class="food-photo sp:absolute sp:inset-0 sp:h-full sp:w-full sp:object-cover" src="{{ post.food_item.image_url }}"
                  alt="{{ post.food_item.name }}" decoding="async" referrerpolicy="no-referrer">
         {% endif %}
         {% if is_owner %}<span class="owner-badge">● Penawaran saya</span>{% endif %}
     </div>
 
-    <div class="detail-content">
-        <div class="detail-meta">
+    <div class="detail-content sp:min-w-0 sp:p-6 sp:lg:p-10">
+        <div class="detail-meta sp:mb-5 sp:flex sp:items-center sp:justify-between sp:gap-3">
             <span class="category-pill">{{ post.food_item.get_category_display }}</span>
             {% if is_available %}
                 <span class="available">Tersedia</span>
@@ -38,22 +38,25 @@
             {% endif %}
         </div>
 
-        <h1>{{ post.food_item.name }}</h1>
-        <p class="detail-donor">Dibagikan oleh <strong>{{ post.food_item.owner.username }}</strong></p>
+        <h1 class="sp:m-0 sp:mb-2 sp:wrap-anywhere sp:font-heading sp:text-[34px] sp:font-normal sp:leading-tight">{{ post.food_item.name }}</h1>
+        <p class="detail-donor sp:wrap-anywhere sp:text-muted">Dibagikan oleh <strong>{{ post.food_item.owner.username }}</strong></p>
 
-        <dl class="detail-facts">
-            <div><dt>Area pengambilan</dt><dd>⌖ {{ post.location.area_name }}</dd></div>
+        <dl class="detail-facts sp:my-6 sp:grid sp:gap-4 sp:border-0 sp:border-y sp:border-solid sp:border-line sp:py-5">
+            <div><dt>Area pengambilan</dt><dd class="sp:flex sp:items-center sp:gap-2 sp:text-brand">
+                {% include "SharedPost/partials/icon.html" with icon="pin" size="18" %}
+                <span>{{ post.location.area_name }}</span>
+            </dd></div>
             <div><dt>Tanggal kedaluwarsa</dt><dd>{{ post.food_item.expiration_date|date:"j F Y" }}</dd></div>
             <div><dt>Dipublikasikan</dt><dd>{{ post.created_at|date:"j F Y" }}</dd></div>
         </dl>
 
         <section class="pickup-instructions" aria-labelledby="pickup-title">
-            <h2 id="pickup-title">Petunjuk pengambilan</h2>
-            <p>{{ post.description }}</p>
+            <h2 id="pickup-title" class="sp:font-heading sp:text-[23px] sp:font-normal">Petunjuk pengambilan</h2>
+            <p class="sp:whitespace-pre-line sp:wrap-anywhere">{{ post.description }}</p>
         </section>
 
         {% if not is_available %}
-            <p class="detail-notice">Penawaran ini sudah tidak tersedia untuk diambil.</p>
+            <p class="detail-notice sp:rounded-xl sp:bg-[#f5ede0] sp:px-3 sp:py-2 sp:text-[#805a27]">Penawaran ini sudah tidak tersedia untuk diambil.</p>
         {% elif is_owner %}
             <a class="button primary" href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
         {% endif %}

@@ -1,0 +1,13 @@
+<svg class="sp:block sp:shrink-0" width="{{ size|default:'16' }}" height="{{ size|default:'16' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    {% if icon == "pin" %}
+        <path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>
+    {% elif icon == "search" %}
+        <circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/>
+    {% elif icon == "edit" %}
+        <path d="m16 3 5 5M4 20l4.5-1L20 7.5a2.1 2.1 0 0 0-3-3L5.5 16Z"/>
+    {% elif icon == "trash" %}
+        <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>
+    {% elif icon == "check" %}
+        <path d="m5 12 4 4L19 6"/>
+    {% endif %}
+</svg>
