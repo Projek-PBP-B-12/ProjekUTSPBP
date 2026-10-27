@@ -62,6 +62,11 @@
     color: #9b2828;
 }
 
+.badge-gray {
+    background-color: #c4c4c4;
+    color: #292929;
+}
+
 .detail-link {
     color: #1d6b62;
     font-weight: 600;
@@ -157,4 +162,5 @@
     display: flex;
     justify-content: space-between;
     margin-top: 24px;
+    flex-wrap: wrap;
 }

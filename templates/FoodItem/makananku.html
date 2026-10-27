@@ -52,7 +52,9 @@
                         data-status=""
                         data-expiration-state=""
                         data-image-url=""
-                        data-change-url="">
+                        data-change-url=""
+                        data-stored-url=""
+                        data-consumed-url="">
                         Detail ➞
                     </a>
                 </td>
@@ -108,7 +110,10 @@
         </div>
 
         <div class="modal-footer">
-            <a href="#" id="modal-change-url" class="button primary">Ubah</a>
+            <div>
+                <a href="#" id="modal-change-url" class="button primary">Ubah</a>
+                <button id="modal-mark-consume-button" id="modal-change-url" class="button primary">Mark As Consumed</button>
+            </div>
             <button id="modal-close" class="button secondary">Tutup</button>
         </div>
     </div>
@@ -136,6 +141,32 @@
         
         document.getElementById("modal-change-url").href = link.dataset.changeUrl;
 
+        document.getElementById("modal-mark-consume-button").textContent = link.dataset.status != "CONSUMED" ? "Mark As Consumed" : "Unmark As Consumed"
+        document.getElementById("modal-mark-consume-button").onclick = async () => {
+            try {
+                var response;
+
+                if (link.dataset.status != "CONSUMED") {
+                    response = await fetch(link.dataset.consumedUrl, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    });
+                }
+                else {
+                    response = await fetch(link.dataset.storedUrl, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    });
+                }
+                const result = await response.json().catch(() => ({}));
+            }
+            catch (error) {
+                console.error('Error mengubah status makanan:', error);
+            }
+            modal.classList.remove("show");
+            fetchFoodItems();
+        }
+
         modal.classList.add("show");
     });
 
@@ -159,6 +190,21 @@
 </script>
 
 <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     function formatDate(dateString) {
         return new Date(dateString + "T00:00:00").toLocaleDateString("id-ID", {
             day: "2-digit",
@@ -204,6 +250,13 @@
             clone.querySelector("#expiration-badge").classList.add('badge-red');
             clone.querySelector("#expiration-badge").textContent = "Sudah Kedaluarsa";
         }
+        if (expiration_state == "CONSUMED") {
+            clone.querySelector("#expiration-badge").classList.remove('badge-green');
+            clone.querySelector("#expiration-badge").classList.remove('badge-orange');
+            clone.querySelector("#expiration-badge").classList.remove('badge-red');
+            clone.querySelector("#expiration-badge").classList.add('badge-gray');
+            clone.querySelector("#expiration-badge").textContent = "Sudah Dikonsumsi";
+        }
 
         const detailLinkElement = clone.querySelector(".detail-link");
 
@@ -216,6 +269,8 @@
         detailLinkElement.dataset.imageUrl = image_url;
 
         detailLinkElement.dataset.changeUrl = "{% url 'FoodItem:change_food_item' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
+        detailLinkElement.dataset.storedUrl = "{% url 'FoodItem:make_food_item_status_stored' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
+        detailLinkElement.dataset.consumedUrl = "{% url 'FoodItem:make_food_item_status_consumed' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
 
         trTemplateElement.before(clone);
     }
