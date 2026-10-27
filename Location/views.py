@@ -4,9 +4,13 @@ from django.views.decorators.http import require_GET, require_POST
 from django.db.models import ProtectedError
 from .services import GeocodingError, geocode_address
 from django.contrib.auth.decorators import login_required
+from types import SimpleNamespace
+from django.utils import timezone
 
 from .forms import LocationForm
 from .models import Location
+from SharedPost.models import SharedPost
+from SharedPost.services import get_map_pins
 
 def auth_required():
     return JsonResponse({"message": "Authentication required."}, status=401)
@@ -91,9 +95,20 @@ def delete_location(request:HttpRequest, pk):
         return JsonResponse({"message": "Lokasi masih dipakai di penawaran"}, status=409)
     return JsonResponse({"message": "Location deleted."})
 
-
-# TODO: ganti dengan data penawaran asli (SharedPost) 
-
 @login_required
-def map_page(request):
-    return render(request, "Location/map.html", {"pins": []})
+def map_page(request: HttpRequest):
+    posts = SharedPost.objects.filter(
+        is_active=True,
+        food_item__status="OFFERED",
+        food_item__expiration_date__gte=timezone.localdate()
+        )
+    origin = None
+    profile = getattr(request.user, "profile", None)
+    if profile and profile.default_latitude is not None:
+        origin = SimpleNamespace(
+            latitude=profile.default_latitude,
+            longitude=profile.default_longitude
+        )
+    pins = get_map_pins(posts, origin=origin)
+
+    return render(request, "Location/map.html", {"pins": pins})
