@@ -3,94 +3,598 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#176e72">
-  <meta name="description" content="TitikLapar membantu mahasiswa mencatat isi kulkas bersama, mengingat batas simpan, dan membagikan makanan yang masih layak.">
-  <title>TitikLapar — Selamatkan makanan sebelum terlupakan</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=jakarta-sans-1">
-</head>
-<body>
-  <!-- Ikon lokal: tidak memerlukan library atau koneksi internet. -->
-  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
-    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 3 7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
-    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M19 10c0 6-7 11-7 11S5 16 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
-    <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M20 4C8 2 3 9 6 16c7 5 15-2 14-12Z"/><path d="M3 21 15 9M8 16v-5m0 5h6"/></symbol>
-    <symbol id="icon-recycle" viewBox="0 0 24 24"><path d="m9 7 3-5 4 7m-3-1 3 1 1-3M18 10l4 7h-8m2-3-2 3 2 3M10 19H2l4-7m0 3v-3H3"/></symbol>
-    <symbol id="icon-wifi" viewBox="0 0 24 24"><path d="M3 8a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="20" r=".8"/></symbol>
-  </svg>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176d70">
+  <meta name="description"
+        content="Catat makanan, ingat batas simpan, dan bagikan makanan yang masih layak bersama TitikLapar.">
 
-  <header class="site-header">
-    <nav class="navbar container" aria-label="Navigasi utama">
-      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
-      <div class="nav-links">
+  <title>TitikLapar — Selamatkan makanan sebelum terlupakan</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+    crossorigin="anonymous"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+
+<body class="landing">
+  <a class="skip-link" href="#konten">Langsung ke isi halaman</a>
+
+  <!-- Navbar -->
+  <header class="landing-header">
+    <nav class="landing-container landing-nav"
+         aria-label="Navigasi utama">
+
+      <a class="landing-brand" href="{% url 'landing_page' %}">
+        <img src="{% static 'images/landing/logo.svg' %}" alt="">
+        <span>TitikLapar</span>
+      </a>
+
+      <div class="landing-nav-links">
         <a href="#cara-kerja">Cara kerja</a>
         <a href="#fitur">Fitur</a>
-        <a href="{% url 'sharedpost:list' %}">Forum Donasi</a>
+        <a href="#forum">Forum Donasi</a>
       </div>
-      <div class="nav-actions">
+
+      <div class="d-flex gap-2 landing-account">
         {% if user.is_authenticated %}
-          <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
-          {% include 'userprofile/includes/logout_form.html' %}
+          <a class="landing-button secondary"
+             href="{% url 'userprofile:profile' %}">
+            Profilku
+          </a>
         {% else %}
-          <a class="button button-outline" href="{% url 'userprofile:login' %}">Login</a>
-          <a class="button button-primary" href="{% url 'userprofile:register' %}">Daftar</a>
+          <a class="landing-button secondary"
+             href="{% url 'userprofile:login' %}">
+            Login
+          </a>
+          <a class="landing-button primary"
+             href="{% url 'userprofile:register' %}">
+            Daftar
+          </a>
         {% endif %}
       </div>
     </nav>
   </header>
 
-  <main>
+  <main id="konten">
     {% if messages %}
-      <div class="site-messages container" role="status">
-        {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+      <div class="landing-container" role="status">
+        {% for message in messages %}
+          <p class="landing-message">{{ message }}</p>
+        {% endfor %}
       </div>
     {% endif %}
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-inner container">
-        <div class="hero-copy">
-          <svg class="decorative-leaf" viewBox="0 0 90 110" fill="none" aria-hidden="true"><path d="M22 100C-4 71 18 42 42 32 57 25 66 13 68 6c33 31 26 74-7 83-15 4-30 0-39 11Z"/><path d="M19 108c0-32 25-45 42-67"/></svg>
-          <p class="eyebrow"><span></span>KULKAS KOS, LEBIH BIJAK</p>
-          <h1 id="hero-title">Selamatkan<br>makanan sebelum<br>terlupakan.</h1>
-          <p class="hero-description">TitikLapar membantu mahasiswa mencatat isi kulkas bersama, mengingat batas simpan, lalu membagikan makanan yang masih layak ke tetangga kos.</p>
-          <div class="hero-actions">
-            {% if user.is_authenticated %}
-              <a class="button button-primary start-button" href="{% url 'userprofile:profile' %}">Buka Profilku</a>
-            {% else %}
-              <a class="button button-primary start-button" href="{% url 'userprofile:register' %}">Mulai Sekarang</a>
-            {% endif %}
-            <span class="free-note"><svg class="icon"><use href="#icon-check"/></svg>Gratis untuk mulai</span>
-          </div>
-          <ul class="trust-list" aria-label="Keunggulan TitikLapar">
-            <li><svg class="icon"><use href="#icon-shield"/></svg>Data sederhana</li>
-            <li><svg class="icon"><use href="#icon-pin"/></svg>Berbagi terdekat</li>
-            <li><svg class="icon"><use href="#icon-leaf"/></svg>Dampak nyata</li>
-          </ul>
-        </div>
 
-        <!-- Ilustrasi antarmuka, bukan data kulkas pengguna yang sebenarnya. -->
-        <div class="hero-visual" id="fitur" role="group" aria-label="Contoh tampilan kulkas dan pengingat makanan">
-          <div class="fridge-card">
-            <div class="saved-badge"><svg class="icon"><use href="#icon-recycle"/></svg><span>3 makanan terselamatkan</span></div>
-            <div class="fridge-heading">
-              <div><p class="fridge-label">KULKAS KOS A3</p><h2>Makananmu</h2></div>
-              <span class="stored-badge">8 tersimpan</span>
+    <!-- Hero -->
+    <section class="landing-hero" id="fitur" aria-labelledby="hero-title">
+      <img class="hero-lime"
+           src="{% static 'images/landing/lime-glow.svg' %}"
+           alt="">
+      <img class="hero-teal"
+           src="{% static 'images/landing/teal-glow.svg' %}"
+           alt="">
+      <img class="hero-leaf"
+           src="{% static 'images/landing/leaf.svg' %}"
+           alt="">
+
+      <div class="landing-container position-relative">
+        <div class="row align-items-center gy-5 gy-lg-0 hero-row">
+
+          <div class="col-lg-6 hero-copy">
+            <p class="landing-eyebrow">
+              <img src="{% static 'images/landing/live-dot.svg' %}"
+                   alt="">
+              Kulkas kos, lebih bijak
+            </p>
+
+            <h1 id="hero-title">
+              Selamatkan makanan sebelum terlupakan.
+            </h1>
+
+            <p class="hero-description">
+              TitikLapar membantu mahasiswa mencatat isi kulkas
+              bersama, mengingat batas simpan, lalu membagikan
+              makanan yang masih layak ke tetangga kos.
+            </p>
+
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              {% if user.is_authenticated %}
+                <a class="landing-button primary"
+                   href="{% url 'userprofile:profile' %}">
+                  Buka Profilku
+                </a>
+              {% else %}
+                <a class="landing-button primary"
+                   href="{% url 'userprofile:register' %}">
+                  Mulai Sekarang
+                </a>
+              {% endif %}
+
+              <span class="hero-promise">
+                <img src="{% static 'images/landing/circle-check.svg' %}"
+                     alt="">
+                Gratis untuk mulai
+              </span>
             </div>
-            <ul class="food-list">
-              <li class="food-item"><div><h3>Bayam segar</h3><p>Sayuran • dibeli 24 Sep</p></div><span class="status status-soon">Besok</span></li>
-              <li class="food-item"><div><h3>Susu kedelai</h3><p>Minuman • dibeli 25 Sep</p></div><span class="status status-active">Aktif</span></li>
-              <li class="food-item"><div><h3>Roti gandum</h3><p>Roti • dibeli 26 Sep</p></div><span class="status status-later">5 hari lagi</span></li>
+
+            <ul class="hero-trust">
+              <li>
+                <img src="{% static 'images/landing/shield.svg' %}"
+                     alt="">
+                Data sederhana
+              </li>
+              <li>
+                <img src="{% static 'images/landing/trust-pin.svg' %}"
+                     alt="">
+                Berbagi terdekat
+              </li>
+              <li>
+                <img src="{% static 'images/landing/trust-leaf.svg' %}"
+                     alt="">
+                Dampak nyata
+              </li>
             </ul>
-            <div class="reminder" id="cara-kerja"><span class="day-badge">H-3</span><div><h3>Waktunya cek kulkas</h3><p>Konsumsi segera atau bagikan.</p></div></div>
           </div>
-          <div class="phone-card" id="berbagi">
-            <div class="phone-status"><span>09.41</span><div><svg class="icon"><use href="#icon-wifi"/></svg><span class="battery"></span></div></div>
-            <div class="notification"><span class="notification-dot"></span><div><h3>Susu kedelaimu tinggal H-3</h3><p>Yuk konsumsi atau bagikan di</p></div><span class="notification-time">2 jam lalu</span></div>
-            <div class="phone-actions"><span class="phone-action postpone">Nanti</span><span class="phone-action share">Bagikan</span></div>
+
+          <div class="col-lg-6">
+            <div class="inventory-card landing-glass">
+              <div class="d-flex justify-content-between align-items-center gap-3">
+                <h2>Inventori pribadi</h2>
+                <span class="landing-pill">3 makanan</span>
+              </div>
+
+              <div class="table-responsive">
+                <table class="inventory-table" aria-label="Contoh tampilan inventori makanan">
+
+                  <thead>
+                    <tr>
+                      <th scope="col">Makanan</th>
+                      <th scope="col">Dibeli</th>
+                      <th scope="col">Kedaluwarsa</th>
+                      <th scope="col">Aksi</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Bayam segar</strong>
+                        <small>Sayuran</small>
+                      </td>
+                      <td>24 Sep 2026</td>
+                      <td>
+                        <span class="landing-pill warning">
+                          Besok · perkiraan
+                        </span>
+                      </td>
+                      <td>
+                        <div class="inventory-actions">
+                          <a href="{% url 'userprofile:login' %}">
+                            Konsumsi
+                          </a>
+                          <a href="{% url 'sharedpost:create' %}">
+                            Bagikan
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <strong>Susu kedelai</strong>
+                        <small>Minuman</small>
+                      </td>
+                      <td>24 Sep 2026</td>
+                      <td>
+                        <span class="landing-pill warning">
+                          3 hari · perkiraan
+                        </span>
+                      </td>
+                      <td>
+                        <div class="inventory-actions">
+                          <a href="{% url 'userprofile:login' %}">
+                            Konsumsi
+                          </a>
+                          <a href="{% url 'sharedpost:create' %}">
+                            Bagikan
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <strong>Roti gandum</strong>
+                        <small>Roti</small>
+                      </td>
+                      <td>26 Sep 2026</td>
+                      <td>
+                        <span class="landing-pill neutral">
+                          5 hari lagi
+                        </span>
+                      </td>
+                      <td>
+                        <div class="inventory-actions">
+                          <a href="{% url 'userprofile:login' %}">
+                            Konsumsi
+                          </a>
+                          <a href="{% url 'sharedpost:create' %}">
+                            Bagikan
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Masalah -->
+    <section class="problem-section landing-dark"
+             id="cara-kerja"
+             aria-labelledby="problem-title">
+
+      <img class="problem-glow"
+           src="{% static 'images/landing/problem-glow.svg' %}"
+           alt="">
+
+      <div class="landing-container position-relative">
+        <h2 class="landing-section-title" id="problem-title">
+          Bukan niat yang kurang. Ingatan kita yang penuh.
+        </h2>
+
+        <div class="row g-4 problem-grid">
+          <div class="col-md-4">
+            <article class="problem-card h-100">
+              <span class="problem-icon">
+                <img src="{% static 'images/landing/fridge.svg' %}"
+                     alt="">
+              </span>
+              <h3>Lupa isi kulkas</h3>
+              <p>
+                Belanja masuk, jadwal kuliah padat, lalu bayam
+                di rak bawah baru terlihat saat sudah layu.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-md-4">
+            <article class="problem-card h-100">
+              <span class="problem-icon">
+                <img src="{% static 'images/landing/fridge.svg' %}"
+                     alt="">
+              </span>
+              <h3>Tak tahu tahan berapa lama</h3>
+              <p>
+                Tanggal kedaluwarsa sering tidak ada—apalagi
+                untuk sayur, lauk matang, dan bahan curah.
+              </p>
+            </article>
+          </div>
+
+          <div class="col-md-4">
+            <article class="problem-card h-100">
+              <span class="problem-icon">
+                <img src="{% static 'images/landing/fridge.svg' %}"
+                     alt="">
+              </span>
+              <h3>Masih layak, tapi terbuang</h3>
+              <p>
+                Porsi kebanyakan atau pulang kampung membuat
+                makanan bagus berakhir di tempat sampah.
+              </p>
+            </article>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Forum Donasi -->
+    <section class="forum-section" id="forum"
+             aria-labelledby="forum-title">
+      <div class="landing-container">
+        <div class="forum-heading">
+          <div>
+            <p class="landing-eyebrow">
+              <img src="{% static 'images/landing/indicator.svg' %}"
+                   alt="">
+              Forum Donasi
+            </p>
+
+            <h2 class="landing-section-title" id="forum-title">
+              Yang berlebih di kosmu,<br>
+              mungkin dibutuhkan di sebelah.
+            </h2>
+
+            <p class="landing-description">
+              Temukan makanan gratis berdasarkan jarak, kondisi,
+              dan batas waktu pengambilan. Berbagi tetap sederhana
+              dan terasa lokal.
+            </p>
+          </div>
+
+          <aside class="forum-activity landing-glass">
+            <strong>12 penawaran</strong>
+            <p>aktif dalam radius 2 km hari ini</p>
+            <small>Contoh tampilan forum</small>
+          </aside>
+        </div>
+
+        <div class="row g-4" aria-label="Contoh penawaran makanan">
+          <div class="col-md-4">
+            <article class="donation-card landing-glass h-100">
+              <img class="donation-photo"
+                   src="{% static 'images/landing/food.png' %}"
+                   alt="Ilustrasi bahan makanan di dapur">
+
+              <div class="donation-body">
+                <div class="donation-meta">
+                  <span class="landing-pill">Roti</span>
+                  <span>4 jam lagi</span>
+                </div>
+
+                <h3>Roti gandum, masih utuh</h3>
+                <p>
+                  Beli dua, satu belum dibuka.
+                  Ambil di lobi kos putri.
+                </p>
+
+                <div class="donation-footer">
+                  <span>
+                    <img src="{% static 'images/landing/pin.svg' %}"
+                         alt="">
+                    350 m
+                  </span>
+                  <a href="{% url 'sharedpost:list' %}">Klaim</a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-md-4">
+            <article class="donation-card landing-glass h-100">
+              <img class="donation-photo"
+                   src="{% static 'images/landing/food.png' %}"
+                   alt="Ilustrasi bahan makanan di dapur">
+
+              <div class="donation-body">
+                <div class="donation-meta">
+                  <span class="landing-pill">Sayuran</span>
+                  <span>Sampai 19.00</span>
+                </div>
+
+                <h3>Sayur sop siap dimasak</h3>
+                <p>
+                  Wortel, kol, dan buncis.
+                  Sudah dicuci, belum dipotong.
+                </p>
+
+                <div class="donation-footer">
+                  <span>
+                    <img src="{% static 'images/landing/pin.svg' %}"
+                         alt="">
+                    800 m
+                  </span>
+                  <a href="{% url 'sharedpost:list' %}">Klaim</a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-md-4">
+            <article class="donation-card landing-glass h-100">
+              <img class="donation-photo"
+                   src="{% static 'images/landing/food.png' %}"
+                   alt="Ilustrasi bahan makanan di dapur">
+
+              <div class="donation-body">
+                <div class="donation-meta">
+                  <span class="landing-pill">Minuman</span>
+                  <span>Besok pagi</span>
+                </div>
+
+                <h3>Susu kedelai 2 botol</h3>
+                <p>
+                  Masih tersegel dan selalu disimpan dingin.
+                </p>
+
+                <div class="donation-footer">
+                  <span>
+                    <img src="{% static 'images/landing/pin.svg' %}"
+                         alt="">
+                    1.2 km
+                  </span>
+                  <a href="{% url 'sharedpost:list' %}">Klaim</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pengingat -->
+    <section class="choice-section landing-dark"
+             id="pengingat"
+             aria-labelledby="choice-title">
+      <div class="landing-container">
+        <div class="row align-items-center gy-5 choice-row">
+          <div class="col-lg-6">
+            <p class="landing-eyebrow">
+              <img src="{% static 'images/landing/indicator.svg' %}"
+                   alt="">
+              Satu pengingat, dua jalan baik
+            </p>
+
+            <h2 class="landing-section-title" id="choice-title">
+              Habiskan hari ini, atau beri kesempatan kedua.
+            </h2>
+
+            <p class="landing-description">
+              TitikLapar tidak memutuskan untukmu. Ia memberi
+              konteks yang cukup agar makanan segera dikonsumsi
+              atau ditawarkan selagi masih layak.
+            </p>
+
+            <ul class="choice-notes">
+              <li>
+                <img src="{% static 'images/landing/check.svg' %}"
+                     alt="">
+                Kondisi makanan tetap diperiksa oleh pemilik
+              </li>
+              <li>
+                <img src="{% static 'images/landing/check.svg' %}"
+                     alt="">
+                Penawaran selalu gratis, tanpa transaksi
+              </li>
+              <li>
+                <img src="{% static 'images/landing/check.svg' %}"
+                     alt="">
+                Lokasi pengambilan disepakati dengan donor
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-lg-6">
+            <article class="reminder-preview"
+                     aria-label="Contoh kartu pengingat">
+              <div class="reminder-heading">
+                <span>
+                  <img src="{% static 'images/landing/reminder-dot.svg' %}"
+                       alt="">
+                  Pengingat makanan
+                </span>
+                <span class="landing-pill info">Belum dibaca</span>
+              </div>
+
+              <div class="reminder-copy">
+                <h3>
+                  Bayam segar mendekati perkiraan kedaluwarsa
+                </h3>
+                <p>
+                  Perkiraan besok. Periksa kondisinya
+                  dan tentukan langkah berikutnya.
+                </p>
+              </div>
+
+              <div class="reminder-details">
+                <span>Hari ini, 09.00</span>
+                <span>Bayam segar</span>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                {% url 'notification:show_notification' as notification_url %}
+                <a class="landing-button primary"
+                   {% if user.is_authenticated %}
+                     href="{{ notification_url }}"
+                   {% else %}
+                     href="{% url 'userprofile:login' %}?next={{ notification_url|urlencode }}"
+                   {% endif %}>
+                  Lihat pengingat
+                </a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ajakan mendaftar -->
+    <section class="cta-section" aria-labelledby="cta-title">
+      <img class="cta-glow"
+           src="{% static 'images/landing/cta-glow.svg' %}"
+           alt="">
+
+      <div class="landing-container position-relative">
+        <div class="cta-panel landing-glass">
+          <span class="cta-icon">
+            <img src="{% static 'images/landing/sprout.svg' %}"
+                 alt="">
+          </span>
+
+          <h2 id="cta-title">
+            Isi kulkasmu pantas punya rencana,
+            bukan akhir yang sia-sia.
+          </h2>
+
+          <p>
+            Mulai catat makanan hari ini. Saat kamu tak sempat
+            menghabiskan, komunitas di sekitarmu siap membantu.
+          </p>
+
+          {% if user.is_authenticated %}
+            <a class="landing-button primary"
+               href="{% url 'FoodItem:add_food_item' %}">
+              Tambah Makanan
+            </a>
+          {% else %}
+            <a class="landing-button primary"
+               href="{% url 'userprofile:register' %}">
+              Daftar Gratis
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
   </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer" id="tentang">
+    <div class="landing-container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a class="landing-brand" href="{% url 'landing_page' %}">
+            <img src="{% static 'images/landing/footer-logo.svg' %}"
+                 alt="">
+            <span>TitikLapar</span>
+          </a>
+          <p>
+            Food tracker dan papan berbagi lokal untuk kulkas kos
+            yang lebih tertata dan kampus yang lebih peduli.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <div>
+            <h2>Produk</h2>
+            <a href="#fitur">Food Tracker</a>
+            <a href="#pengingat">Estimasi kedaluwarsa</a>
+            <a href="#forum">Forum Donasi</a>
+          </div>
+          <div>
+            <h2>TitikLapar</h2>
+            <a href="#tentang">Tentang kami</a>
+            <a href="#pengingat">Keamanan pangan</a>
+            <a href="https://github.com/Projek-PBP-B-12/ProjekUTSPBP/">
+              Kontak tim
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          © {% now "Y" %} TitikLapar.
+          Dibuat untuk berbagi, bukan membuang.
+        </p>
+        <p>Projek PBP · Kelompok B12</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
