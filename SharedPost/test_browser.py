@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from contextlib import contextmanager
 from datetime import timedelta
 
@@ -188,6 +189,26 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
         self.assertTrue(self.post.is_active)
         self.assertEqual(self.post.description, "Ambil di lobi kos sore hari.")
         self.assertEqual(self.offered_food.status, "OFFERED")
+
+    def test_responsive_grid_uses_tailwind_breakpoints(self):
+        with self.open_board() as (page, navigations):
+            for width, columns in [(1440, 3), (900, 2), (390, 1)]:
+                with self.subTest(width=width):
+                    page.set_viewport_size({"width": width, "height": 1000})
+                    grid = page.locator(".post-grid")
+                    expect(grid).to_have_css("display", "grid")
+                    actual = grid.evaluate("element => getComputedStyle(element).gridTemplateColumns.split(' ').length")
+                    self.assertEqual(actual, columns)
+                    self.assertTrue(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
+                    photo = page.locator('.post-card .food-placeholder').first.bounding_box()
+                    self.assertAlmostEqual(photo['height'] / photo['width'], 10 / 16, places=2)
+                    expect(page.locator('.post-card .area svg').first).to_be_visible()
+                    screenshot_dir = os.getenv("BROWSER_SCREENSHOT_DIR")
+                    if screenshot_dir:
+                        output = Path(screenshot_dir)
+                        output.mkdir(parents=True, exist_ok=True)
+                        page.screenshot(path=str(output / f"sharedpost-{width}.png"), full_page=True)
+            self.assert_no_reload(page, navigations)
 
     def test_mobile_menu_and_form_fit_screen(self):
         with self.open_board(mobile=True) as (page, navigations):

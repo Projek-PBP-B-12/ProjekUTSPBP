@@ -8,12 +8,16 @@
 
 {% block content %}
 
-<p class="page-quote">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
+<p class="page-quote sp:my-7 sp:text-xl sp:text-muted sp:font-heading">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
 <div id="post-form" aria-live="polite"></div>
-<form id="board-filters" class="filters" method="get" action="{% url 'sharedpost:list' %}" hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
-<label class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Cari makanan atau lokasi..." aria-label="Cari makanan atau lokasi"></label>
-<label class="filter-select"><span>Kategori</span><select name="category"><option value="">Semua kategori</option><option value="GRAIN">Roti & biji-bijian</option><option value="VEGETABLE">Sayuran</option><option value="BEVERAGE">Minuman</option><option value="FRUIT">Buah</option><option value="OTHER">Lainnya</option></select></label>
-<fieldset class="scope-tabs"><legend class="sr-only">Pemilik penawaran</legend><label><input type="radio" name="mine" value="0" {% if request.GET.mine != '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua Penawaran</span></label><label><input type="radio" name="mine" value="1" {% if request.GET.mine == '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label></fieldset>
+<form id="board-filters" class="filters sp:flex sp:flex-wrap sp:items-center sp:gap-3" method="get" action="{% url 'sharedpost:list' %}" hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
+<label class="search-field sp:flex sp:flex-1 sp:basis-full sp:min-w-0 sp:items-center sp:gap-2.5 sp:rounded-lg sp:border sp:border-solid sp:border-line sp:bg-white sp:px-3.5 sp:min-[481px]:basis-auto sp:min-[481px]:min-w-[220px]">{% include "SharedPost/partials/icon.html" with icon="search" size="18" %}<input class="sp:m-0 sp:h-auto sp:w-full sp:min-w-0 sp:border-0 sp:bg-transparent sp:px-0 sp:py-3 sp:font-normal sp:text-ink" type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Cari makanan atau lokasi..." aria-label="Cari makanan atau lokasi"></label>
+<label class="filter-select sp:flex sp:w-full sp:items-center sp:justify-between sp:gap-2.5 sp:rounded-full sp:border sp:border-solid sp:border-[#ceddd1] sp:bg-[#edf5ec] sp:px-3 sp:py-[5px] sp:text-xs sp:text-brand sp:min-[481px]:w-auto"><span>Kategori</span><select class="sp:h-auto sp:w-auto sp:max-w-[160px] sp:border-0 sp:bg-transparent sp:p-1.5 sp:text-inherit" name="category"><option value="">Semua kategori</option>
+    {% for value, label in categories %}
+        <option value="{{ value }}"{% if value == selected_category %} selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+</select></label>
+<fieldset class="scope-tabs sp:m-0 sp:flex sp:basis-full sp:gap-6 sp:border-0 sp:border-b sp:border-solid sp:border-line sp:px-0 sp:pt-2"><legend class="sr-only sp:sr-only">Pemilik penawaran</legend><label><input type="radio" name="mine" value="0" {% if request.GET.mine != '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua Penawaran</span></label><label><input type="radio" name="mine" value="1" {% if request.GET.mine == '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label></fieldset>
 </form>
 <div id="board-feedback" class="feedback" role="status" aria-live="polite"></div>
 <div id="post-list" aria-live="polite" hx-get="{% url 'sharedpost:list' %}" hx-include="#board-filters" hx-trigger="postCreated from:body, postUpdated from:body" hx-swap="innerHTML">{% include "SharedPost/partials/post_list.html" %}</div>

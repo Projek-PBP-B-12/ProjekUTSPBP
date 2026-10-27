@@ -111,8 +111,10 @@ a {
   color: var(--color-text-inverse);
 }
 
-.sidebar-item-active,
-.sidebar-item-active:hover {
+.sidebar-nav .sidebar-item-active,
+.sidebar-nav .sidebar-item-active:hover,
+.sidebar-nav .sidebar-item-active:focus-visible,
+.sidebar-nav .sidebar-item[aria-current="page"] {
   background: var(--color-action-primary);
   color: var(--color-text-inverse);
 }

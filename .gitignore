@@ -121,3 +121,6 @@ sftp-config.json
 
 # macOS
 .DS_Store
+
+# Local CSS compiler
+.tools/

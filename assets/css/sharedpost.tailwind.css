@@ -1,0 +1,113 @@
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(sp);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(sp) important source(none);
+@source "../../templates/SharedPost";
+
+@theme inline {
+    --color-brand: var(--color-action-primary);
+    --color-ink: var(--color-text-primary);
+    --color-muted: var(--color-text-secondary);
+    --color-line: var(--color-border-default);
+    --font-heading: var(--font-heading);
+}
+
+.sharedpost-page {
+    --teal: var(--color-action-primary);
+    --ink: var(--color-text-primary);
+    --muted: var(--color-text-secondary);
+    --line: var(--color-border-default);
+    @apply sp:m-0 sp:text-ink sp:text-sm sp:leading-relaxed;
+}
+
+.sharedpost-page *, .sharedpost-page *::before, .sharedpost-page *::after {
+    box-sizing: border-box;
+}
+
+.sharedpost-page :focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 3px;
+}
+
+.sharedpost-page .app-main { @apply sp:w-full sp:max-w-[1560px] sp:mx-auto; }
+.sharedpost-page .button {
+    @apply sp:inline-flex sp:items-center sp:justify-center sp:gap-2 sp:min-h-10 sp:rounded-lg sp:border sp:border-solid sp:border-transparent sp:px-[19px] sp:py-[9px] sp:text-[13px] sp:font-normal sp:leading-snug sp:text-center sp:cursor-pointer sp:transition-colors;
+    font-family: inherit;
+}
+.sharedpost-page .button:disabled { @apply sp:opacity-55 sp:cursor-wait; }
+.sharedpost-page .primary { @apply sp:bg-brand sp:text-white; }
+.sharedpost-page .secondary { @apply sp:bg-white sp:border-[#bbcfc5] sp:text-brand; }
+.sharedpost-page .danger { @apply sp:bg-[#fbeae5] sp:border-[#c5a9a0] sp:text-[#814439]; }
+@media (hover: hover) {
+    .sharedpost-page .primary:hover:not(:disabled) { @apply sp:bg-[#10595d]; }
+    .sharedpost-page .secondary:hover:not(:disabled) { @apply sp:bg-[#edf5ec] sp:border-brand sp:text-[#10595d]; }
+    .sharedpost-page .danger:hover:not(:disabled) { @apply sp:bg-[#f5d5cb] sp:border-[#a85e4b] sp:text-[#6e3021]; }
+    .sharedpost-page .detail-back:hover { @apply sp:bg-[#edf5ec] sp:text-[#10595d]; }
+    .sharedpost-page .detail-back:hover .detail-back-icon { @apply sp:bg-[#e0eddc] sp:border-brand; }
+}
+
+.sharedpost-page .search-field, .sharedpost-page .filter-select { @apply sp:mb-0 sp:font-normal; }
+.sharedpost-page .search-field:focus-within, .sharedpost-page .filter-select:focus-within {
+    @apply sp:border-brand sp:shadow-[0_0_0_2px_rgba(23,110,114,0.18)];
+}
+.sharedpost-page .search-field input:focus, .sharedpost-page .filter-select select:focus { outline: none; }
+.sharedpost-page .scope-tabs label { @apply sp:mb-0 sp:cursor-pointer sp:font-normal; }
+.sharedpost-page .scope-tabs input { @apply sp:absolute sp:opacity-0 sp:size-px sp:p-0 sp:border-0; }
+.sharedpost-page .scope-tabs span { @apply sp:block sp:rounded-lg sp:px-2 sp:py-2.5 sp:border-0 sp:border-b-2 sp:border-solid sp:border-transparent; }
+.sharedpost-page .scope-tabs input:checked + span { @apply sp:border-brand sp:text-brand; }
+.sharedpost-page .scope-tabs input:focus-visible { outline: none; }
+.sharedpost-page .scope-tabs input:focus-visible + span {
+    @apply sp:bg-[#edf5ec] sp:shadow-[0_0_0_2px_rgba(23,110,114,0.22)];
+    outline: none;
+}
+
+.sharedpost-page .food-placeholder { @apply sp:bg-linear-to-br sp:from-[#e8dfc6] sp:to-[#d0dcb8] sp:text-[#708453]; }
+.sharedpost-page .category-fruit { @apply sp:from-[#f3e5d1] sp:to-[#e7c6b7]; }
+.sharedpost-page .category-beverage, .sharedpost-page .category-dairy { @apply sp:from-[#dcece8] sp:to-[#c5d5cd]; }
+.sharedpost-page .category-vegetable { @apply sp:from-[#e4edcf] sp:to-[#b7d1b2]; }
+.sharedpost-page .owned { @apply sp:border-brand; }
+.sharedpost-page .food-photo[hidden] { display: none !important; }
+.sharedpost-page .category-pill { @apply sp:rounded-full sp:bg-[#e7efda] sp:px-2.5 sp:py-1 sp:text-[11px] sp:text-[#32625b]; }
+.sharedpost-page .owner-badge { @apply sp:absolute sp:top-3 sp:left-3 sp:z-10 sp:rounded-full sp:bg-[#e8f3b2] sp:px-2.5 sp:py-[3px] sp:text-[11px] sp:text-[#355629]; }
+.sharedpost-page .available { @apply sp:shrink-0 sp:rounded-full sp:bg-[#edf4e8] sp:px-3 sp:py-1 sp:text-xs sp:text-brand; }
+.sharedpost-page .unavailable { @apply sp:rounded-xl sp:bg-[#f5ede0] sp:px-3 sp:py-2 sp:text-[11px] sp:text-[#805a27]; }
+
+.sharedpost-page .owner-actions .button { @apply sp:w-full sp:min-h-10 sp:px-3 sp:py-2 sp:text-xs; }
+.sharedpost-page .owner-actions form { @apply sp:m-0; }
+.sharedpost-page .form-panel { @apply sp:my-6 sp:mb-[30px] sp:max-w-[650px] sp:rounded-3xl sp:border sp:border-solid sp:border-[#edf0e8] sp:bg-white sp:p-[22px] sp:md:p-[30px]; }
+.sharedpost-page .form-panel h2 { @apply sp:m-0 sp:mb-2 sp:text-[27px] sp:font-normal sp:leading-snug; font-family: var(--font-heading); }
+.sharedpost-page .form-intro, .sharedpost-page .field-hint { @apply sp:text-[13px] sp:text-muted; }
+.sharedpost-page .form-panel label { @apply sp:block sp:mb-1.5 sp:text-[13px] sp:font-semibold; }
+.sharedpost-page .form-panel input, .sharedpost-page .form-panel select, .sharedpost-page .form-panel textarea {
+    @apply sp:block sp:w-full sp:max-w-full sp:h-auto sp:rounded-lg sp:border sp:border-solid sp:border-line sp:bg-white sp:px-3 sp:py-[11px] sp:text-ink;
+    font: inherit;
+}
+.sharedpost-page .form-panel textarea { @apply sp:resize-y; }
+.sharedpost-page .form-panel select:disabled { @apply sp:bg-[#f4f5f0] sp:text-[#8a958b]; }
+.sharedpost-page .form-panel form > p { @apply sp:my-[18px]; }
+.sharedpost-page .form-panel input:focus, .sharedpost-page .form-panel select:focus, .sharedpost-page .form-panel textarea:focus {
+    outline: none;
+    @apply sp:border-brand sp:shadow-[0_0_0_2px_rgba(23,110,114,0.18)];
+}
+.sharedpost-page .errorlist { @apply sp:pl-5 sp:text-[13px] sp:text-[#a33729]; }
+.sharedpost-page .feedback { @apply sp:text-[#a33729]; }
+.sharedpost-page .feedback:empty, .sharedpost-page #post-form:empty { display: none; }
+.sharedpost-page #post-form > p[role="status"] { @apply sp:rounded-xl sp:bg-[#e6efdb] sp:px-5 sp:py-[15px] sp:text-[#386244]; }
+.sharedpost-page .detail-facts dt { @apply sp:text-xs sp:text-muted; }
+.sharedpost-page .detail-facts dd { @apply sp:m-0 sp:mt-1 sp:wrap-anywhere; }
+.sharedpost-page .htmx-request { cursor: progress; }
+
+.sharedpost-page .mobile-header, .sharedpost-page .menu-close { @apply sp:hidden; }
+@media (max-width: 800px) {
+    .sharedpost-page .mobile-header { @apply sp:flex sp:items-center sp:justify-between sp:border-0 sp:border-b sp:border-solid sp:border-line sp:bg-white sp:px-5 sp:py-4; }
+    .sharedpost-page .menu-toggle, .sharedpost-page .menu-close { @apply sp:border-0 sp:bg-transparent sp:text-[22px] sp:text-brand sp:cursor-pointer; }
+    .sharedpost-page .menu-toggle span { @apply sp:text-[13px]; }
+    .sharedpost-page .sidebar { @apply sp:fixed sp:inset-y-0 sp:left-0 sp:z-30 sp:w-[min(280px,85vw)] sp:h-dvh sp:overflow-y-auto sp:border-0 sp:border-r sp:border-solid sp:border-line sp:px-5 sp:py-8 sp:-translate-x-full sp:invisible sp:transition-[transform,visibility] sp:duration-200; }
+    .sharedpost-page.menu-open .sidebar { @apply sp:translate-x-0 sp:visible; }
+    .sharedpost-page.menu-open { @apply sp:overflow-hidden; }
+    .sharedpost-page .sidebar-nav { @apply sp:grid sp:overflow-x-visible; }
+    .sharedpost-page .menu-close { @apply sp:block sp:absolute sp:right-3 sp:top-[22px]; }
+    .sharedpost-page .sidebar-backdrop:not([hidden]) { @apply sp:fixed sp:inset-0 sp:z-25 sp:border-0 sp:bg-[#203b3266]; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sharedpost-page *, .sharedpost-page *::before, .sharedpost-page *::after { transition: none !important; scroll-behavior: auto !important; }
+}

@@ -179,7 +179,11 @@ def shared_post_list(request):
     return render(
         request,
         template,
-        {"posts": posts},
+        {
+            "posts": posts,
+            "categories": FoodItem._meta.get_field("category").choices,
+            "selected_category": filters.get("category", ""),
+        },
     )
 
 
