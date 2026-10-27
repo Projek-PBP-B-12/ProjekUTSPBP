@@ -124,14 +124,14 @@ def add_food_item(request: HttpRequest):
         fooditem = form.save(commit=False)
         fooditem.owner = request.user
         fooditem.save()
-        return redirect("landing_page")
+        return redirect("FoodItem:makananku")
     
     context = {
         "form" : form,
         "page_title": "Tambah Makanan",
         "submit_button_text": "Tambah Makanan",
         "post_form_url": reverse("FoodItem:add_food_item"),
-        "cancel_button_url": reverse("landing_page")
+        "cancel_button_url": reverse("FoodItem:makananku")
     }
     return render(request, "FoodItem/form.html", global_context | context)
 
@@ -144,14 +144,14 @@ def change_food_item(request: HttpRequest, fooditem_id):
 
         if request.method == "POST" and form.is_valid():
             form.save()
-            return redirect("landing_page")
+            return redirect("FoodItem:makananku")
 
         context = {
             "form" : form,
             "page_title": "Ubah Makanan",
             "submit_button_text": "Ubah Makanan",
             "post_form_url": reverse("FoodItem:change_food_item", kwargs={"fooditem_id": fooditem_id}),
-            "cancel_button_url": reverse("landing_page")
+            "cancel_button_url": reverse("FoodItem:makananku")
         }
         return render(request, "FoodItem/form.html", global_context | context)
 

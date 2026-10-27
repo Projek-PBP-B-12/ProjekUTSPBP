@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"></script>
 <link rel="stylesheet" href="{% static 'css/fooditem.css' %}">
 {% endblock %}
 
@@ -16,7 +15,7 @@
 <div class="card">
     <div style="display: flex; margin: 0 0 40px; justify-content: space-between;">
         <h2 style="margin: 0; color: var(--title-color)">Inventori Pribadi</h2>
-        <p style="margin: 0; color: var(--faded-color)">3 Makanan</p>
+        <p id="food-amount" style="margin: 0; color: var(--faded-color)">- Makanan</p>
     </div>
 
     <table class="table">
@@ -29,56 +28,37 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr id="table-empty" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Tidak ada makanan.</td></tr>
+            <tr id="table-loading" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Memuat makanan...</td></tr>
+            <tr id="table-error" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Gagal memuat data makanan.</td></tr>
+
+            <template id="tr-template">
+            <tr id="tr-element">
                 <td style="width: 30%;">
-                    <div class="food-title">Bawang</div>
-                    <div class="food-category">Vegetable</div>
+                    <div class="food-title">-</div>
+                    <div class="food-category">-</div>
                 </td>
-                <td style="color: var(--faded-color)">24 Sep 2026</td>
+                <td id="purchase-date" style="color: var(--faded-color)">-</td>
                 <td>
-                    <span class="badge badge-red">Sudah Kedaluarsa</span>
+                    <span id="expiration-badge" class="badge">-</span>
                 </td>
                 <td>
                     <a href="#"
                         class="detail-link"
-                        data-name="Bawang"
-                        data-category="Vegetable"
-                        data-purchase-date="24 Sep 2026"
-                        data-expiration-date="25 Sep 2026"
-                        data-status="STORED"
-                        data-expiration-state="EXPIRED"
+                        data-name=""
+                        data-category=""
+                        data-purchase-date=""
+                        data-expiration-date=""
+                        data-status=""
+                        data-expiration-state=""
                         data-image-url=""
-                        data-change-url="/">
+                        data-change-url="">
                         Detail ➞
                     </a>
                 </td>
             </tr>
-            <tr>
-                <td style="width: 30%;">
-                    <div class="food-title">Bayam</div>
-                    <div class="food-category">Vegetable</div>
-                </td>
-                <td style="color: var(--faded-color)">24 Sep 2026</td>
-                <td>
-                    <span class="badge badge-orange">Besok</span>
-                </td>
-                <td>
-                    <a href="#" class="detail-link">Detail ➞</a>
-                </td>
-            </tr>
-            <tr>
-                <td style="width: 30%;">
-                    <div class="food-title">Pisang</div>
-                    <div class="food-category">Fruit</div>
-                </td>
-                <td style="color: var(--faded-color)">24 Sep 2026</td>
-                <td>
-                    <span class="badge badge-green">5 hari</span>
-                </td>
-                <td>
-                    <a href="#" class="detail-link">Detail ➞</a>
-                </td>
-            </tr>
+            </template>
+
         </tbody>
     </table>
 
@@ -139,22 +119,24 @@
 
     const closeButtons = modal.querySelectorAll("#modal-close");
 
-    document.querySelectorAll(".detail-link").forEach(link => {
-        link.addEventListener("click", event => {
-            event.preventDefault();
+    document.addEventListener("click", event => {
+        const link = event.target.closest(".detail-link");
 
-            document.getElementById("modal-food-name").textContent = link.dataset.name;
-            document.getElementById("modal-food-category").textContent = link.dataset.category;
-            document.getElementById("modal-purchase-date").textContent = link.dataset.purchaseDate;
-            document.getElementById("modal-expiration-date").textContent = link.dataset.expirationDate;
-            document.getElementById("modal-status").textContent = link.dataset.status;
-            document.getElementById("modal-expiration-state").textContent = link.dataset.expirationState;
-            document.getElementById("modal-image-url").src = link.dataset.imageUrl;
-            
-            document.getElementById("modal-change-url").href = link.dataset.changeUrl;
+        if (!link) return;
 
-            modal.classList.add("show");
-        });
+        event.preventDefault();
+
+        document.getElementById("modal-food-name").textContent = link.dataset.name;
+        document.getElementById("modal-food-category").textContent = link.dataset.category;
+        document.getElementById("modal-purchase-date").textContent = link.dataset.purchaseDate;
+        document.getElementById("modal-expiration-date").textContent = link.dataset.expirationDate;
+        document.getElementById("modal-status").textContent = link.dataset.status;
+        document.getElementById("modal-expiration-state").textContent = link.dataset.expirationState;
+        document.getElementById("modal-image-url").src = link.dataset.imageUrl;
+        
+        document.getElementById("modal-change-url").href = link.dataset.changeUrl;
+
+        modal.classList.add("show");
     });
 
     closeButtons.forEach(button => {
@@ -174,6 +156,111 @@
             modal.classList.remove("show");
         }
     })
+</script>
+
+<script>
+    function formatDate(dateString) {
+        return new Date(dateString + "T00:00:00").toLocaleDateString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+    function buildElements(item) {
+        const fooditem = item.fields;
+        const fooditemId = item.id;
+
+        const name = fooditem.name;
+        const category = fooditem.category;
+        const purchase_date = fooditem.purchase_date;
+        const expiration_date = fooditem.expiration_date;
+        const status = fooditem.status;
+        const image_url = fooditem.image_url;
+        const days_until_expiration = fooditem.days_until_expiration;
+        const expiration_state = fooditem.expiration_state;
+
+        const trTemplateElement = document.getElementById("tr-template");
+        const clone = trTemplateElement.content.cloneNode(true);
+
+        clone.querySelector(".food-title").textContent = name;
+        clone.querySelector(".food-category").textContent = category;
+        clone.querySelector("#purchase-date").textContent = formatDate(purchase_date);
+
+        clone.querySelector("#expiration-badge").textContent = days_until_expiration + " Hari"
+        clone.querySelector("#expiration-badge").classList.add('badge-green');
+        if (days_until_expiration <= 3) {
+            clone.querySelector("#expiration-badge").classList.remove('badge-green');
+            clone.querySelector("#expiration-badge").classList.add('badge-orange');
+        }
+        if (days_until_expiration == 1) {
+            clone.querySelector("#expiration-badge").textContent = "Besok";
+        }
+        if (days_until_expiration == 0) {
+            clone.querySelector("#expiration-badge").textContent = "Hari Ini";
+        }
+        if (days_until_expiration < 0) {
+            clone.querySelector("#expiration-badge").classList.remove('badge-orange');
+            clone.querySelector("#expiration-badge").classList.add('badge-red');
+            clone.querySelector("#expiration-badge").textContent = "Sudah Kedaluarsa";
+        }
+
+        const detailLinkElement = clone.querySelector(".detail-link");
+
+        detailLinkElement.dataset.name = name;
+        detailLinkElement.dataset.category = category;
+        detailLinkElement.dataset.purchaseDate = formatDate(purchase_date);
+        detailLinkElement.dataset.expirationDate = formatDate(expiration_date);
+        detailLinkElement.dataset.status = status;
+        detailLinkElement.dataset.expirationState = expiration_state;
+        detailLinkElement.dataset.imageUrl = image_url;
+
+        detailLinkElement.dataset.changeUrl = "{% url 'FoodItem:change_food_item' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
+
+        trTemplateElement.before(clone);
+    }
+
+    async function fetchFoodItems() {
+        try {
+            const url = "{% url 'FoodItem:get_food_items' %}"
+
+            displayPageSection({ showLoading: true })
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                //signal: abortController.signal,
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch data');
+
+            var FoodItemData = await response.json();
+
+            document.getElementById("food-amount").textContent = FoodItemData.length ? FoodItemData.length + " Makanan" : "- Makanan"
+            if (FoodItemData.length === 0) {
+                document.getElementById("food-amount").textContent = FoodItemData.length + " Makanan";
+                displayPageSection({ showEmpty: true })
+                return;
+            }
+            
+            document.querySelectorAll('#tr-element').forEach(e => e.remove());
+            FoodItemData.forEach(item => {
+                buildElements(item)
+            })
+            displayPageSection({ showElement: true })
+        }
+        catch (error) {
+            if (error.name === 'AbortError') return;
+            console.error('Error loading FoodItems:', error);
+            displayPageSection({ showError: true })
+        }
+    }
+    fetchFoodItems();
+
+    function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showElement = false }) {
+        document.getElementById("table-loading").classList.toggle('hide', !showLoading);
+        document.getElementById("table-error").classList.toggle('hide', !showError);
+        document.getElementById("table-empty").classList.toggle('hide', !showEmpty);
+        document.querySelectorAll('#tr-element').forEach(e => e.classList.toggle('hide', !showElement));
+    }
 </script>
 
 {% endblock %}
