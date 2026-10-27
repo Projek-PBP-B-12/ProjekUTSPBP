@@ -36,6 +36,16 @@ python tools/build_sharedpost_css.py --compiler /path/to/tailwindcss
 
 Compiler Windows yang disiapkan di proyek diperiksa menggunakan SHA-256. Compiler lokal tidak ikut Git; folder `.tools/` diabaikan. Template harus memuat nama utility lengkap agar terdeteksi saat build; jangan merangkai nama utility Tailwind dari potongan variabel Django.
 
+## Build beranda setelah login
+
+Beranda menggunakan compiler yang sama dengan prefix `db` dan CSS terpisah. Edit `templates/dashboard.html` atau `assets/css/dashboard.tailwind.css`, lalu bangun ulang `static/css/dashboard.css`:
+
+```powershell
+python tools/build_sharedpost_css.py --page dashboard
+```
+
+Tambahkan `--watch` untuk build otomatis. CSS beranda hanya dimuat ketika pengguna membuka Beranda dalam keadaan login.
+
 ## Commit dan deployment
 
 Commit sumber CSS, template, skrip build, dan hasil CSS. PWS cukup menjalankan aplikasi Django dan collectstatic seperti sebelumnya; tidak perlu mengunduh atau menjalankan Tailwind saat deployment. Jika kelas Tailwind berubah, bangun ulang CSS sebelum commit.

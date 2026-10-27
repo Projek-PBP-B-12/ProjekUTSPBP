@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Beranda · TitikLapar{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block page_title %}Selamat Datang, {{ display_name }}{% endblock %}
+{% block page_summary %}Satu tempat untuk melihat makananmu dan hal penting hari ini.{% endblock %}
+
+{% block body_top %}
+<header class="dashboard-mobile-header">
+    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
+    <button class="dashboard-menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>Menu</span>
+    </button>
+</header>
+<button class="dashboard-menu-backdrop" type="button" aria-label="Tutup menu" hidden></button>
+{% endblock %}
+
+{% block sidebar_controls %}
+    <button class="dashboard-menu-close" type="button" aria-label="Tutup menu">×</button>
+{% endblock %}
+
+{% block sidebar_footer %}
+<div class="dashboard-account">
+    {% include "userprofile/includes/logout_form.html" %}
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="quick-notification db:min-h-[150px] db:rounded-xl db:bg-[#e6ecd9] db:p-5" aria-labelledby="quick-notification-title">
+    <h2 id="quick-notification-title" class="db:m-0 db:mb-2 db:font-display db:text-[32px] db:font-normal db:leading-tight">Quick Notification</h2>
+    {% if quick_notifications %}
+        <ul class="db:m-0 db:grid db:list-none db:gap-2 db:p-0">
+            {% for notification in quick_notifications %}
+            <li>
+                <a class="notification-preview db:inline-block db:max-w-full db:text-[13px] db:leading-relaxed db:text-[#52635d] db:wrap-anywhere db:hover:underline" href="{% url 'notification:show_notification' %}">
+                    {{ notification.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="db:m-0 db:text-[13px] db:leading-relaxed db:text-[#52635d]">Belum ada notifikasi baru. Semoga harimu menyenangkan!</p>
+    {% endif %}
+</section>
+
+<section class="dashboard-stats db:mt-8 db:grid db:grid-cols-1 db:gap-5 db:min-[640px]:grid-cols-3 db:lg:gap-8" aria-label="Ringkasan makananmu">
+    <a class="summary-card db:flex db:min-h-36 db:min-w-0 db:flex-col db:rounded-xl db:border db:border-solid db:border-[#d7ded5] db:bg-white db:p-5 db:transition-colors db:hover:border-[#176d70]" href="{% url 'FoodItem:makananku' %}">
+        <h2 class="db:m-0 db:text-xs db:font-normal db:leading-relaxed db:text-[#52635d]">Makanan tersimpan</h2>
+        <span class="summary-value db:my-1 db:font-display db:text-[32px] db:leading-tight">{{ stored_count }}</span>
+        <p class="db:m-0 db:mt-auto db:text-xs db:leading-relaxed db:text-[#52635d]">Tercatat di kulkasmu</p>
+    </a>
+    <a class="summary-card db:flex db:min-h-36 db:min-w-0 db:flex-col db:rounded-xl db:border db:border-solid db:border-[#d7ded5] db:bg-white db:p-5 db:transition-colors db:hover:border-[#176d70]" href="{% url 'FoodItem:makananku' %}">
+        <h2 class="db:m-0 db:text-xs db:font-normal db:leading-relaxed db:text-[#52635d]">Perlu diperhatikan</h2>
+        <span class="summary-value db:my-1 db:font-display db:text-[32px] db:leading-tight">{{ attention_count }}</span>
+        <p class="db:m-0 db:mt-auto db:text-xs db:leading-relaxed db:text-[#52635d]">Mendekati kedaluwarsa · 0–3 hari</p>
+    </a>
+    <a class="summary-card db:flex db:min-h-36 db:min-w-0 db:flex-col db:rounded-xl db:border db:border-solid db:border-[#d7ded5] db:bg-white db:p-5 db:transition-colors db:hover:border-[#176d70]" href="{% url 'sharedpost:list' %}?mine=1">
+        <h2 class="db:m-0 db:text-xs db:font-normal db:leading-relaxed db:text-[#52635d]">Sedang dibagikan</h2>
+        <span class="summary-value db:my-1 db:font-display db:text-[32px] db:leading-tight">{{ shared_count }}</span>
+        <p class="db:m-0 db:mt-auto db:text-xs db:leading-relaxed db:text-[#52635d]">Penawaran aktif</p>
+    </a>
+</section>
+
+<div class="dashboard-previews db:mt-8 db:grid db:grid-cols-1 db:gap-6 db:min-[1100px]:grid-cols-[1.1fr_1fr]">
+    <section class="dashboard-panel" aria-labelledby="attention-title">
+        <header class="dashboard-panel-header">
+            <div>
+                <h2 id="attention-title" class="dashboard-panel-title">Segera diperiksa</h2>
+                <p class="dashboard-panel-description">Dahulukan makanan yang mendekati kedaluwarsa.</p>
+            </div>
+            <a class="dashboard-text-link" href="{% url 'FoodItem:makananku' %}">Lihat makanan <span aria-hidden="true">→</span></a>
+        </header>
+        {% if attention_foods %}
+            <ul class="dashboard-list">
+                {% for food in attention_foods %}
+                <li>
+                    <a class="dashboard-food-row" href="{% url 'FoodItem:change_food_item' food.pk %}">
+                        <div class="db:min-w-0">
+                            <h3 class="dashboard-food-name">{{ food.name }}</h3>
+                            <p class="dashboard-food-meta">{{ food.get_category_display }} · {{ food.expiration_date|date:"d M Y" }}</p>
+                        </div>
+                        <span class="dashboard-deadline">
+                            {% if food.days_until_expiration == 0 %}Hari ini{% elif food.days_until_expiration == 1 %}Besok{% else %}{{ food.days_until_expiration }} hari lagi{% endif %}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="dashboard-panel-note">Periksa kondisi makanan sebelum dikonsumsi atau dibagikan.</p>
+        {% else %}
+            <div class="dashboard-empty">
+                <span class="dashboard-empty-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4m8-4v4M4 11h16m-12 5 2 2 5-5"/></svg></span>
+                <h3>Belum ada yang perlu segera diperiksa</h3>
+                <p>Makanan dengan perkiraan kedaluwarsa 0–3 hari akan muncul di sini.</p>
+                <a class="dashboard-text-link" href="{% url 'FoodItem:add_food_item' %}">Catat makanan <span aria-hidden="true">→</span></a>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="dashboard-panel" aria-labelledby="active-posts-title">
+        <header class="dashboard-panel-header">
+            <div>
+                <h2 id="active-posts-title" class="dashboard-panel-title">Penawaran aktifmu</h2>
+                <p class="dashboard-panel-description">Pantau makanan yang sedang kamu bagikan.</p>
+            </div>
+            <a class="dashboard-text-link" href="{% url 'sharedpost:list' %}?mine=1">Lihat semua <span aria-hidden="true">→</span></a>
+        </header>
+        {% if active_posts %}
+            <ul class="dashboard-list">
+                {% for post in active_posts %}
+                <li>
+                    <a class="dashboard-food-row" href="{% url 'sharedpost:detail' post.pk %}">
+                        <div class="db:min-w-0">
+                            <h3 class="dashboard-food-name">{{ post.food_item.name }}</h3>
+                            <p class="dashboard-food-meta">{{ post.location.area_name }} · {{ post.food_item.expiration_date|date:"d M Y" }}</p>
+                        </div>
+                        <span class="dashboard-post-status">Tersedia <span aria-hidden="true">↗</span></span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="dashboard-panel-note">Buka penawaran untuk melihat detail dan mengelolanya.</p>
+        {% else %}
+            <div class="dashboard-empty">
+                <span class="dashboard-empty-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-4 4 4-4 4 4M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></span>
+                <h3>Mulai berbagi dari kulkasmu</h3>
+                <p>Punya makanan berlebih yang masih layak? Buat penawaran untuk orang di sekitarmu.</p>
+                <a class="dashboard-text-link" href="{% url 'sharedpost:create' %}">Buat penawaran <span aria-hidden="true">→</span></a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/dashboard-ui.js' %}" defer></script>
+{% endblock %}
