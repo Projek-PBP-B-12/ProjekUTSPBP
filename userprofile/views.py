@@ -1,11 +1,12 @@
 from urllib.parse import urlsplit
 
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.db.models.deletion import ProtectedError, RestrictedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import override
@@ -13,7 +14,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_safe
 from django.views.decorators.debug import sensitive_post_parameters
 
-from .forms import LoginForm, RegistrationForm, UserProfileForm
+from .forms import DeleteAccountForm, LoginForm, RegistrationForm, UserProfileForm
 from .models import UserProfile
 
 
@@ -116,3 +117,35 @@ def donor_contact(request, user_id):
     return render(request, "userprofile/donor_contact.html", {
         "contact": contact, "whatsapp_url": whatsapp_url,
     })
+
+
+@never_cache
+@login_required
+@require_http_methods(["GET", "POST", "HEAD"])
+@sensitive_post_parameters("password")
+@override("id")
+def delete_account(request):
+    form = DeleteAccountForm(user=request.user)
+    deleted = False
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                account = get_object_or_404(
+                    get_user_model().objects.select_for_update(),
+                    pk=request.user.pk, is_active=True,
+                )
+                form = DeleteAccountForm(request.POST, user=account)
+                if form.is_valid():
+                    account.delete()
+                    deleted = True
+        except (ProtectedError, RestrictedError):
+            form.add_error(
+                None,
+                "Akun belum dapat dihapus karena masih memiliki data terkait yang "
+                "harus diselesaikan. Hubungi pengelola aplikasi.",
+            )
+        if deleted:
+            logout(request)
+            messages.success(request, "Akun dan profilmu berhasil dihapus.")
+            return redirect("landing_page")
+    return render(request, "userprofile/delete_account.html", {"form": form})

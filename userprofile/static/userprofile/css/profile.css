@@ -120,6 +120,21 @@
 .contact-button { margin-top: 24px; gap: 16px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+.account-settings { border-color: #e4cfc7; margin-top: 12px; }
+.account-settings h2 { font-size: 24px; }
+.button-danger { color: #fff; background: #9c382b; }
+.button-danger:hover { background: #7d281e; }
+.button-danger-outline { color: #913326; border-color: #d5a69b; background: #fff; }
+.button-danger-outline:hover { background: #fff4ef; }
+.deletion-summary { background: #f7eae3; border-color: #e4cfc7; }
+.deletion-effects { padding-left: 20px; margin-block: 24px; font-size: 14px; line-height: 1.7; }
+.deletion-effects li + li { margin-top: 14px; }
+.deletion-summary .profile-privacy { padding-top: 20px; border-top: 1px solid #e4cfc7; }
+.confirmation-field { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; margin-top: 24px; font-size: 13px; line-height: 1.7; }
+.confirmation-field input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: #9c382b; }
+.confirmation-field input:focus-visible { outline: 3px solid #789b23; outline-offset: 3px; }
+.deletion-actions { margin-top: 28px; }
+
 @media (max-width: 800px) {
   .profile-nav { min-height: 80px; }
   .profile-layout { max-width: 560px; padding-block: 32px 40px; }

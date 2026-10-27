@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.hashers import check_password
+from django.views.decorators.debug import sensitive_variables
 
 from .models import UserProfile
 
@@ -88,3 +90,27 @@ class UserProfileForm(forms.ModelForm):
                         field, "Isi lintang dan bujur bersama, atau kosongkan keduanya."
                     )
         return cleaned_data
+
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(
+        label="Kata sandi saat ini",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        error_messages={"required": "Masukkan kata sandi saat ini."},
+    )
+    confirm = forms.BooleanField(
+        label="Saya memahami bahwa akun dan profil saya akan dihapus permanen.",
+        error_messages={"required": "Centang konfirmasi sebelum menghapus akun."},
+    )
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    @sensitive_variables("password")
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not check_password(password, self.user.password):
+            raise forms.ValidationError("Kata sandi tidak sesuai.", code="incorrect_password")
+        return password
