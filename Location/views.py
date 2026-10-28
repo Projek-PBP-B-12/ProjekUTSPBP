@@ -222,4 +222,12 @@ def map_page(request):
         location__owner_id=F("food_item__owner_id"),
     )
     pins = get_map_pins(posts, origin=default_location)
-    return render(request, "Location/map.html", {"pins": pins, "map_center": center})
+    selected_id = request.GET.get("post", "")
+    selected = None
+    if selected_id.isascii() and selected_id.isdigit() and len(selected_id) <= 19:
+        selected = next((pin for pin in pins if pin["id"] == int(selected_id)), None)
+    return render(request, "Location/map.html", {
+        "pins": pins, "map_center": center,
+        "selected_post_id": selected["id"] if selected else None,
+        "selection_unavailable": bool(selected_id) and selected is None,
+    })

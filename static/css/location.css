@@ -46,7 +46,7 @@
   overflow: hidden;
 }
 
-/* 3. Pin bernomor */
+/* 3. Jumlah penawaran pada tiap titik */
 
 .map-pin {
   display: grid;
@@ -62,6 +62,17 @@
   background: var(--color-action-hover);
 }
 
+.map-pin-selected {
+  border-color: var(--color-accent-lime);
+  box-shadow: 0 0 0 3px var(--color-action-primary);
+}
+
+.map-selected-offer {
+  padding: 12px;
+  border-radius: var(--radius-8);
+  background: var(--color-surface-soft);
+}
+
 /* 4. Popup penawaran.
    Selektor diawali .map-popup supaya menang atas gaya bawaan Leaflet. */
 
@@ -72,12 +83,47 @@
 
 .map-popup .leaflet-popup-content {
   margin: 0;
+  max-width: calc(100vw - 104px);
   font: 400 14px/21px var(--font-body);
 }
 
 .map-popup .leaflet-popup-close-button {
   top: 4px;
   right: 4px;
+}
+
+.map-popup .map-popup-heading {
+  margin: 0;
+  font: 600 15px/21px var(--font-body);
+}
+
+.map-popup .map-popup-help {
+  margin: 4px 0 12px;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.map-popup .map-popup-offers {
+  max-height: min(340px, 45vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
+
+.map-popup .map-popup-offers:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 2px;
+}
+
+.map-popup .map-popup-offer + .map-popup-offer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-default);
+}
+
+.map-popup .map-popup-offer-selected .map-popup-title::after {
+  content: ' · Dipilih';
+  color: var(--color-action-primary);
 }
 
 .map-popup .map-popup-photo {
@@ -157,4 +203,5 @@
   .location-coordinate-fields { grid-template-columns: 1fr; }
   .location-search-row { flex-direction: column; }
   .map-canvas { height: 420px; }
+  .map-popup .map-popup-offers { max-height: min(240px, 40vh); }
 }

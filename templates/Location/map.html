@@ -5,7 +5,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="{% static 'css/location.css' %}">
+<link rel="stylesheet" href="{% static 'css/location.css' %}?v=20261028-2">
 {% endblock %}
 
 {% block page_title %}Peta Berbagi{% endblock %}
@@ -13,6 +13,7 @@
 {% block page_action %}<a class="button button-outline" href="{% url 'Location:manage' %}">Kelola lokasi</a>{% endblock %}
 
 {% block content %}
+{% if selection_unavailable %}<p class="location-notice" role="status">Penawaran yang dipilih sudah tidak tersedia di peta. Kamu tetap bisa menjelajahi penawaran lainnya.</p>{% endif %}
 <form class="map-search" id="map-search-form" data-search-url="{% url 'Location:search_locations' %}">
   <label class="map-search-label" for="map-search-input">Cari lokasi</label>
   <input class="map-search-input" id="map-search-input" type="search" placeholder="Masukkan nama tempat umum atau area" autocomplete="off">
@@ -22,13 +23,14 @@
 </form>
 <div class="location-actions map-actions"><button class="button button-outline" type="button" id="map-reset-center">Kembali ke {{ map_center.label }}</button><button class="button button-outline" type="button" id="map-show-all"{% if not pins %} disabled{% endif %}>Lihat semua penawaran</button></div>
 <div class="map-canvas" id="map" role="application" aria-label="Peta penawaran makanan"></div>
-<p class="location-muted">Pin dibulatkan ke area sekitar, bukan alamat persis donor. Hubungi donor untuk menentukan titik pengambilan.</p>
-<section class="location-panel map-offers" aria-labelledby="map-offers-title"><h2 id="map-offers-title">Penawaran di peta</h2><ul class="location-list">{% for pin in pins %}<li><a href="{{ pin.detail_url }}">{{ pin.title }}</a> · {{ pin.area_name }}</li>{% empty %}<li>Belum ada penawaran makanan yang tersedia.</li>{% endfor %}</ul></section>
+<p class="location-muted">Angka pada pin menunjukkan jumlah penawaran di titik tersebut. Klik pin lalu gulir daftar untuk melihat semua makanan. Pin dibulatkan ke area sekitar, bukan alamat persis donor. Hubungi donor untuk menentukan titik pengambilan.</p>
+<section class="location-panel map-offers" aria-labelledby="map-offers-title"><h2 id="map-offers-title">Penawaran di peta</h2><ul class="location-list">{% for pin in pins %}<li{% if pin.id == selected_post_id %} class="map-selected-offer"{% endif %}><a href="{{ pin.detail_url }}"{% if pin.id == selected_post_id %} aria-current="true"{% endif %}>{{ pin.title }}</a> · {{ pin.area_name }}</li>{% empty %}<li>Belum ada penawaran makanan yang tersedia.</li>{% endfor %}</ul></section>
 {{ pins|json_script:"pins-data" }}
 {{ map_center|json_script:"map-center-data" }}
+{{ selected_post_id|json_script:"selected-post-data" }}
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="{% static 'js/location.js' %}"></script>
+<script src="{% static 'js/location.js' %}?v=20261028-2"></script>
 {% endblock %}
