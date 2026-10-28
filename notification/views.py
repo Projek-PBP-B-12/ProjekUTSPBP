@@ -20,10 +20,11 @@ REMINDER_DAYS = (7, 3, 1)
 ACTIVE_FOOD_STATUSES = ("STORED", "OFFERED")
 
 
-@login_required(login_url="admin:login")
+@login_required
 @require_GET
 def show_notification(request):
     """Tampilkan notifikasi milik pengguna yang sedang login."""
+    generate_food_reminders(recipient=request.user)
     notifications = Notification.objects.filter(
         recipient=request.user,
     ).select_related("food_item")
@@ -55,7 +56,7 @@ def mark_notification_read(request, pk):
     })
 
 
-def generate_food_reminders(dry_run=False):
+def generate_food_reminders(dry_run=False, recipient=None, food_item=None):
     """Cari makanan aktif pada H-7, H-3, dan H-1; buat pesan jika belum ada."""
     today = timezone.localdate()
     result = {"checked": 0, "created": 0}
@@ -65,6 +66,10 @@ def generate_food_reminders(dry_run=False):
             expiration_date=today + timedelta(days=days),
             status__in=ACTIVE_FOOD_STATUSES,
         )
+        if recipient is not None:
+            foods = foods.filter(owner=recipient)
+        if food_item is not None:
+            foods = foods.filter(pk=food_item.pk)
 
         for food in foods:
             result["checked"] += 1
@@ -165,15 +170,21 @@ def send_reminder_email(notification_id):
     return status
 
 
-def send_pending_reminder_emails():
+def send_pending_reminder_emails(food_item=None):
     """Proses email yang menunggu/gagal, kemudian hitung hasilnya."""
-    notifications = list(Notification.objects.filter(
+    notifications = Notification.objects.filter(
         reminder_days__in=REMINDER_DAYS,
         email_status__in=[
             Notification.EmailStatus.PENDING,
             Notification.EmailStatus.FAILED,
         ],
-    ))
+    )
+    # Saat menyimpan makanan, kirim hanya pengingat milik makanan itu.
+    if food_item is not None:
+        notifications = notifications.filter(
+            food_item=food_item, recipient_id=food_item.owner_id,
+        )
+    notifications = list(notifications)
     result = {"sent": 0, "failed": 0, "skipped": 0}
 
     for notification in notifications:
