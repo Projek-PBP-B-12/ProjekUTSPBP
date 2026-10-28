@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import *
 from .forms import *
+from notification.views import generate_food_reminders, send_pending_reminder_emails
 
 # Create your views here.
 
@@ -124,6 +125,8 @@ def add_food_item(request: HttpRequest):
         fooditem = form.save(commit=False)
         fooditem.owner = request.user
         fooditem.save()
+        generate_food_reminders(recipient=fooditem.owner, food_item=fooditem)
+        send_pending_reminder_emails(food_item=fooditem)
         return redirect("FoodItem:makananku")
     
     context = {
@@ -143,7 +146,9 @@ def change_food_item(request: HttpRequest, fooditem_id):
     if fooditem.owner == request.user or request.user.is_superuser:
 
         if request.method == "POST" and form.is_valid():
-            form.save()
+            fooditem = form.save()
+            generate_food_reminders(recipient=fooditem.owner, food_item=fooditem)
+            send_pending_reminder_emails(food_item=fooditem)
             return redirect("FoodItem:makananku")
 
         context = {
