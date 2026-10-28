@@ -51,6 +51,19 @@
       event.detail.target.scrollIntoView({behavior: 'smooth', block: 'nearest'});
     }
   });
-  document.body.addEventListener('htmx:responseError', () => { firstNewCard = null; const feedback = document.querySelector('#board-feedback'); if (feedback) feedback.textContent = 'Permintaan gagal. Muat ulang halaman dan coba lagi.'; });
-  document.body.addEventListener('htmx:sendError', () => { firstNewCard = null; const feedback = document.querySelector('#board-feedback'); if (feedback) feedback.textContent = 'Koneksi terputus. Periksa jaringan lalu coba lagi.'; });
+  function showError(event, message) {
+    firstNewCard = null;
+    if (event.defaultPrevented) return;
+    const feedback = document.querySelector('#board-feedback');
+    if (feedback) {
+      feedback.dataset.state = 'error';
+      const retryAfter = Math.max(1, Number.parseInt(event.detail.xhr?.getResponseHeader('Retry-After'), 10) || 60);
+      feedback.textContent = event.detail.xhr?.status === 429
+        ? `Terlalu banyak perubahan. Coba lagi dalam ${retryAfter} detik. Isian form tetap tersimpan.`
+        : message;
+    }
+  }
+  document.body.addEventListener('htmx:responseError', event => showError(event, 'Permintaan gagal. Muat ulang halaman dan coba lagi.'));
+  document.body.addEventListener('htmx:sendError', event => showError(event, 'Koneksi terputus. Periksa jaringan lalu coba lagi.'));
+  document.body.addEventListener('htmx:timeout', event => showError(event, 'Permintaan terlalu lama. Coba lagi.'));
 })();

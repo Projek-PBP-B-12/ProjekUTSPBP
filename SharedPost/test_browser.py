@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import Client
+from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from playwright.sync_api import expect, sync_playwright
@@ -116,6 +116,7 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
             page.once("dialog", lambda dialog: dialog.accept())
             card.get_by_role("button", name="Hapus", exact=True).click()
             expect(card).to_have_count(0)
+            expect(page.locator("#board-feedback")).to_have_attribute("data-state", "success")
 
             panel = self.fill_create(page)
             panel.get_by_role("button", name="Bagikan makanan", exact=True).click()
@@ -144,6 +145,201 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
         self.assertFalse(SharedPost.objects.filter(food_item=self.food).exists())
         self.food.refresh_from_db()
         self.assertEqual(self.food.status, "STORED")
+
+    def test_optimistic_delete_and_complete_update_before_the_server_receives_request(self):
+        self.food.status = "OFFERED"
+        self.food.save(update_fields=["status"])
+        second = SharedPost.objects.create(
+            food_item=self.food, location=self.location, description="Ambil di lobi sore hari.",
+        )
+        with self.open_board(expected_count=3) as (page, navigations):
+            for action, post, name, button, remaining in [
+                ("delete", self.post, "Susu kedelai", "Hapus", 2),
+                ("complete", second, "Roti gandum", "Tandai Sudah Diambil", 1),
+            ]:
+                with self.subTest(action=action):
+                    held = []
+                    target = self.live_server_url + reverse(f"sharedpost:{action}", args=[post.pk])
+                    page.route(target, lambda route: held.append(route))
+                    card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text=name))
+                    page.once("dialog", lambda dialog: dialog.accept())
+                    with page.expect_request(target):
+                        card.get_by_role("button", name=button, exact=True).click()
+                    expect(card).to_be_hidden()
+                    expect(page.locator(".post-card:visible")).to_have_count(remaining)
+                    expect(page.locator("#all-offers-count")).to_have_text(str(remaining))
+                    expect(page.locator(".result-count")).to_have_text(f"{remaining} penawaran aktif")
+                    expect(page.locator("#board-feedback")).to_have_attribute("data-state", "pending")
+                    expect(page.locator("#post-list")).to_have_attribute("aria-busy", "true")
+                    expect(page.get_by_role("searchbox")).to_be_disabled()
+                    self.assertEqual(len(held), 1)
+                    unchanged = page.request.get(self.live_server_url + reverse("sharedpost:detail", args=[post.pk]))
+                    self.assertEqual(unchanged.status, 200)
+                    self.assertIn("Tersedia", unchanged.text())
+                    self.assertNotIn("Penawaran ini sudah tidak tersedia", unchanged.text())
+                    held.pop().continue_()
+                    expect(card).to_have_count(0)
+                    expect(page.locator("#board-feedback")).to_have_attribute("data-state", "success")
+                    expect(page.get_by_role("searchbox")).to_be_enabled()
+                    expect(page.get_by_role("combobox", name="Radius pencarian")).to_be_disabled()
+                    self.assertFalse(page.locator("#post-list").get_attribute("aria-busy"))
+                    expect(page.locator("#all-offers-count")).to_have_text(str(remaining))
+                    self.assert_no_reload(page, navigations)
+        self.assertFalse(SharedPost.objects.filter(pk=self.post.pk).exists())
+        second.refresh_from_db()
+        self.food.refresh_from_db()
+        self.assertFalse(second.is_active)
+        self.assertEqual(self.food.status, "CONSUMED")
+
+    def test_optimistic_failures_restore_cards_counts_controls_and_allow_refresh(self):
+        with self.open_board(mobile=True) as (page, navigations):
+            for action, button in [("delete", "Hapus"), ("complete", "Tandai Sudah Diambil")]:
+                target = self.live_server_url + reverse(f"sharedpost:{action}", args=[self.post.pk])
+                held = []
+                page.route(target, lambda route: held.append(route))
+                for failure in [403, 404, 500, "network", "timeout", "abort", "unexpected-html"]:
+                    with self.subTest(action=action, failure=failure):
+                        card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text="Susu kedelai"))
+                        form = card.locator(f'form[data-optimistic-action="{action}"]')
+                        form.evaluate("(el, timeout) => el.setAttribute('hx-request', JSON.stringify({timeout}))", 1000 if failure == "timeout" else 15000)
+                        page.once("dialog", lambda dialog: dialog.accept())
+                        with page.expect_request(target):
+                            card.get_by_role("button", name=button, exact=True).click()
+                        expect(card).to_be_hidden()
+                        expect(page.locator("#all-offers-count")).to_have_text("1")
+                        route = held.pop()
+                        if isinstance(failure, int):
+                            route.fulfill(status=failure, body="Request rejected")
+                        elif failure == "network":
+                            route.abort("failed")
+                        elif failure == "abort":
+                            form.evaluate("el => htmx.trigger(el, 'htmx:abort')")
+                        elif failure == "unexpected-html":
+                            route.fulfill(status=200, body="<h1>Login</h1>")
+                        # For timeout the request intentionally stays unanswered.
+                        expect(card).to_be_visible()
+                        if failure in ["timeout", "abort"]:
+                            route.abort()
+                        expect(page.locator(".post-card:visible")).to_have_count(2)
+                        expect(page.locator("#all-offers-count")).to_have_text("2")
+                        expect(page.locator(".result-count")).to_have_text("2 penawaran aktif")
+                        expect(page.locator("#board-feedback")).to_have_attribute("data-state", "error")
+                        expect(page.locator("#board-feedback")).to_contain_text("Tampilan dipulihkan")
+                        expect(card.get_by_role("button", name=button, exact=True)).to_be_enabled()
+                        expect(page.get_by_role("searchbox")).to_be_enabled()
+                        expect(page.locator("#post-list h1")).to_have_count(0)
+                        self.assertTrue(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
+                        self.assert_no_reload(page, navigations)
+                page.unroute(target)
+            page.get_by_role("button", name="Periksa ulang daftar", exact=True).click()
+            expect(page.locator("#post-list.htmx-settling")).to_have_count(0)
+            expect(page.locator(".post-card:visible")).to_have_count(2)
+            expect(page.locator("#board-feedback")).to_have_text("Daftar penawaran telah diperbarui.")
+            self.assert_no_reload(page, navigations)
+        self.post.refresh_from_db()
+        self.offered_food.refresh_from_db()
+        self.assertTrue(self.post.is_active)
+        self.assertEqual(self.offered_food.status, "OFFERED")
+
+    def test_cancelling_optimistic_actions_does_not_change_the_board(self):
+        with self.open_board() as (page, navigations):
+            requests = []
+            page.on("request", lambda request: requests.append(request) if request.method == "POST" else None)
+            card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text="Susu kedelai"))
+            for button in ["Hapus", "Tandai Sudah Diambil"]:
+                page.once("dialog", lambda dialog: dialog.dismiss())
+                with page.expect_event("dialog"):
+                    card.get_by_role("button", name=button, exact=True).click()
+                expect(card).to_be_visible()
+                expect(page.locator("#all-offers-count")).to_have_text("2")
+                expect(page.locator("#board-feedback")).to_be_empty()
+            self.assertEqual(requests, [])
+            self.assert_no_reload(page, navigations)
+
+    @override_settings(SHAREDPOST_WRITE_LIMIT=1, SHAREDPOST_WRITE_WINDOW_SECONDS=60)
+    def test_rate_limit_restores_optimistic_actions_and_keeps_reading_available(self):
+        with self.open_board(mobile=True) as (page, navigations):
+            # Consume the single slot with an invalid form; no inventory changes.
+            panel = self.fill_create(page, description="       pendek       ")
+            panel.get_by_role("button", name="Bagikan makanan", exact=True).click()
+            expect(panel).to_contain_text("Petunjuk pengambilan minimal 10 karakter.")
+            panel.get_by_role("button", name="Batal", exact=True).click()
+            card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text="Susu kedelai"))
+            for action, button in [("delete", "Hapus"), ("complete", "Tandai Sudah Diambil")]:
+                page.once("dialog", lambda dialog: dialog.accept())
+                with page.expect_response(self.live_server_url + reverse(f"sharedpost:{action}", args=[self.post.pk])) as result:
+                    card.get_by_role("button", name=button, exact=True).click()
+                self.assertEqual(result.value.status, 429)
+                self.assertTrue(result.value.headers["retry-after"].isdigit())
+                expect(card).to_be_visible()
+                expect(page.locator("#all-offers-count")).to_have_text("2")
+                expect(page.locator("#board-feedback")).to_contain_text("Terlalu banyak perubahan")
+                expect(page.locator("#board-feedback")).to_contain_text("Tampilan dipulihkan")
+                expect(card.get_by_role("button", name=button, exact=True)).to_be_enabled()
+            page.get_by_role("button", name="Periksa ulang daftar", exact=True).click()
+            expect(page.locator("#board-feedback")).to_have_text("Daftar penawaran telah diperbarui.")
+            expect(page.locator(".post-card:visible")).to_have_count(2)
+            self.assert_no_reload(page, navigations)
+        self.post.refresh_from_db()
+        self.offered_food.refresh_from_db()
+        self.assertTrue(self.post.is_active)
+        self.assertEqual(self.offered_food.status, "OFFERED")
+
+    @override_settings(SHAREDPOST_WRITE_LIMIT=1, SHAREDPOST_WRITE_WINDOW_SECONDS=60)
+    def test_rate_limit_preserves_create_and_edit_form_inputs(self):
+        with self.open_board() as (page, navigations):
+            panel = self.fill_create(page, description="       pendek       ")
+            panel.get_by_role("button", name="Bagikan makanan", exact=True).click()
+            expect(panel).to_contain_text("Petunjuk pengambilan minimal 10 karakter.")
+            panel.get_by_label("Petunjuk pengambilan").fill("Petunjuk lengkap yang perlu dipertahankan.")
+            with page.expect_response(self.live_server_url + reverse("sharedpost:create")) as result:
+                panel.get_by_role("button", name="Bagikan makanan", exact=True).click()
+            self.assertEqual(result.value.status, 429)
+            expect(panel.get_by_label("Petunjuk pengambilan")).to_have_value("Petunjuk lengkap yang perlu dipertahankan.")
+            expect(page.locator("#board-feedback")).to_contain_text("Isian form tetap tersimpan")
+            expect(panel.get_by_role("button", name="Bagikan makanan", exact=True)).to_be_enabled()
+            panel.get_by_role("button", name="Batal", exact=True).click()
+            card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text="Susu kedelai"))
+            card.locator('a[hx-get]').click()
+            panel.get_by_label("Petunjuk pengambilan").fill("Perubahan ini harus tetap ada di form.")
+            with page.expect_response(self.live_server_url + reverse("sharedpost:update", args=[self.post.pk])) as result:
+                panel.get_by_role("button", name="Simpan perubahan", exact=True).click()
+            self.assertEqual(result.value.status, 429)
+            expect(panel.get_by_label("Petunjuk pengambilan")).to_have_value("Perubahan ini harus tetap ada di form.")
+            self.assert_no_reload(page, navigations)
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.description, "Ambil di lobi kos sore hari.")
+
+    def test_optimistic_mutation_cancels_stale_filter_read_and_blocks_competing_updates(self):
+        with self.open_board() as (page, navigations):
+            reads, mutations = [], []
+            list_url = self.live_server_url + reverse("sharedpost:list")
+            target = self.live_server_url + reverse("sharedpost:delete", args=[self.post.pk])
+            def hold_read(route):
+                reads.append(route)
+                page.evaluate("window.filterReadHeld = true")
+            page.route(list_url + "?**", hold_read)
+            page.route(target, lambda route: mutations.append(route))
+            with page.expect_request(lambda request: request.method == "GET" and request.url.startswith(list_url + "?")):
+                page.get_by_role("searchbox").fill("Susu")
+            page.wait_for_function("window.filterReadHeld === true")
+            self.assertEqual(len(reads), 1)
+            card = page.locator(".post-card").filter(has=page.locator(".post-title", has_text="Susu kedelai"))
+            page.once("dialog", lambda dialog: dialog.accept())
+            with page.expect_request(target), page.expect_event("requestfailed", predicate=lambda request: request.url.startswith(list_url + "?")):
+                card.get_by_role("button", name="Hapus", exact=True).click()
+            expect(card).to_be_hidden()
+            expect(page.locator("#all-offers-count")).to_have_text("1")
+            page.evaluate("url => { htmx.ajax('GET', url, {target: '#post-list'}); }", list_url)
+            self.assertEqual(len(reads), 1)
+            reads.pop().abort()
+            self.assertIn("q=Susu", mutations[0].request.post_data)
+            mutations.pop().continue_()
+            expect(page.locator(".empty-state")).to_be_visible()
+            expect(page.locator("#all-offers-count")).to_have_text("0")
+            expect(page.get_by_role("searchbox")).to_have_value("Susu")
+            expect(page.get_by_role("searchbox")).to_be_enabled()
+            self.assert_no_reload(page, navigations)
 
     def test_search_category_and_own_posts_without_reload(self):
         with self.open_board() as (page, navigations):
@@ -252,8 +448,9 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
         with self.open_board(expected_count=6) as (page, navigations):
             expect(page.locator("#all-offers-count")).to_have_text("7")
             expect(page.get_by_role("combobox", name="Radius pencarian")).to_have_value("2")
-            expect(page.get_by_role("combobox", name="Urutkan penawaran")).to_have_value("nearest")
-            expect(page.locator(".post-card .area").first).to_contain_text("111 m")
+            expect(page.get_by_role("combobox", name="Urutkan penawaran")).to_have_count(0)
+            expect(page.locator(".post-title").first).to_have_text("Roti untuk besok")
+            expect(page.locator(".post-card .area").first).to_contain_text("778 m")
             expect(page.locator(".claim-link")).to_have_count(5)
             for width, columns in [(1440, 3), (900, 2), (481, 2), (390, 1), (320, 1)]:
                 page.set_viewport_size({"width": width, "height": 1000})
@@ -281,12 +478,10 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
 
             page.get_by_role("combobox", name="Radius pencarian").select_option("")
             expect(page.locator("#all-offers-count")).to_have_text("8")
-            page.get_by_role("combobox", name="Urutkan penawaran").select_option("newest")
             expect(page.locator(".post-title").first).to_have_text("Roti di luar radius")
             page.get_by_role("combobox", name="Radius pencarian").select_option("1")
             expect(page.locator("#all-offers-count")).to_have_text("7")
-            page.get_by_role("combobox", name="Urutkan penawaran").select_option("nearest")
-            expect(page.locator(".post-title").first).to_have_text("Roti gandum, masih utuh")
+            expect(page.locator(".post-title").first).to_have_text("Roti untuk besok")
 
             expect(page.locator("#post-list.htmx-settling")).to_have_count(0)
             page.get_by_role("link", name="Lihat lebih banyak penawaran", exact=True).click()

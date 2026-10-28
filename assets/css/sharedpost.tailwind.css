@@ -88,6 +88,7 @@
 .sharedpost-page .category-beverage, .sharedpost-page .category-dairy { @apply sp:from-[#dcece8] sp:to-[#c5d5cd]; }
 .sharedpost-page .category-vegetable { @apply sp:from-[#e4edcf] sp:to-[#b7d1b2]; }
 .sharedpost-page .owned { @apply sp:border-brand; }
+.sharedpost-page .post-card[hidden] { display: none !important; }
 .sharedpost-page .post-title { @apply sp:mt-3 sp:mb-2 sp:line-clamp-2 sp:font-heading sp:text-xl sp:font-normal sp:leading-snug; }
 .sharedpost-page .post-title a:hover { @apply sp:text-brand sp:underline sp:underline-offset-4; }
 .sharedpost-page .card-description { @apply sp:m-0 sp:min-h-9 sp:line-clamp-2 sp:wrap-anywhere sp:text-xs sp:leading-relaxed sp:text-muted; }
@@ -127,6 +128,7 @@
 }
 .sharedpost-page .errorlist { @apply sp:pl-5 sp:text-[13px] sp:text-[#a33729]; }
 .sharedpost-page .feedback { @apply sp:text-[#a33729]; }
+.sharedpost-page .feedback[data-state="pending"], .sharedpost-page .feedback[data-state="success"] { @apply sp:text-brand; }
 .sharedpost-page .feedback:empty, .sharedpost-page #post-form:empty { display: none; }
 .sharedpost-page #post-form > p[role="status"] { @apply sp:rounded-xl sp:bg-[#e6efdb] sp:px-5 sp:py-[15px] sp:text-[#386244]; }
 .sharedpost-page .detail-facts dt { @apply sp:text-xs sp:text-muted; }

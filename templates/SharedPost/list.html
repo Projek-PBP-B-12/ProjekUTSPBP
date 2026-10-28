@@ -27,15 +27,6 @@
                 {% endfor %}
             </select>
         </label>
-        <label class="filter-control">
-            {% include "SharedPost/partials/icon.html" with icon="sort" size="15" %}
-            <span class="sp:sr-only">Urutkan penawaran</span>
-            <select name="sort" aria-label="Urutkan penawaran">
-                <option value="nearest"{% if selected_sort == 'nearest' %} selected{% endif %}{% if not origin %} disabled{% endif %}>Terdekat</option>
-                <option value="newest"{% if selected_sort == 'newest' %} selected{% endif %}>Terbaru</option>
-                <option value="expiry"{% if selected_sort == 'expiry' %} selected{% endif %}>Segera kedaluwarsa</option>
-            </select>
-        </label>
     </div>
     <fieldset class="category-chips">
         <legend class="sp:sr-only">Kategori makanan</legend>
@@ -53,6 +44,6 @@
         <label><input type="radio" name="mine" value="1"{% if mine %} checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label>
     </fieldset>
 </form>
-<div id="board-feedback" class="feedback" role="status" aria-live="polite"></div>
+<div id="board-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></div>
 <div id="post-list" aria-live="polite" hx-get="{% url 'sharedpost:list' %}" hx-include="#board-filters" hx-trigger="postCreated from:body, postUpdated from:body" hx-swap="innerHTML">{% include "SharedPost/partials/post_list.html" %}</div>
 {% endblock %}

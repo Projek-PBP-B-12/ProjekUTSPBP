@@ -1,0 +1,10 @@
+{% extends "SharedPost/base.html" %}
+{% block page_title %}Batas perubahan tercapai{% endblock %}
+{% block page_summary %}Terlalu banyak percobaan perubahan dalam waktu singkat.{% endblock %}
+{% block content %}
+<section class="form-panel" role="status">
+    <h2>Tunggu sebentar</h2>
+    <p>Coba lagi dalam {{ retry_after }} detik. Kamu tetap bisa membaca penawaran selama menunggu.</p>
+    <a class="button secondary" href="{% url 'sharedpost:list' %}">Kembali ke Papan Berbagi</a>
+</section>
+{% endblock %}

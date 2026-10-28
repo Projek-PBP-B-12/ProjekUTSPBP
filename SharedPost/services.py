@@ -110,14 +110,12 @@ def get_board_context(posts, user, filters):
     radius = filters.get("radius", "2" if origin else "")
     if radius not in RADIUS_OPTIONS or not origin:
         radius = ""
-    sort = filters.get("sort", "nearest" if origin else "newest")
-    if sort not in ("nearest", "newest", "expiry") or (sort == "nearest" and not origin):
-        sort = "newest"
 
     if query:
         posts = posts.filter(Q(food_item__name__icontains=query) | Q(location__area_name__icontains=query))
     if category:
         posts = posts.filter(food_item__category=category)
+    posts = posts.order_by("-created_at", "-pk")
 
     offers = []
     for post in posts:
@@ -137,16 +135,6 @@ def get_board_context(posts, user, filters):
     mine = filters.get("mine") == "1"
     if mine:
         offers = [post for post in offers if post.food_item.owner_id == user.pk]
-    def recent(post):
-        return (-post.created_at.timestamp(), -post.pk)
-
-    if sort == "nearest":
-        offers.sort(key=lambda post: (post.distance_km, *recent(post)))
-    elif sort == "expiry":
-        offers.sort(key=lambda post: (post.food_item.expiration_date, *recent(post)))
-    else:
-        offers.sort(key=recent)
-
     page_value = filters.get("page", "1")
     if not (page_value.isascii() and page_value.isdigit() and len(page_value) <= 6 and int(page_value) > 0):
         page_value = "1"
@@ -154,13 +142,13 @@ def get_board_context(posts, user, filters):
     shown = offers[:page.number * OFFERS_PER_PAGE]
     parameters = {
         "q": query, "category": category, "mine": "1" if mine else "0",
-        "radius": radius, "sort": sort, "page": page.number + 1,
+        "radius": radius, "page": page.number + 1,
     }
     return {
         "posts": shown, "total_count": len(offers), "all_count": all_count,
         "visible_count": len(shown), "page_number": page.number, "has_more": page.has_next(),
         "next_url": reverse("sharedpost:list") + "?" + urlencode(parameters),
         "categories": categories, "selected_category": category, "query": query, "mine": mine,
-        "origin": origin, "selected_radius": radius, "selected_sort": sort,
+        "origin": origin, "selected_radius": radius,
         "radius_options": RADIUS_OPTIONS,
     }

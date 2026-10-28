@@ -2,7 +2,7 @@
 <span id="all-offers-count" class="tab-count" hx-swap-oob="outerHTML">{{ all_count }}</span>
 <input type="hidden" name="page" id="board-page" value="{{ page_number }}" hx-swap-oob="outerHTML">
 {% endif %}
-<p class="result-count">{{ total_count }} penawaran aktif</p>
+<p class="result-count"><span data-total-count>{{ total_count }}</span> penawaran aktif</p>
 <div class="post-grid sp:grid sp:grid-cols-1 sp:items-start sp:gap-5 sp:min-[481px]:grid-cols-2 sp:min-[1151px]:grid-cols-3">
     {% for post in posts %}
     <article class="post-card sp:min-w-0 sp:overflow-hidden sp:rounded-[20px] sp:border sp:border-solid sp:bg-white sp:shadow-[0_9px_24px_#263f2b0b] {% if post.food_item.owner_id == request.user.id %}owned sp:border-brand{% else %}sp:border-transparent{% endif %}">
@@ -34,7 +34,8 @@
             <div class="owner-actions sp:mt-3 sp:border-0 sp:border-t sp:border-solid sp:border-line sp:pt-3">
                 <form method="post" action="{% url 'sharedpost:complete' post.pk %}"
                       hx-post="{% url 'sharedpost:complete' post.pk %}" hx-target="#post-list" hx-include="#board-filters"
-                      hx-swap="innerHTML" hx-confirm="Tandai makanan ini sudah diambil?" hx-disabled-elt="find button">
+                      hx-swap="innerHTML" hx-confirm="Tandai makanan ini sudah diambil?" hx-disabled-elt="find button"
+                      data-optimistic-action="complete" hx-request='{"timeout":15000}'>
                     {% csrf_token %}
                     <button class="button primary" type="submit">{% include "SharedPost/partials/icon.html" with icon="check" %}Tandai Sudah Diambil</button>
                 </form>
@@ -42,7 +43,8 @@
                     <a class="button secondary" href="{% url 'sharedpost:update' post.pk %}" hx-get="{% url 'sharedpost:update' post.pk %}" hx-target="#post-form" hx-swap="innerHTML">{% include "SharedPost/partials/icon.html" with icon="edit" %} Edit</a>
                     <form method="post" action="{% url 'sharedpost:delete' post.pk %}"
                           hx-post="{% url 'sharedpost:delete' post.pk %}" hx-target="#post-list" hx-include="#board-filters"
-                          hx-swap="innerHTML" hx-confirm="Yakin ingin menghapus penawaran ini?" hx-disabled-elt="find button">
+                          hx-swap="innerHTML" hx-confirm="Yakin ingin menghapus penawaran ini?" hx-disabled-elt="find button"
+                          data-optimistic-action="delete" hx-request='{"timeout":15000}'>
                         {% csrf_token %}
                         <button class="button danger" type="submit">{% include "SharedPost/partials/icon.html" with icon="trash" %} Hapus</button>
                     </form>
@@ -61,7 +63,7 @@
 </div>
 {% if has_more %}
 <div class="more-offers">
-    <p>Menampilkan {{ visible_count }} dari {{ total_count }} penawaran</p>
+    <p>Menampilkan <span data-visible-count>{{ visible_count }}</span> dari <span data-total-count>{{ total_count }}</span> penawaran</p>
     <a class="button secondary load-more" href="{{ next_url }}" hx-get="{{ next_url }}" hx-include="unset" hx-target="#post-list" hx-swap="innerHTML" hx-sync="#post-list:replace" hx-disabled-elt="this">Lihat lebih banyak penawaran</a>
 </div>
 {% endif %}

@@ -43,15 +43,15 @@ class OfferBoardTests(TestCase):
     def ids(self, response):
         return [post.pk for post in response.context["posts"]]
 
-    def test_default_radius_and_nearest_sort_use_owned_default_location(self):
+    def test_default_radius_uses_owned_default_location_with_newest_posts_first(self):
         near = self.offer("Dekat")
         middle = self.offer("Sedang", latitude="-6.372000")
         self.offer("Jauh", latitude="-6.395000")
         response = self.client.get(self.url)
-        self.assertEqual(self.ids(response), [near.pk, middle.pk])
+        self.assertEqual(self.ids(response), [middle.pk, near.pk])
         self.assertEqual(response.context["origin"], self.origin)
         self.assertEqual(response.context["selected_radius"], "2")
-        self.assertEqual(response.context["selected_sort"], "nearest")
+        self.assertNotContains(response, 'name="sort"')
         self.assertContains(response, "334 m")
 
     def test_radius_and_all_areas(self):
@@ -60,27 +60,29 @@ class OfferBoardTests(TestCase):
         far = self.offer(latitude="-6.395000")
         self.assertEqual(self.ids(self.client.get(self.url, {"radius": "1"})), [near.pk])
         response = self.client.get(self.url, {"radius": ""})
-        self.assertEqual(self.ids(response), [near.pk, middle.pk, far.pk])
+        self.assertEqual(self.ids(response), [far.pk, middle.pk, near.pk])
         self.assertEqual(response.context["total_count"], 3)
 
-    def test_expiry_and_newest_sort_have_stable_tiebreakers(self):
+    def test_newest_order_is_stable_and_legacy_sort_parameters_are_ignored(self):
         earlier = self.offer(days=5)
         sooner = self.offer(days=1)
         latest = self.offer(days=3)
         same_time = timezone.now()
         SharedPost.objects.all().update(created_at=same_time)
-        self.assertEqual(self.ids(self.client.get(self.url, {"sort": "newest"})), [latest.pk, sooner.pk, earlier.pk])
-        self.assertEqual(self.ids(self.client.get(self.url, {"sort": "expiry"})), [sooner.pk, latest.pk, earlier.pk])
+        for value in ["nearest", "expiry", "newest", "invalid"]:
+            with self.subTest(sort=value):
+                response = self.client.get(self.url, {"sort": value})
+                self.assertEqual(self.ids(response), [latest.pk, sooner.pk, earlier.pk])
+                self.assertNotIn("selected_sort", response.context)
 
     def test_missing_origin_keeps_posts_and_offers_a_setup_link(self):
         self.profile.delete()
         near = self.offer()
         far = self.offer(latitude="-6.395000")
-        response = self.client.get(self.url, {"radius": "1", "sort": "nearest"})
+        response = self.client.get(self.url, {"radius": "1"})
         self.assertIsNone(response.context["origin"])
         self.assertEqual(set(self.ids(response)), {near.pk, far.pk})
         self.assertEqual(response.context["selected_radius"], "")
-        self.assertEqual(response.context["selected_sort"], "newest")
         self.assertContains(response, "Atur lokasi bawaan")
         self.assertContains(response, 'name="radius" aria-label="Radius pencarian" disabled')
         self.assertEqual(response.context["posts"][0].distance_label, "Beji")
@@ -125,13 +127,14 @@ class OfferBoardTests(TestCase):
     def test_next_link_preserves_all_filters_and_ordinary_navigation(self):
         for index in range(8):
             self.offer(f"Roti & susu {index}", owner=self.user)
-        filters = {"q": "Roti & susu", "category": "GRAIN", "mine": "1", "radius": "5", "sort": "expiry"}
-        response = self.client.get(self.url, filters)
+        filters = {"q": "Roti & susu", "category": "GRAIN", "mine": "1", "radius": "5"}
+        response = self.client.get(self.url, {**filters, "sort": "expiry"})
         next_url = response.context["next_url"]
         parameters = parse_qs(urlsplit(next_url).query)
         for key, value in filters.items():
             self.assertEqual(parameters[key], [value])
         self.assertEqual(parameters["page"], ["2"])
+        self.assertNotIn("sort", parameters)
         next_response = self.client.get(next_url)
         self.assertEqual(len(self.ids(next_response)), 8)
         self.assertTemplateUsed(next_response, "SharedPost/list.html")
@@ -141,7 +144,7 @@ class OfferBoardTests(TestCase):
         offers = [self.offer(f"Roti {index}", owner=self.user) for index in range(14)]
         self.offer("Susu", owner=self.user, category="BEVERAGE")
         response = self.client.post(reverse("sharedpost:delete", args=[offers[0].pk]), {
-            "q": "Roti", "category": "GRAIN", "mine": "1", "radius": "1", "sort": "newest", "page": "2",
+            "q": "Roti", "category": "GRAIN", "mine": "1", "radius": "1", "page": "2",
         }, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["page_number"], 2)
@@ -183,12 +186,11 @@ class OfferBoardTests(TestCase):
             self.offer(f"Roti {index}")
         for value in ["", "0", "-1", "wat", "9" * 100, "١", '<script>alert(1)</script>']:
             with self.subTest(page=value):
-                response = self.client.get(self.url, {"page": value, "radius": "nan", "sort": "invalid", "category": value})
+                response = self.client.get(self.url, {"page": value, "radius": "nan", "category": value})
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.context["page_number"], 1)
                 self.assertEqual(len(self.ids(response)), 6)
                 self.assertEqual(response.context["selected_radius"], "")
-                self.assertEqual(response.context["selected_sort"], "newest")
                 self.assertEqual(response.context["selected_category"], "")
         response = self.client.get(self.url, {"page": "999999"})
         self.assertEqual(len(self.ids(response)), 8)
