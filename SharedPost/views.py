@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponse
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 
@@ -13,6 +13,7 @@ from FoodItem.models import FoodItem
 from Location.models import Location
 from .forms import SharedPostForm
 from .models import SharedPost
+from .services import get_board_context
 
 
 @never_cache
@@ -45,6 +46,10 @@ def shared_post_detail(request, pk):
             "post": post,
             "is_owner": is_owner,
             "is_available": is_available,
+            "map_url": (
+                reverse("Location:map") + f"?post={post.pk}"
+                if is_available and post.location.owner_id == post.food_item.owner_id else None
+            ),
         },
     )
 
@@ -168,16 +173,8 @@ def shared_post_list(request):
     )
 
     filters = request.GET if request.method == "GET" else request.POST
-    query = filters.get("q", "").strip()[:150]
-    if query:
-        posts = posts.filter(
-            Q(food_item__name__icontains=query)
-            | Q(location__area_name__icontains=query)
-        )
-    if filters.get("category"):
-        posts = posts.filter(food_item__category=filters["category"])
-    if filters.get("mine") == "1":
-        posts = posts.filter(food_item__owner=request.user)
+    context = get_board_context(posts, request.user, filters)
+    context["is_htmx"] = request.headers.get("HX-Request") == "true"
 
     template = (
         "SharedPost/partials/post_list.html"
@@ -188,11 +185,7 @@ def shared_post_list(request):
     return render(
         request,
         template,
-        {
-            "posts": posts,
-            "categories": FoodItem._meta.get_field("category").choices,
-            "selected_category": filters.get("category", ""),
-        },
+        context,
     )
 
 

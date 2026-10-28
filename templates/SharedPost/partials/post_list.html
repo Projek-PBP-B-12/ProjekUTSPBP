@@ -1,61 +1,50 @@
-<p class="result-count sp:mt-3 sp:mb-5 sp:text-xs sp:text-muted sp:md:text-right">{{ posts|length }} penawaran aktif</p>
-
+{% if is_htmx %}
+<span id="all-offers-count" class="tab-count" hx-swap-oob="outerHTML">{{ all_count }}</span>
+<input type="hidden" name="page" id="board-page" value="{{ page_number }}" hx-swap-oob="outerHTML">
+{% endif %}
+<p class="result-count">{{ total_count }} penawaran aktif</p>
 <div class="post-grid sp:grid sp:grid-cols-1 sp:items-start sp:gap-5 sp:min-[481px]:grid-cols-2 sp:min-[1151px]:grid-cols-3">
     {% for post in posts %}
     <article class="post-card sp:min-w-0 sp:overflow-hidden sp:rounded-[20px] sp:border sp:border-solid sp:bg-white sp:shadow-[0_9px_24px_#263f2b0b] {% if post.food_item.owner_id == request.user.id %}owned sp:border-brand{% else %}sp:border-transparent{% endif %}">
-        <div class="food-placeholder category-{{ post.food_item.category|lower }} sp:relative sp:flex sp:aspect-[16/10] sp:items-center sp:justify-center sp:overflow-hidden">
-            <span class="placeholder-symbol sp:-rotate-12 sp:text-[92px] sp:leading-none sp:opacity-60" aria-hidden="true">{% if post.food_item.category == 'FRUIT' %}◉{% elif post.food_item.category == 'BEVERAGE' or post.food_item.category == 'DAIRY' %}▥{% else %}◒{% endif %}</span>
-            <span class="placeholder-label sp:absolute sp:right-4 sp:bottom-3 sp:text-[11px] sp:tracking-[2px] sp:uppercase sp:opacity-70">{{ post.food_item.get_category_display }}</span>
-            {% if post.food_item.image_url %}
-                <img class="food-photo sp:absolute sp:inset-0 sp:h-full sp:w-full sp:object-cover" src="{{ post.food_item.image_url }}" alt="{{ post.food_item.name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        <div class="food-placeholder category-{{ post.food_item.category|lower }} sp:relative sp:flex sp:aspect-[2/1] sp:items-center sp:justify-center sp:overflow-hidden">
+            <span class="placeholder-symbol sp:-rotate-12 sp:text-[72px] sp:leading-none sp:opacity-60" aria-hidden="true">{% if post.food_item.category == 'FRUIT' %}◉{% elif post.food_item.category == 'BEVERAGE' or post.food_item.category == 'DAIRY' %}▥{% else %}◒{% endif %}</span>
+            <span class="placeholder-label sp:absolute sp:right-4 sp:bottom-3 sp:text-[11px] sp:tracking-[2px] sp:uppercase sp:opacity-70">{{ post.category_label }}</span>
+            {% if post.photo_url %}
+            <img class="food-photo sp:absolute sp:inset-0 sp:h-full sp:w-full sp:object-cover" src="{{ post.photo_url }}" alt="{{ post.food_item.name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
             {% endif %}
-            {% if post.food_item.owner_id == request.user.id %}
-                <span class="owner-badge">● Penawaran saya</span>
-            {% endif %}
+            {% if post.food_item.owner_id == request.user.id %}<span class="owner-badge">● Penawaran saya</span>{% endif %}
         </div>
-
-        <div class="card-body sp:p-5">
-            <div class="card-meta sp:flex sp:items-center sp:justify-between sp:gap-3 sp:text-xs">
-                <span class="category-pill">{{ post.food_item.get_category_display }}</span>
-                <span class="expiry sp:font-medium sp:text-brand">{% if post.food_item.days_until_expiration == 0 %}Hari ini{% else %}{{ post.food_item.days_until_expiration }} hari lagi{% endif %}</span>
+        <div class="card-body sp:p-4">
+            <div class="card-meta sp:flex sp:items-center sp:justify-between sp:gap-2">
+                <span class="category-pill">{{ post.category_label }}</span>
+                <span class="expiry">{% if post.food_item.days_until_expiration == 0 %}Hari ini{% elif post.food_item.days_until_expiration == 1 %}Besok{% else %}{{ post.food_item.days_until_expiration }} hari lagi{% endif %}</span>
             </div>
-            <h2 class="sp:mt-3 sp:mb-2.5 sp:wrap-anywhere sp:font-heading sp:text-[24px] sp:font-normal sp:leading-snug">{{ post.food_item.name }}</h2>
-            <p class="card-description sp:m-0 sp:whitespace-pre-line sp:wrap-anywhere sp:text-sm sp:leading-relaxed sp:text-muted">{{ post.description }}</p>
-            <p class="donor sp:mt-3 sp:mb-4 sp:wrap-anywhere sp:text-xs sp:text-muted">Dari {{ post.food_item.owner.username }}</p>
-
-            <div class="card-footer sp:flex sp:items-center sp:justify-between sp:gap-3 sp:text-[13px]">
-                <span class="area sp:inline-flex sp:min-w-0 sp:items-center sp:gap-1.5 sp:text-brand">
-                    {% include "SharedPost/partials/icon.html" with icon="pin" size="17" %}
-                    <span class="sp:wrap-anywhere">{{ post.location.area_name }}</span>
+            <h2 class="post-title"><a href="{% url 'sharedpost:detail' post.pk %}">{{ post.food_item.name }}</a></h2>
+            <p class="card-description" title="{{ post.description }}">{{ post.description }}</p>
+            <div class="card-footer sp:mt-3 sp:flex sp:items-center sp:justify-between sp:gap-3">
+                <span class="area" title="{% if origin %}Perkiraan jarak dari {{ origin.area_name }} · {% endif %}{{ post.location.area_name }}">
+                    {% include "SharedPost/partials/icon.html" with icon="pin" size="15" %}
+                    <span>{{ post.distance_label }}{% if post.is_origin %} (lokasi saya){% endif %}</span>
                 </span>
-                <span class="available">Tersedia</span>
+                {% if post.food_item.owner_id != request.user.id %}
+                <a class="button primary claim-link" href="{% url 'sharedpost:detail' post.pk %}" aria-label="Klaim {{ post.food_item.name }}">Klaim</a>
+                {% endif %}
             </div>
-
-            <a class="button secondary detail-link sp:mt-4 sp:w-full" href="{% url 'sharedpost:detail' post.pk %}">Lihat detail</a>
-
             {% if post.food_item.owner_id == request.user.id %}
-            <div class="owner-actions sp:mt-4 sp:border-0 sp:border-t sp:border-solid sp:border-line sp:pt-4">
+            <div class="owner-actions sp:mt-3 sp:border-0 sp:border-t sp:border-solid sp:border-line sp:pt-3">
                 <form method="post" action="{% url 'sharedpost:complete' post.pk %}"
                       hx-post="{% url 'sharedpost:complete' post.pk %}" hx-target="#post-list" hx-include="#board-filters"
                       hx-swap="innerHTML" hx-confirm="Tandai makanan ini sudah diambil?" hx-disabled-elt="find button">
                     {% csrf_token %}
-                    <button class="button primary" type="submit">
-                        {% include "SharedPost/partials/icon.html" with icon="check" %}
-                        Tandai Sudah Diambil
-                    </button>
+                    <button class="button primary" type="submit">{% include "SharedPost/partials/icon.html" with icon="check" %}Tandai Sudah Diambil</button>
                 </form>
                 <div class="action-pair sp:mt-2 sp:grid sp:grid-cols-2 sp:gap-2">
-                    <a class="button secondary" href="{% url 'sharedpost:update' post.pk %}"
-                       hx-get="{% url 'sharedpost:update' post.pk %}" hx-target="#post-form" hx-swap="innerHTML">
-                        {% include "SharedPost/partials/icon.html" with icon="edit" %} Edit
-                    </a>
+                    <a class="button secondary" href="{% url 'sharedpost:update' post.pk %}" hx-get="{% url 'sharedpost:update' post.pk %}" hx-target="#post-form" hx-swap="innerHTML">{% include "SharedPost/partials/icon.html" with icon="edit" %} Edit</a>
                     <form method="post" action="{% url 'sharedpost:delete' post.pk %}"
                           hx-post="{% url 'sharedpost:delete' post.pk %}" hx-target="#post-list" hx-include="#board-filters"
                           hx-swap="innerHTML" hx-confirm="Yakin ingin menghapus penawaran ini?" hx-disabled-elt="find button">
                         {% csrf_token %}
-                        <button class="button danger" type="submit">
-                            {% include "SharedPost/partials/icon.html" with icon="trash" %} Hapus
-                        </button>
+                        <button class="button danger" type="submit">{% include "SharedPost/partials/icon.html" with icon="trash" %} Hapus</button>
                     </form>
                 </div>
             </div>
@@ -66,7 +55,13 @@
     <section class="empty-state sp:col-span-full sp:rounded-[20px] sp:border sp:border-dashed sp:border-[#c8d4c5] sp:bg-white sp:px-5 sp:py-14 sp:text-center">
         <span class="empty-symbol sp:text-6xl sp:text-[#a5bb75]" aria-hidden="true">◒</span>
         <h2 class="sp:font-heading sp:text-[27px] sp:font-normal">Belum ada penawaran yang tersedia</h2>
-        <p class="sp:text-muted">Coba pencarian lain, atau bagikan makanan yang masih layak dari inventorimu.</p>
+        <p class="sp:text-muted">Coba kategori, radius, atau pencarian lain. Kamu juga bisa membagikan makanan dari inventorimu.</p>
     </section>
     {% endfor %}
 </div>
+{% if has_more %}
+<div class="more-offers">
+    <p>Menampilkan {{ visible_count }} dari {{ total_count }} penawaran</p>
+    <a class="button secondary load-more" href="{{ next_url }}" hx-get="{{ next_url }}" hx-include="unset" hx-target="#post-list" hx-swap="innerHTML" hx-sync="#post-list:replace" hx-disabled-elt="this">Lihat lebih banyak penawaran</a>
+</div>
+{% endif %}

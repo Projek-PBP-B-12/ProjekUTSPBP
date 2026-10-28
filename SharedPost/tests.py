@@ -534,7 +534,7 @@ class SharedPostTests(TestCase):
         for filters, expected in cases:
             with self.subTest(filters=filters):
                 response = self.client.get(reverse("sharedpost:list"), filters, HTTP_HX_REQUEST="true")
-                self.assertEqual(set(response.context["posts"].values_list("pk", flat=True)), expected)
+                self.assertEqual({post.pk for post in response.context["posts"]}, expected)
         for active, status, expiry in [(False, "OFFERED", timezone.localdate()), (True, "CONSUMED", timezone.localdate()), (True, "OFFERED", timezone.localdate()-timedelta(days=1))]:
             with self.subTest(active=active, status=status, expiry=expiry):
                 post.is_active=active; post.save()

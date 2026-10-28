@@ -10,6 +10,18 @@ SharedPost menggunakan Tailwind CSS 4.3.3. Layout kartu memakai grid responsif m
 
 Preflight tidak diimpor. Utility dan variabel Tailwind memakai prefix `sp`, sedangkan selector komponen dibatasi ke `.sharedpost-page`. CSS hanya dimuat melalui `SharedPost/base.html`, yang tetap mewarisi `base.html` kelompok. Utility diberi prioritas `important` untuk mengatasi selector global milik `app.css` pada elemen SharedPost yang menggunakan kelas `sp:`.
 
+## Filter dan kartu Papan Berbagi
+
+Kategori ditampilkan sebagai chip dengan nilai pilihan FoodItem dan label Indonesia. Foto kartu memakai rasio 2:1. Tombol Klaim membuka detail penawaran, tempat pengguna dapat melanjutkan ke Hubungi donor; menekan Klaim tidak mengubah status makanan.
+
+Radius (1, 2, 5, 10 km atau Semua area) dan urutan Terdekat memakai lokasi bawaan milik akun di Lokasi tersimpan. Jika lokasi belum dipilih, radius dan Terdekat dinonaktifkan, kartu menampilkan nama area, dan halaman menyediakan tautan pengaturan lokasi. Jarak menggunakan titik perkiraan yang sama dengan pin peta. Dengan lokasi bawaan, pilihan awal adalah radius 2 km dan Terdekat.
+
+Daftar awal berisi maksimal enam penawaran. Lihat lebih banyak meminta halaman berikutnya melalui HTMX dan mengganti daftar dengan hasil kumulatif. Tautannya menyimpan seluruh filter. Nomor halaman dan badge jumlah disinkronkan lewat out-of-band swap; filter baru kembali ke halaman pertama. Tautan pagination menonaktifkan pewarisan `hx-include`, karena seluruh parameter sudah berada di URL.
+
+Detail penawaran aktif menyediakan kartu Lokasi umum. Lihat lokasi membuka `Location:map?post=<id>` untuk menyorot pin perkiraan dan membuka popup penawaran tersebut. Tautan lama ke penawaran yang sudah tidak tersedia menampilkan pemberitahuan pada halaman peta.
+
+Template SharedPost dan peta menyertakan parameter versi pada aset CSS/JS yang berubah agar browser meminta aset baru. Naikkan versinya ketika memperbarui berkas tersebut; hasil build CSS tetap harus ikut commit dan deployment.
+
 ## Build lokal
 
 Compiler standalone resmi dipakai agar proyek Django tidak membutuhkan npm. Unduh Tailwind 4.3.3 dari rilis resminya sesuai sistem operasi:

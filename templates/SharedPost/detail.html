@@ -50,6 +50,14 @@
             <div><dt>Dipublikasikan</dt><dd>{{ post.created_at|date:"j F Y" }}</dd></div>
         </dl>
 
+        {% if map_url %}
+        <section class="detail-location" aria-labelledby="public-location-title">
+            <h2 id="public-location-title">{% include "SharedPost/partials/icon.html" with icon="pin" size="18" %}Lokasi umum</h2>
+            <p>Titik di peta menunjukkan area umum, bukan alamat pribadi. Hubungi donor untuk menyepakati titik pengambilan.</p>
+            <a class="button secondary" href="{{ map_url }}" aria-label="Lihat lokasi {{ post.food_item.name }} di peta">Lihat lokasi</a>
+        </section>
+        {% endif %}
+
         <section class="pickup-instructions" aria-labelledby="pickup-title">
             <h2 id="pickup-title" class="sp:font-heading sp:text-[23px] sp:font-normal">Petunjuk pengambilan</h2>
             <p class="sp:whitespace-pre-line sp:wrap-anywhere">{{ post.description }}</p>
