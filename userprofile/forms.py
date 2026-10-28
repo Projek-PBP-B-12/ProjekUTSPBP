@@ -3,14 +3,22 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.debug import sensitive_variables
 
+from Location.models import Location
 from .models import UserProfile
 
 
 class RegistrationForm(UserCreationForm):
     """Pakai validasi dan hashing password bawaan Django."""
 
+    email = forms.EmailField(
+        label="Email",
+        max_length=254,
+        help_text="Pengingat kedaluwarsa dikirim ke email ini. Tidak ditampilkan kepada donor atau penerima.",
+        widget=forms.EmailInput(attrs={"autocomplete": "email", "autocapitalize": "none"}),
+    )
+
     class Meta(UserCreationForm.Meta):
-        fields = ("username",)
+        fields = ("username", "email")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -46,50 +54,45 @@ class LoginForm(AuthenticationForm):
 class UserProfileForm(forms.ModelForm):
     """Daftar field eksplisit menjaga identitas dan hak akses di luar form."""
 
+    email = forms.EmailField(
+        label="Email pengingat",
+        max_length=254,
+        help_text="Gunakan alamat email milikmu yang aktif. Email hanya terlihat olehmu dan tidak menjadi kontak berbagi.",
+        widget=forms.EmailInput(attrs={"autocomplete": "email", "autocapitalize": "none"}),
+    )
+
     class Meta:
         model = UserProfile
         fields = (
             "whatsapp_number",
             "line_id",
-            "default_latitude",
-            "default_longitude",
+            "default_location",
         )
         labels = {
             "whatsapp_number": "Nomor WhatsApp",
             "line_id": "ID Line",
-            "default_latitude": "Lintang (latitude)",
-            "default_longitude": "Bujur (longitude)",
+            "default_location": "Lokasi bawaan peta",
         }
         help_texts = {
             "whatsapp_number": "Gunakan 8–15 digit dengan kode negara, misalnya 6281234567890. Tanpa + atau spasi.",
             "line_id": "Masukkan ID Line, bukan nama tampilan. Maksimal 100 karakter.",
-            "default_latitude": "Rentang -90 sampai 90. Gunakan titik desimal, maksimal 6 angka di belakang titik.",
-            "default_longitude": "Rentang -180 sampai 180. Isi bersama lintang, atau kosongkan keduanya.",
+            "default_location": "Peta langsung dibuka di lokasi ini. Lokasi pengambilan tetap dipilih pada setiap penawaran makanan.",
         }
         widgets = {
             "whatsapp_number": forms.TextInput(attrs={
                 "inputmode": "tel", "autocomplete": "tel", "placeholder": "6281234567890",
             }),
             "line_id": forms.TextInput(attrs={"autocapitalize": "none", "spellcheck": "false"}),
-            "default_latitude": forms.NumberInput(attrs={
-                "min": "-90", "max": "90", "step": "0.000001", "placeholder": "Contoh: -6.360000",
-            }),
-            "default_longitude": forms.NumberInput(attrs={
-                "min": "-180", "max": "180", "step": "0.000001", "placeholder": "Contoh: 106.820000",
-            }),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        coordinates = ("default_latitude", "default_longitude")
-        if all(field in cleaned_data for field in coordinates):
-            latitude, longitude = (cleaned_data[field] for field in coordinates)
-            if (latitude is None) != (longitude is None):
-                for field in coordinates:
-                    self.add_error(
-                        field, "Isi lintang dan bujur bersama, atau kosongkan keduanya."
-                    )
-        return cleaned_data
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].initial = user.email
+        self.initial["email"] = user.email
+        self.fields["default_location"].queryset = Location.objects.filter(
+            owner=user
+        ).order_by("area_name", "pk")
+        self.fields["default_location"].empty_label = "Belum memilih lokasi bawaan"
 
 
 class DeleteAccountForm(forms.Form):
@@ -100,7 +103,7 @@ class DeleteAccountForm(forms.Form):
         error_messages={"required": "Masukkan kata sandi saat ini."},
     )
     confirm = forms.BooleanField(
-        label="Saya memahami bahwa akun dan profil saya akan dihapus permanen.",
+        label="Saya memahami bahwa akun, profil, makanan, penawaran, lokasi, dan notifikasi saya akan dihapus permanen.",
         error_messages={"required": "Centang konfirmasi sebelum menghapus akun."},
     )
 

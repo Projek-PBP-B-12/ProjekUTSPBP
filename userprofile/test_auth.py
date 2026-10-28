@@ -12,6 +12,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
+from Location.models import Location
 from userprofile.models import UserProfile
 
 
@@ -26,14 +27,14 @@ class AccountTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(
-            username="pemilik_akun", password=cls.password
+            username="pemilik_akun", password=cls.password, email="pemilik@example.com"
         )
         cls.profile = UserProfile.objects.create(
             user=cls.user,
             whatsapp_number="6281234567890",
             line_id="pemilik.line",
-            default_latitude=Decimal("-6.360000"),
-            default_longitude=Decimal("106.820000"),
+            default_location=Location.objects.create(owner=cls.user, area_name="Rumah",
+                latitude=Decimal("-6.360000"), longitude=Decimal("106.820000")),
         )
 
     def setUp(self):
@@ -214,17 +215,17 @@ class OwnProfileTests(AccountTestCase):
         self.assertNotContains(response, self.user.password)
 
     def test_zero_coordinates_are_displayed_as_a_saved_location(self):
-        self.profile.default_latitude = Decimal("0")
-        self.profile.default_longitude = Decimal("0")
-        self.profile.save()
+        self.profile.default_location.latitude = Decimal("0")
+        self.profile.default_location.longitude = Decimal("0")
+        self.profile.default_location.save()
         self.client.force_login(self.user)
 
         response = self.client.get(self.profile_url)
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Belum diisi")
-        self.assertEqual(response.context["profile"].default_latitude, Decimal("0"))
-        self.assertEqual(response.context["profile"].default_longitude, Decimal("0"))
+        self.assertEqual(response.context["profile"].default_location.latitude, Decimal("0"))
+        self.assertEqual(response.context["profile"].default_location.longitude, Decimal("0"))
 
     def test_user_controlled_contact_is_escaped_in_html(self):
         malicious_line = '<script>alert("kontak")</script>'

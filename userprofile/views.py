@@ -14,6 +14,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_safe
 from django.views.decorators.debug import sensitive_post_parameters
 
+from Location.models import Location
 from .forms import DeleteAccountForm, LoginForm, RegistrationForm, UserProfileForm
 from .models import UserProfile
 
@@ -65,7 +66,7 @@ class UserLogoutView(LogoutView):
 @login_required
 @require_safe
 def profile_detail(request):
-    profile = UserProfile.objects.filter(user=request.user).first()
+    profile = UserProfile.objects.select_related("default_location").filter(user=request.user).first()
     return render(request, "userprofile/profile.html", {"profile": profile})
 
 
@@ -78,12 +79,27 @@ def profile_edit(request):
     if profile is None:
         profile = UserProfile(user=request.user)
     form = UserProfileForm(
-        request.POST if request.method == "POST" else None, instance=profile
+        request.POST if request.method == "POST" else None,
+        instance=profile,
+        user=request.user,
     )
     if request.method == "POST" and form.is_valid():
-        UserProfile.objects.update_or_create(
-            user=request.user, defaults=form.cleaned_data
-        )
+        with transaction.atomic():
+            location = form.cleaned_data["default_location"]
+            if location is not None:
+                # Keep the owned location present until its profile reference is saved.
+                get_object_or_404(
+                    Location.objects.select_for_update(),
+                    pk=location.pk, owner=request.user,
+                )
+            # Email belongs to auth.User; the other fields belong to UserProfile.
+            get_user_model().objects.filter(pk=request.user.pk).update(
+                email=form.cleaned_data["email"]
+            )
+            UserProfile.objects.update_or_create(
+                user=request.user,
+                defaults={name: form.cleaned_data[name] for name in form.Meta.fields},
+            )
         messages.success(request, "Profil berhasil diperbarui.")
         return redirect("userprofile:profile")
     return render(request, "userprofile/profile_edit.html", {"form": form})

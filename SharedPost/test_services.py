@@ -72,8 +72,8 @@ class MapPinTests(TestCase):
             "description": "Ambil di lobi kos sore hari.",
             "photo_url": "https://drive.google.com/thumbnail?id=abc&sz=w1000",
             "area_name": "Beji",
-            "latitude": "-6.360000",
-            "longitude": "106.830000",
+            "latitude": "-6.360",
+            "longitude": "106.830",
             "distance_km": None,
             "detail_url": reverse("sharedpost:detail", args=[self.post.pk]),
         }])
@@ -94,3 +94,20 @@ class MapPinTests(TestCase):
         self.food.image_url = ""
         self.food.save(update_fields=["image_url"])
         self.assertIsNone(get_map_pins(SharedPost.objects.all())[0]["photo_url"])
+
+    def test_public_distance_uses_the_approximate_pin_instead_of_exact_home(self):
+        self.location.latitude = "-6.371234"
+        self.location.longitude = "106.831234"
+        self.location.save(update_fields=["latitude", "longitude"])
+        pins = get_map_pins(SharedPost.objects.all(), origin=self.location)
+        self.assertEqual(pins[0]["latitude"], "-6.371")
+        self.assertEqual(pins[0]["longitude"], "106.831")
+        expected = round(distance_km(-6.371234, 106.831234, -6.371, 106.831), 2)
+        self.assertGreater(expected, 0)
+        self.assertEqual(pins[0]["distance_km"], expected)
+
+
+class DistanceTests(SimpleTestCase):
+    def test_same_and_opposite_points_remain_finite(self):
+        self.assertEqual(distance_km(0, 0, 0, 0), 0)
+        self.assertAlmostEqual(distance_km(90, 0, -90, 180), 20015.114442, places=5)

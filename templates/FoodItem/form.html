@@ -8,6 +8,7 @@
 {% block content %}
 <form method="post" action="{{ post_form_url }}" class="card" style="display: flex; flex-direction: column;">
     {% csrf_token %}
+    {% for error in form.non_field_errors %}<p class="form-error" role="alert">{{ error }}</p>{% endfor %}
     {% for field in form %}
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
         {{ field }}

@@ -1,4 +1,8 @@
 .profile-nav { padding-inline: 0; }
+.profile-app-links { display: flex; flex-wrap: wrap; gap: 12px 22px; padding-block: 18px; color: var(--teal); font-size: 13px; }
+.profile-app-links a { text-underline-offset: 4px; }
+.profile-app-links a:hover, .profile-app-links a:focus-visible { text-decoration: underline; }
+.edit-form select { width: 100%; padding: 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
 
 .profile-main {
   background: radial-gradient(ellipse at 5% 95%, #dce9e4, transparent 50%), #f8f8f0;

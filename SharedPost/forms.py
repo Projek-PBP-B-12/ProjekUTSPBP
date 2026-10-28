@@ -57,6 +57,11 @@ class SharedPostForm(forms.ModelForm):
 
         self.fields["food_item"].empty_label = "Pilih makanan"
         self.fields["location"].empty_label = "Pilih lokasi"
+        self.fields["location"].help_text = (
+            "Pilih titik pengambilan secara sengaja, termasuk Rumah jika diinginkan. "
+            "Nama lokasi dan area perkiraannya akan terlihat oleh pengguna lain pada penawaran. "
+            "Lokasi bawaan profil hanya digunakan untuk memusatkan peta."
+        )
 
     def clean_description(self):
         description = self.cleaned_data["description"].strip()

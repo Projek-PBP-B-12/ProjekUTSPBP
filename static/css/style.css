@@ -6,31 +6,7 @@
  * Ubah warna dan font melalui variabel pada bagian 1.
  */
 
-/* Font navbar lokal: tidak memerlukan koneksi ke Google Fonts. */
-
-@font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/plus-jakarta-sans-medium.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/plus-jakarta-sans-semibold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/plus-jakarta-sans-bold.ttf') format('truetype');
-}
+/* Font sistem tersedia tanpa mengunduh aset font tambahan. */
 
 /* 1. Variabel warna dan tipografi */
 
@@ -40,7 +16,7 @@
   --teal: #176e72;
   --lime: #c7de73;
   --border: #d5ded6;
-  --font-nav: 'Plus Jakarta Sans', Arial, Helvetica, sans-serif;
+  --font-nav: Arial, Helvetica, sans-serif;
 }
 
 /* 2. Reset dan elemen dasar */

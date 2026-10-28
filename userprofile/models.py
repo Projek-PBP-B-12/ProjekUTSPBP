@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import RegexValidator
 # Create your models here.
 
 class UserProfile(models.Model):
@@ -11,43 +11,27 @@ class UserProfile(models.Model):
     
     line_id = models.CharField("ID Line", max_length=100, blank=True)
 
-    default_latitude = models.DecimalField("Default Latitude", max_digits=9, decimal_places=6, null=True, blank=True, validators=[MinValueValidator(-90),MaxValueValidator(90)],)
-
-    default_longitude = models.DecimalField("Default Longitude", max_digits=9, decimal_places=6, null=True, blank=True, validators=[MinValueValidator(-180),MaxValueValidator(180)],)
+    default_location = models.ForeignKey(
+        "Location.Location",
+        verbose_name="Lokasi bawaan",
+        on_delete=models.SET_NULL,
+        related_name="default_for_profiles",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = "profil pengguna"
         verbose_name_plural = "profil pengguna"
-        constraints = [
-            models.CheckConstraint(
-                condition=(
-                    models.Q(default_latitude__isnull=True, default_longitude__isnull=True)
-                    | models.Q(default_latitude__isnull=False, default_longitude__isnull=False)
-                ),
-                name="profile_coordinates_pair",
-            ),
-            models.CheckConstraint(
-                condition=(
-                    models.Q(default_latitude__isnull=True)
-                    | models.Q(default_latitude__gte=-90, default_latitude__lte=90)
-                ),
-                name="profile_latitude_range",
-            ),
-            models.CheckConstraint(
-                condition=(
-                    models.Q(default_longitude__isnull=True)
-                    | models.Q(default_longitude__gte=-180, default_longitude__lte=180)
-                ),
-                name="profile_longitude_range",
-            ),
-        ]
 
     def clean(self):
         super().clean()
-        if (self.default_latitude is None) != (self.default_longitude is None):
-            raise ValidationError(
-                "Lintang dan Bujur harus diisi bersama atau keduanya dikosongkan."
-            )
+        if self.default_location_id and self.user_id:
+            location_model = self._meta.get_field("default_location").remote_field.model
+            if location_model.objects.filter(pk=self.default_location_id).exclude(owner_id=self.user_id).exists():
+                raise ValidationError({
+                    "default_location": "Pilih lokasi yang tersimpan di akunmu sendiri."
+                })
 
     def __str__(self):
         return f"Profil {self.user.get_username()}"

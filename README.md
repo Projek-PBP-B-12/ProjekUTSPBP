@@ -103,3 +103,7 @@ https://justin-evan-titiklapar.pws.cs.ui.ac.id/
 ## Tautan Figma
 
 https://www.figma.com/design/r3aIEwY6EmWnxDocq8Rrl3/Projek-PBP-B12?node-id=0-1&t=RJOL7DroOzRv7Kqf-1
+
+## Panduan integrasi terbaru
+
+Alur akun/email, lokasi tersimpan + GPS, inventori, penawaran, peta, pengingat, migrasi, dan pengujian dijelaskan dalam [docs/integrasi.md](docs/integrasi.md).

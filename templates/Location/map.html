@@ -10,16 +10,22 @@
 
 {% block page_title %}Peta Berbagi{% endblock %}
 {% block page_summary %}Jelajahi penawaran di sekitar. Pin menunjukkan area umum.{% endblock %}
+{% block page_action %}<a class="button button-outline" href="{% url 'Location:manage' %}">Kelola lokasi</a>{% endblock %}
 
 {% block content %}
 <form class="map-search" id="map-search-form" data-search-url="{% url 'Location:search_locations' %}">
   <label class="map-search-label" for="map-search-input">Cari lokasi</label>
-  <input class="map-search-input" id="map-search-input" type="search" placeholder="Masukkan alamat atau nama tempat" autocomplete="off">
-  <p class="map-search-hint" id="map-search-hint" aria-live="polite">Tulis nama yang mudah dikenali.</p>
+  <input class="map-search-input" id="map-search-input" type="search" placeholder="Masukkan nama tempat umum atau area" autocomplete="off">
+  <button class="button button-outline" type="submit">Cari area</button>
+  <p class="map-search-hint" id="map-search-hint" aria-live="polite">Peta dibuka dari {{ map_center.label }}{% if not map_center.is_default %}. Pilih lokasi bawaan di Lokasi Saya{% endif %}.</p>
+  <p class="location-muted">Pencarian oleh <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">OpenStreetMap</a> / Nominatim. Gunakan nama area umum, tanpa alamat rumah lengkap atau data pribadi.</p>
 </form>
-
+<div class="location-actions map-actions"><button class="button button-outline" type="button" id="map-reset-center">Kembali ke {{ map_center.label }}</button><button class="button button-outline" type="button" id="map-show-all"{% if not pins %} disabled{% endif %}>Lihat semua penawaran</button></div>
 <div class="map-canvas" id="map" role="application" aria-label="Peta penawaran makanan"></div>
+<p class="location-muted">Pin dibulatkan ke area sekitar, bukan alamat persis donor. Hubungi donor untuk menentukan titik pengambilan.</p>
+<section class="location-panel map-offers" aria-labelledby="map-offers-title"><h2 id="map-offers-title">Penawaran di peta</h2><ul class="location-list">{% for pin in pins %}<li><a href="{{ pin.detail_url }}">{{ pin.title }}</a> · {{ pin.area_name }}</li>{% empty %}<li>Belum ada penawaran makanan yang tersedia.</li>{% endfor %}</ul></section>
 {{ pins|json_script:"pins-data" }}
+{{ map_center|json_script:"map-center-data" }}
 {% endblock %}
 
 {% block extra_js %}

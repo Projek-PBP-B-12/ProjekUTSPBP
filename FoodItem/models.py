@@ -68,5 +68,5 @@ class FoodItem(models.Model):
         return self.name
 
     def clean(self):
-        if self.expiration_date < self.purchase_date:
+        if self.expiration_date and self.purchase_date and self.expiration_date < self.purchase_date:
             raise ValidationError("Expiration date cannot be before purchase date.")

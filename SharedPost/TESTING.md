@@ -8,7 +8,7 @@ Aktifkan virtual environment proyek, lalu instal dependensi pengujian:
 python -m pip install -r requirements-dev.txt
 ```
 
-Tes browser memakai Playwright dan Microsoft Edge secara default. Edge harus sudah terpasang. Tidak perlu menjalankan `runserver`: Django menyediakan server pengujian dan database sementara sendiri. Akun, sesi login, lokasi, dan makanan contoh dibuat otomatis, sehingga tes tidak membutuhkan akun atau data inventori lokal. Sesi login disiapkan oleh Django; tes ini tidak menguji halaman login milik modul lain.
+Tes browser memakai Playwright dan Chromium secara default. Pasang browser dengan `python -m playwright install chromium`. Tidak perlu menjalankan `runserver`: Django menyediakan server pengujian dan database sementara sendiri. Akun, sesi login, lokasi, dan makanan contoh dibuat otomatis, sehingga tes tidak membutuhkan akun atau data inventori lokal. Sesi login disiapkan oleh Django; tes ini tidak menguji halaman login milik modul lain.
 
 ## Perintah
 
@@ -41,7 +41,7 @@ Pengukuran coverage mengecualikan berkas tes dan migrasi. Coverage Python tidak 
 
 ## Pilihan browser
 
-Untuk komputer tanpa Edge, instal Chromium milik Playwright dan atur pilihan browser:
+Untuk memakai Chromium milik Playwright, instal browser (Chromium sudah menjadi pilihan default):
 
 ```powershell
 python -m playwright install chromium
@@ -49,7 +49,7 @@ $env:BROWSER_CHANNEL = "chromium"
 python manage.py test SharedPost.test_browser
 ```
 
-`BROWSER_CHANNEL=chrome` juga dapat memakai Chrome yang sudah terpasang. Untuk melihat browser selama tes, gunakan `$env:BROWSER_HEADLESS = "0"`; nilai default `1` menjalankannya tanpa jendela.
+`BROWSER_CHANNEL=chrome` atau `BROWSER_CHANNEL=msedge` dapat memakai Chrome/Edge yang sudah terpasang. Di macOS/zsh gunakan `BROWSER_CHANNEL=chromium python manage.py test SharedPost.test_browser`. Untuk melihat browser selama tes, gunakan `$env:BROWSER_HEADLESS = "0"`; nilai default `1` menjalankannya tanpa jendela.
 
 ## Skenario browser
 

@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.cache import never_cache
 
 from FoodItem.models import FoodItem
 from .models import Notification
@@ -20,6 +21,7 @@ REMINDER_DAYS = (7, 3, 1)
 ACTIVE_FOOD_STATUSES = ("STORED", "OFFERED")
 
 
+@never_cache
 @login_required
 @require_GET
 def show_notification(request):
@@ -34,10 +36,12 @@ def show_notification(request):
         "page_summary": "Pengingat tentang makananmu. Keputusan tetap ada padamu.",
         "notifications": notifications,
         "unread_count": notifications.filter(is_read=False).count(),
+        "has_email": bool(request.user.email.strip()),
     }
     return render(request, "notification/list.html", context)
 
 
+@never_cache
 @require_POST
 def mark_notification_read(request, pk):
     """Ubah status baca, tanpa mengubah status makanan atau email."""
@@ -65,6 +69,7 @@ def generate_food_reminders(dry_run=False, recipient=None, food_item=None):
         foods = FoodItem.objects.filter(
             expiration_date=today + timedelta(days=days),
             status__in=ACTIVE_FOOD_STATUSES,
+            owner__is_active=True,
         )
         if recipient is not None:
             foods = foods.filter(owner=recipient)
@@ -99,22 +104,33 @@ def generate_food_reminders(dry_run=False, recipient=None, food_item=None):
 
 def send_reminder_email(notification_id):
     """Periksa kondisi makanan, kirim email, lalu simpan hasilnya."""
+    # Claim lewat satu UPDATE bersyarat: hanya satu worker yang boleh mengirim.
+    claimed = Notification.objects.filter(
+        pk=notification_id,
+        email_status__in=(
+            Notification.EmailStatus.PENDING, Notification.EmailStatus.FAILED,
+        ),
+    ).update(email_status=Notification.EmailStatus.SENDING, last_email_error="")
+    if not claimed:
+        return (
+            Notification.objects.filter(pk=notification_id)
+            .values_list("email_status", flat=True).first()
+            or Notification.EmailStatus.SKIPPED
+        )
+
     notification = Notification.objects.select_related(
         "recipient", "food_item",
     ).filter(pk=notification_id).first()
 
     if notification is None:
         return Notification.EmailStatus.SKIPPED
-    if notification.email_status not in (
-        Notification.EmailStatus.PENDING, Notification.EmailStatus.FAILED,
-    ):
-        return notification.email_status
-
     food = notification.food_item
     email = notification.recipient.email.strip()
     error = ""
 
-    if notification.reminder_days not in REMINDER_DAYS:
+    if not notification.recipient.is_active:
+        error = "Akun penerima sudah tidak aktif."
+    elif notification.reminder_days not in REMINDER_DAYS:
         error = "Notifikasi ini bukan pengingat H-7, H-3, atau H-1."
     elif food is None:
         error = "Makanan sudah dihapus."
@@ -185,7 +201,7 @@ def send_pending_reminder_emails(food_item=None):
             food_item=food_item, recipient_id=food_item.owner_id,
         )
     notifications = list(notifications)
-    result = {"sent": 0, "failed": 0, "skipped": 0}
+    result = {"sent": 0, "failed": 0, "skipped": 0, "in_progress": 0}
 
     for notification in notifications:
         status = send_reminder_email(notification.pk)
@@ -194,6 +210,8 @@ def send_pending_reminder_emails(food_item=None):
             result["sent"] += 1
         elif status == Notification.EmailStatus.FAILED:
             result["failed"] += 1
+        elif status == Notification.EmailStatus.SENDING:
+            result["in_progress"] += 1
         else:
             result["skipped"] += 1
 

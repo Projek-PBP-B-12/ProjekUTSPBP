@@ -20,6 +20,7 @@
       </div>
     </nav>
   </header>
+  {% include 'userprofile/includes/account_navigation.html' %}
   <main class="profile-main">
     <div class="profile-layout container">
       <header class="profile-heading">
@@ -33,7 +34,8 @@
           <h2 id="delete-impact-title">Akun dan profilmu.</h2>
           <ul class="deletion-effects">
             <li>Akun <strong>{{ user.username }}</strong> beserta data login.</li>
-            <li>Profil, termasuk WhatsApp, ID Line, dan lokasi bawaan yang tersimpan.</li>
+            <li>Profil, termasuk email, WhatsApp, dan ID Line.</li>
+            <li>Seluruh makanan, penawaran berbagi, lokasi tersimpan, dan notifikasi milikmu.</li>
           </ul>
           <p class="profile-privacy">Setelah berhasil, kamu akan keluar dan kembali ke beranda. Kontakmu tidak lagi tersedia melalui halaman kontak berbagi.</p>
         </section>

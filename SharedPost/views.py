@@ -1,6 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Q
@@ -9,13 +6,18 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponse
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_http_methods
 
 from FoodItem.models import FoodItem
+from Location.models import Location
 from .forms import SharedPostForm
 from .models import SharedPost
 
 
+@never_cache
 @login_required
+@require_http_methods(["GET", "HEAD"])
 def shared_post_detail(request, pk):
     post = get_object_or_404(
         SharedPost.objects.select_related(
@@ -30,6 +32,7 @@ def shared_post_detail(request, pk):
         post.is_active
         and post.food_item.status == "OFFERED"
         and not post.food_item.is_expired
+        and post.food_item.owner.is_active
     )
 
     if not is_owner and not is_available:
@@ -46,20 +49,22 @@ def shared_post_detail(request, pk):
     )
 
 
+def _locked_post_and_food(user, pk, active_only=False):
+    # Setiap alur inventori/penawaran mengunci makanan sebelum penawaran.
+    owned = SharedPost.objects.filter(food_item__owner=user)
+    if active_only:
+        owned = owned.filter(is_active=True)
+    food_id = get_object_or_404(owned, pk=pk).food_item_id
+    food = get_object_or_404(FoodItem.objects.select_for_update(), pk=food_id, owner=user)
+    post = get_object_or_404(owned.select_for_update(), pk=pk)
+    return post, food
+
+
 @login_required
 @require_POST
 def complete_shared_post(request, pk):
     with transaction.atomic():
-        post = get_object_or_404(
-            SharedPost.objects.select_for_update(),
-            pk=pk,
-            food_item__owner=request.user,
-            is_active=True,
-        )
-
-        food = FoodItem.objects.select_for_update().get(
-            pk=post.food_item_id,
-        )
+        post, food = _locked_post_and_food(request.user, pk, active_only=True)
 
         post.is_active = False
         post.save(update_fields=["is_active", "updated_at"])
@@ -77,15 +82,7 @@ def complete_shared_post(request, pk):
 @require_POST
 def delete_shared_post(request, pk):
     with transaction.atomic():
-        post = get_object_or_404(
-            SharedPost.objects.select_for_update(),
-            pk=pk,
-            food_item__owner=request.user,
-        )
-
-        food = FoodItem.objects.select_for_update().get(
-            pk=post.food_item_id,
-        )
+        post, food = _locked_post_and_food(request.user, pk)
 
         if post.is_active and food.status == "OFFERED":
             food.status = "STORED"
@@ -99,7 +96,9 @@ def delete_shared_post(request, pk):
     return redirect("sharedpost:list")
 
 
+@never_cache
 @login_required
+@require_http_methods(["GET", "POST"])
 def create_shared_post(request):
     if request.method == "POST":
         with transaction.atomic():
@@ -108,7 +107,7 @@ def create_shared_post(request):
             list(
                 FoodItem.objects.select_for_update().filter(
                     owner=request.user,
-                )
+                ).order_by("pk")
             )
 
             form = SharedPostForm(
@@ -117,6 +116,10 @@ def create_shared_post(request):
             )
 
             if form.is_valid():
+                form.instance.location = get_object_or_404(
+                    Location.objects.select_for_update(),
+                    pk=form.cleaned_data["location"].pk, owner=request.user,
+                )
                 post = form.save()
 
                 food = post.food_item
@@ -133,6 +136,10 @@ def create_shared_post(request):
                 return redirect("sharedpost:list")
     else:
         form = SharedPostForm(user=request.user)
+        selected_food = request.GET.get("food", "")
+        if selected_food.isascii() and selected_food.isdigit() and len(selected_food) <= 18:
+            if form.fields["food_item"].queryset.filter(pk=selected_food).exists():
+                form.initial["food_item"] = int(selected_food)
 
     is_htmx = request.headers.get("HX-Request") == "true"
     template = (
@@ -147,6 +154,7 @@ def create_shared_post(request):
         {"form": form, "is_htmx": is_htmx},
     )
 
+@never_cache
 @login_required
 def shared_post_list(request):
     posts = SharedPost.objects.select_related(
@@ -156,6 +164,7 @@ def shared_post_list(request):
         is_active=True,
         food_item__status="OFFERED",
         food_item__expiration_date__gte=timezone.localdate(),
+        food_item__owner__is_active=True,
     )
 
     filters = request.GET if request.method == "GET" else request.POST
@@ -187,17 +196,14 @@ def shared_post_list(request):
     )
 
 
+@never_cache
 @login_required
+@require_http_methods(["GET", "POST"])
 def update_shared_post(request, pk):
     is_htmx = request.headers.get("HX-Request") == "true"
 
     with transaction.atomic():
-        post = get_object_or_404(
-            SharedPost.objects.select_for_update(),
-            pk=pk,
-            food_item__owner=request.user,
-            is_active=True,
-        )
+        post, food = _locked_post_and_food(request.user, pk, active_only=True)
 
         if request.method == "POST":
             form = SharedPostForm(
@@ -207,6 +213,10 @@ def update_shared_post(request, pk):
             )
 
             if form.is_valid():
+                form.instance.location = get_object_or_404(
+                    Location.objects.select_for_update(),
+                    pk=form.cleaned_data["location"].pk, owner=request.user,
+                )
                 form.save()
                 if is_htmx:
                     response = HttpResponse(
