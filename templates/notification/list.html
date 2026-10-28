@@ -21,13 +21,13 @@
             </a>
             <nav class="notif-navigation" aria-label="Navigasi aplikasi">
                 <a class="notif-nav-item" href="{% url 'landing_page' %}">Beranda</a>
-                <span class="notif-nav-item" aria-disabled="true">Makananku</span>
+                <a class="notif-nav-item" href="{% url 'FoodItem:makananku' %}">Makananku</a>
                 <a class="notif-nav-item" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
                 <a class="notif-nav-item" href="{% url 'sharedpost:list' %}">Papan berbagi</a>
-                <span class="notif-nav-item" aria-disabled="true">Peta berbagi</span>
+                <a class="notif-nav-item" href="{% url 'Location:map' %}">Peta berbagi</a>
                 <a class="notif-nav-item notif-nav-item-active"
                    href="{% url 'notification:show_notification' %}" aria-current="page">Notifikasi</a>
-                <span class="notif-nav-item" aria-disabled="true">Profil</span>
+                <a class="notif-nav-item" href="{% url 'userprofile:profile' %}">Profil</a>
             </nav>
         </aside>
 
