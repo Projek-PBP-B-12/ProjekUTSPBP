@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lokasi Saya · TitikLapar{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/location.css' %}">{% endblock %}
+{% block page_title %}Lokasi Saya{% endblock %}
+{% block page_summary %}Simpan Rumah, Kos, Kampus, atau tempat lain untuk memudahkan berbagi.{% endblock %}
+{% block page_action %}<a class="button button-outline" href="{% url 'Location:map' %}">Buka peta</a>{% endblock %}
+
+{% block content %}
+  <div class="location-layout">
+    <section class="location-panel" aria-labelledby="saved-locations-title">
+      <h2 id="saved-locations-title">Lokasi tersimpan</h2>
+      <p class="location-muted">Lokasi bawaan menentukan pusat awal peta. Kamu tetap memilih lokasi pengambilan setiap kali membuat penawaran.</p>
+      <ul class="location-list">
+        {% for location in locations %}
+          <li class="location-card">
+            <div class="location-card-heading"><h3>{{ location.area_name }}</h3>{% if location.pk == default_location_id %}<span class="location-badge">Bawaan</span>{% endif %}</div>
+            <p class="location-coordinates">{{ location.latitude }}, {{ location.longitude }}</p>
+            <div class="location-actions">
+              {% if location.pk != default_location_id %}<form method="post" action="{% url 'Location:set_default' location.pk %}">{% csrf_token %}<button class="button button-outline" type="submit">Jadikan bawaan</button></form>{% endif %}
+              {% if not location.shared_posts.all %}
+                <a class="button button-outline" href="{% url 'Location:manage_edit' location.pk %}#location-form">Ubah</a>
+                <form method="post" action="{% url 'Location:manage_delete' location.pk %}" data-delete-location>{% csrf_token %}<button class="button button-outline location-delete" type="submit">Hapus</button></form>
+              {% else %}<span class="location-muted">Dipakai pada penawaran; tambah lokasi baru untuk mengganti titik.</span>{% endif %}
+            </div>
+          </li>
+        {% empty %}<li class="location-empty">Belum ada lokasi. Tambahkan lokasi pertamamu lewat formulir ini.</li>{% endfor %}
+      </ul>
+      <p class="location-muted">Lokasi tersimpan hanya terlihat olehmu. Jika dipilih untuk penawaran, nama area dan pin perkiraannya akan tampil kepada pengguna lain. Sepakati titik temu tepatnya melalui kontak donor.</p>
+    </section>
+
+    <section class="location-panel" aria-labelledby="location-form-title">
+      <h2 id="location-form-title">{% if editing %}Ubah lokasi{% else %}Tambah lokasi{% endif %}</h2>
+      {% if locked %}
+        <p class="location-notice error">Lokasi ini masih digunakan pada penawaran dan tidak dapat diubah. Tambahkan lokasi baru, lalu ubah lokasi pada penawaran yang ingin dipindahkan.</p>
+        <a class="button button-primary" href="{% url 'Location:manage' %}#location-form">Tambah lokasi baru</a>
+      {% else %}
+        <form method="post" id="location-form" class="location-form" data-search-url="{% url 'Location:search_locations' %}">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="location-field">
+            <label for="{{ form.area_name.id_for_label }}">{{ form.area_name.label }}</label>{{ form.area_name }}
+            <small>{{ form.area_name.help_text }}</small>{{ form.area_name.errors }}
+          </div>
+          <div class="location-assist">
+            <button class="button button-outline" type="button" id="use-current-location">Gunakan lokasi saat ini (GPS)</button>
+            <p class="location-muted" id="location-gps-status" role="status">GPS hanya mengisi koordinat setelah kamu memberi izin. Periksa titiknya, lalu tekan Simpan. Lokasi saat ini belum tentu rumahmu.</p>
+            <label for="location-address-search">Atau cari nama tempat / area</label>
+            <div class="location-search-row"><input id="location-address-search" type="search" placeholder="Contoh: Universitas Indonesia Depok" autocomplete="off"><button type="button" id="location-address-button" class="button button-outline">Cari</button></div>
+            <p class="location-muted" id="location-search-status" role="status">Pilih salah satu hasil untuk mengisi koordinat. Kamu juga bisa mengetik koordinat sendiri.</p>
+            <ul id="location-search-results" class="location-results"></ul>
+            <p class="location-muted">Pencarian area memakai <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">OpenStreetMap</a> melalui Nominatim. Gunakan nama tempat umum; jangan kirim alamat rumah lengkap atau data pribadi.</p>
+          </div>
+          <div class="location-coordinate-fields">
+            <div class="location-field"><label for="{{ form.latitude.id_for_label }}">{{ form.latitude.label }}</label>{{ form.latitude }}<small>{{ form.latitude.help_text }}</small>{{ form.latitude.errors }}</div>
+            <div class="location-field"><label for="{{ form.longitude.id_for_label }}">{{ form.longitude.label }}</label>{{ form.longitude }}<small>{{ form.longitude.help_text }}</small>{{ form.longitude.errors }}</div>
+          </div>
+          <div class="location-checkbox"><label>{{ form.make_default }} <span>{{ form.make_default.label }}</span></label><small>{{ form.make_default.help_text }}</small>{{ form.make_default.errors }}</div>
+          <div class="location-actions"><button class="button button-primary" type="submit">Simpan lokasi</button>{% if editing %}<a class="button button-outline" href="{% url 'Location:manage' %}">Batal</a>{% endif %}</div>
+        </form>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/location-manage.js' %}"></script>{% endblock %}

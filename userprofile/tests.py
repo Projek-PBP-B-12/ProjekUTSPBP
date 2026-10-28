@@ -9,6 +9,7 @@ from django.db import IntegrityError, transaction
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 
+from Location.models import Location
 from .forms import RegistrationForm
 from .models import UserProfile
 from .admin import UserProfileAdmin
@@ -33,8 +34,7 @@ class UserProfileModelTests(TestCase):
 
         self.assertEqual(profile.whatsapp_number, "")
         self.assertEqual(profile.line_id, "")
-        self.assertIsNone(profile.default_latitude)
-        self.assertIsNone(profile.default_longitude)
+        self.assertIsNone(profile.default_location)
         self.assertEqual(self.user.profile.pk, profile.pk)
 
     def test_user_cannot_have_two_profiles(self):
@@ -85,67 +85,34 @@ class UserProfileModelTests(TestCase):
 
         self.assertIn("line_id", error.exception.message_dict)
 
-    def test_coordinates_accept_zero_and_valid_boundaries(self):
-        profile = UserProfile.objects.create(user=self.user)
+    def test_default_location_points_to_one_of_multiple_owned_locations(self):
+        home = Location.objects.create(owner=self.user, area_name="Rumah", latitude=0, longitude=0)
+        campus = Location.objects.create(owner=self.user, area_name="Kampus", latitude=-6, longitude=106)
+        profile = UserProfile(user=self.user, default_location=home)
+        profile.full_clean()
+        profile.save()
+        profile.default_location = campus
+        profile.full_clean()
+        profile.save()
+        profile.refresh_from_db()
+        self.assertEqual(profile.default_location, campus)
+        self.assertEqual(self.user.locations.count(), 2)
 
-        for latitude, longitude in (
-            ("0", "0"),
-            ("-90", "-180"),
-            ("90", "180"),
-            ("-6.360000", "106.820000"),
-        ):
-            with self.subTest(latitude=latitude, longitude=longitude):
-                profile.default_latitude = Decimal(latitude)
-                profile.default_longitude = Decimal(longitude)
-                profile.full_clean()
-                profile.save()
-                profile.refresh_from_db()
+    def test_model_rejects_another_users_default_location(self):
+        other = User.objects.create_user(username="tetangga")
+        location = Location.objects.create(owner=other, area_name="Rumah tetangga", latitude=0, longitude=0)
+        profile = UserProfile(user=self.user, default_location=location)
+        with self.assertRaises(ValidationError) as error:
+            profile.full_clean()
+        self.assertIn("default_location", error.exception.message_dict)
 
-                self.assertEqual(profile.default_latitude, Decimal(latitude))
-                self.assertEqual(profile.default_longitude, Decimal(longitude))
-
-    def test_model_rejects_incomplete_or_out_of_range_coordinates(self):
-        cases = (
-            (Decimal("1"), None),
-            (None, Decimal("1")),
-            (Decimal("-90.000001"), Decimal("0")),
-            (Decimal("90.000001"), Decimal("0")),
-            (Decimal("0"), Decimal("-180.000001")),
-            (Decimal("0"), Decimal("180.000001")),
-        )
-        for latitude, longitude in cases:
-            with self.subTest(latitude=latitude, longitude=longitude):
-                profile = UserProfile(
-                    user=self.user,
-                    default_latitude=latitude,
-                    default_longitude=longitude,
-                )
-                with self.assertRaises(ValidationError):
-                    profile.full_clean()
-
-    def test_database_rejects_bad_coordinates_without_full_clean(self):
-        profile = UserProfile.objects.create(user=self.user)
-        cases = (
-            (Decimal("1"), None),
-            (None, Decimal("1")),
-            (Decimal("-91"), Decimal("0")),
-            (Decimal("91"), Decimal("0")),
-            (Decimal("0"), Decimal("-181")),
-            (Decimal("0"), Decimal("181")),
-        )
-        for latitude, longitude in cases:
-            with self.subTest(latitude=latitude, longitude=longitude):
-                # update() melewati validasi model; constraint DB tetap berlaku.
-                with self.assertRaises(IntegrityError):
-                    with transaction.atomic():
-                        UserProfile.objects.filter(pk=profile.pk).update(
-                            default_latitude=latitude,
-                            default_longitude=longitude,
-                        )
-
-                profile.refresh_from_db()
-                self.assertIsNone(profile.default_latitude)
-                self.assertIsNone(profile.default_longitude)
+    def test_deleting_unused_default_location_clears_pointer_and_keeps_profile(self):
+        location = Location.objects.create(owner=self.user, area_name="Rumah", latitude=0, longitude=0)
+        profile = UserProfile.objects.create(user=self.user, default_location=location)
+        location.delete()
+        profile.refresh_from_db()
+        self.assertIsNone(profile.default_location)
+        self.assertEqual(profile.user, self.user)
 
 
 class RegistrationFormTests(TestCase):
@@ -154,6 +121,7 @@ class RegistrationFormTests(TestCase):
     def setUp(self):
         self.data = {
             "username": "pengguna_baru",
+            "email": "pengguna@example.com",
             "password1": "Q7!mango-river-planet",
             "password2": "Q7!mango-river-planet",
         }
@@ -165,6 +133,7 @@ class RegistrationFormTests(TestCase):
         user = form.save()
         user.refresh_from_db()
 
+        self.assertEqual(user.email, self.data["email"])
         self.assertNotEqual(user.password, self.data["password1"])
         self.assertTrue(user.check_password(self.data["password1"]))
         self.assertEqual(
@@ -215,7 +184,7 @@ class RegistrationFormTests(TestCase):
         form = RegistrationForm(data={})
 
         self.assertFalse(form.is_valid())
-        for field in ("username", "password1", "password2"):
+        for field in ("username", "email", "password1", "password2"):
             self.assertIn(field, form.errors)
         self.assertEqual(User.objects.count(), 0)
 
@@ -238,6 +207,7 @@ class RegistrationViewTests(TestCase):
         self.url = reverse("userprofile:register")
         self.data = {
             "username": "pengguna_baru",
+            "email": "pengguna@example.com",
             "password1": "Q7!mango-river-planet",
             "password2": "Q7!mango-river-planet",
         }
@@ -249,11 +219,11 @@ class RegistrationViewTests(TestCase):
         user = User.objects.get(username=self.data["username"])
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(UserProfile.objects.count(), 1)
+        self.assertEqual(user.email, self.data["email"])
         self.assertEqual(user.profile.user_id, user.pk)
         self.assertEqual(user.profile.whatsapp_number, "")
         self.assertEqual(user.profile.line_id, "")
-        self.assertIsNone(user.profile.default_latitude)
-        self.assertIsNone(user.profile.default_longitude)
+        self.assertIsNone(user.profile.default_location)
         self.assertTrue(user.check_password(self.data["password1"]))
         self.assertNotIn("_auth_user_id", self.client.session)
         self.assertTrue(
@@ -272,7 +242,7 @@ class RegistrationViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "userprofile/register.html")
-        for field in ("username", "password1", "password2", "csrfmiddlewaretoken"):
+        for field in ("username", "email", "password1", "password2", "csrfmiddlewaretoken"):
             self.assertContains(response, f'name="{field}"')
         self.assertEqual(User.objects.count(), 0)
         self.assertEqual(UserProfile.objects.count(), 0)
@@ -357,8 +327,7 @@ class RegistrationViewTests(TestCase):
         self.assertFalse(user.groups.exists())
         self.assertFalse(user.user_permissions.exists())
         self.assertEqual(user.profile.whatsapp_number, "")
-        self.assertIsNone(user.profile.default_latitude)
-        self.assertIsNone(user.profile.default_longitude)
+        self.assertIsNone(user.profile.default_location)
 
     def test_logged_in_user_cannot_register_another_account(self):
         user = User.objects.create_user(username="sudah_login")

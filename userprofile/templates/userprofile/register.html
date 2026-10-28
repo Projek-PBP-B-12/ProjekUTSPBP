@@ -32,7 +32,7 @@
       <section class="registration-card" aria-labelledby="register-title">
         <p class="card-kicker">SELAMAT DATANG DI TITIKLAPAR</p>
         <h2 id="register-title">Buat akunmu.</h2>
-        <p class="card-description">Mulai dengan nama pengguna dan kata sandi.</p>
+        <p class="card-description">Mulai dengan nama pengguna, email pengingat, dan kata sandi.</p>
         <form method="post" action="{% url 'userprofile:register' %}">
           {% csrf_token %}
           {% if form.errors %}

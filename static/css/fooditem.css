@@ -164,3 +164,37 @@
     margin-top: 24px;
     flex-wrap: wrap;
 }
+
+.inventory-heading {display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}
+.inventory-heading h2,.inventory-heading p {margin:0}
+.inventory-heading p {color:var(--faded-color);white-space:nowrap}
+.inventory-filters {display:flex;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.inventory-filters > div:first-child {flex:1;min-width:180px}
+.inventory-table-scroll {overflow-x:auto;max-width:100%}
+.inventory-table-scroll:focus-visible {outline:2px solid var(--teal);outline-offset:4px}
+.inventory-table-scroll .table {min-width:660px}
+.table th,.table td {padding-right:18px}
+.table th:last-child,.table td:last-child {padding-right:0}
+.food-title {overflow-wrap:anywhere;max-width:220px}
+.inventory-date {color:var(--faded-color);white-space:nowrap}
+.inventory-expiry-date {display:block;white-space:nowrap}
+.inventory-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:220px;max-width:340px}
+.inventory-actions form {margin:0}
+.inventory-actions .button {padding:7px 10px;min-height:38px}
+button.detail-link {background:transparent;border:0;padding:10px 4px;font:inherit;color:#1d6b62;font-weight:600;cursor:pointer}
+.inventory-delete {color:#9b2828;text-decoration:underline;padding:8px}
+.inventory-empty {text-align:center;color:var(--faded-color)}
+.inventory-error {color:#9b2828;padding:12px;background:#fff0ed;border-radius:8px}
+.modal-footer {gap:10px}
+.food-detail-dialog {width:min(540px,calc(100% - 32px));max-width:100%;max-height:calc(100vh - 32px);padding:0;border:0;border-radius:12px;background:white;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.food-detail-dialog::backdrop {background:rgba(0,0,0,.5)}
+.food-detail-dialog .modal-content {width:100%;max-width:none;box-shadow:none}
+.food-detail-dialog .modal-header h2 {overflow-wrap:anywhere;min-width:0}
+.modal-food-image {max-width:50%;max-height:200px;object-fit:contain;border-radius:6px}
+.detail-row[hidden] {display:none}
+@media (max-width:600px) {
+    .inventory-card {padding:20px 16px}
+    .inventory-heading {align-items:flex-start}
+    .inventory-heading h2 {font-size:20px}
+    .inventory-filters {gap:12px}
+}

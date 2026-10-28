@@ -415,6 +415,21 @@
     padding: 0;
 }
 
+.notif-email-note {
+    padding: 16px;
+    margin: 0 0 24px;
+    background: var(--notif-teal-tint);
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+
+.notification-page .notif-email-note a {
+    color: var(--notif-teal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    margin-left: 6px;
+}
+
 .notif-read-note {
     margin: 32px 0 0;
 

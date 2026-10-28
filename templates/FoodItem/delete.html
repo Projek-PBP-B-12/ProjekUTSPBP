@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Hapus makanan · TitikLapar{% endblock %}
+{% block page_title %}Hapus makanan{% endblock %}
+{% block content %}
+<section class="card"><h2>Hapus {{ food.name }}?</h2><p>Data makanan dan penawaran terkait akan dihapus. Tindakan ini tidak dapat dibatalkan.</p>
+<form method="post">{% csrf_token %}<button class="button primary" type="submit">Ya, hapus makanan</button><a class="button secondary" href="{% url 'FoodItem:list_food_items' %}">Batal</a></form></section>
+{% endblock %}

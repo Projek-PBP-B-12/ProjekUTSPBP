@@ -6,6 +6,7 @@ class Notification(models.Model):
     class EmailStatus(models.TextChoices):
         SKIPPED = "SKIPPED", "Tidak dikirim"
         PENDING = "PENDING", "Menunggu"
+        SENDING = "SENDING", "Sedang diproses"
         SENT = "SENT", "Diterima layanan email"
         FAILED = "FAILED", "Gagal"
 

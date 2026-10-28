@@ -19,6 +19,7 @@
       </div>
     </nav>
   </header>
+  {% include 'userprofile/includes/account_navigation.html' %}
   <main class="profile-main">
     <div class="profile-layout container">
       <header class="profile-heading">
@@ -37,6 +38,13 @@
         </section>
         <div class="profile-details">
           {% if messages %}<div class="site-messages" role="status">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+          <section class="detail-card" aria-labelledby="email-title">
+            <p class="profile-kicker">KHUSUS UNTUKMU</p>
+            <h2 id="email-title">Email pengingat</h2>
+            <p class="section-description">Pengingat kedaluwarsa dikirim ke alamat ini. Email tidak terlihat oleh pengguna lain.</p>
+            <dl class="profile-values"><div><dt>Email</dt><dd>{{ user.email|default:"Belum diisi" }}</dd></div></dl>
+            {% if not user.email %}<p class="section-description">Lengkapi email melalui Edit profil agar pengingat dapat dikirim.</p>{% endif %}
+          </section>
           <section class="detail-card" aria-labelledby="contact-title">
             <p class="profile-kicker">TETAP TERHUBUNG</p>
             <h2 id="contact-title">Kontak berbagi</h2>
@@ -51,20 +59,22 @@
             <p class="profile-kicker">AREA PILIHANMU</p>
             <h2 id="location-title">Lokasi bawaan</h2>
             <p class="section-description">Titik awal peta pribadimu, terpisah dari lokasi pengambilan makanan.</p>
-            {% if profile and profile.default_latitude != None and profile.default_longitude != None %}
+            {% if profile.default_location %}
               <dl class="profile-values coordinates">
-                <div><dt>Lintang</dt><dd>{{ profile.default_latitude|unlocalize }}</dd></div>
-                <div><dt>Bujur</dt><dd>{{ profile.default_longitude|unlocalize }}</dd></div>
+                <div><dt>Nama lokasi</dt><dd>{{ profile.default_location.area_name }}</dd></div>
+                <div><dt>Lintang</dt><dd>{{ profile.default_location.latitude|unlocalize }}</dd></div>
+                <div><dt>Bujur</dt><dd>{{ profile.default_location.longitude|unlocalize }}</dd></div>
               </dl>
             {% else %}
               <p class="empty-location">Belum diisi</p>
             {% endif %}
+            <a class="profile-text-link" href="{% url 'Location:manage' %}">Kelola lokasi tersimpan <span aria-hidden="true">↗</span></a>
           </section>
           <p class="profile-privacy">Halaman ini hanya menampilkan profil akun yang sedang kamu gunakan.</p>
           <section class="detail-card account-settings" aria-labelledby="account-settings-title">
             <p class="profile-kicker">PENGATURAN AKUN</p>
             <h2 id="account-settings-title">Hapus akun</h2>
-            <p class="section-description">Hapus akun beserta kontak dan lokasi bawaan secara permanen. Kamu akan diminta mengonfirmasi sebelum data dihapus.</p>
+            <p class="section-description">Hapus akun beserta profil, makanan, penawaran, lokasi, dan notifikasi secara permanen. Kamu akan diminta mengonfirmasi sebelum data dihapus.</p>
             <a class="button button-danger-outline" href="{% url 'userprofile:delete_account' %}">Tinjau penghapusan akun</a>
           </section>
         </div>

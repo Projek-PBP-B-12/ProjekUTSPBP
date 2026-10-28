@@ -18,6 +18,7 @@ from django.db.models.signals import post_delete
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 
+from Location.models import Location
 from userprofile.models import UserProfile
 
 
@@ -37,8 +38,8 @@ class DeleteAccountTests(TestCase):
             user=cls.owner,
             whatsapp_number="6281234567890",
             line_id="pemilik.line",
-            default_latitude=Decimal("-6.360000"),
-            default_longitude=Decimal("106.820000"),
+            default_location=Location.objects.create(owner=cls.owner, area_name="Rumah",
+                latitude=Decimal("-6.360000"), longitude=Decimal("106.820000")),
         )
         cls.other = User.objects.create_user(
             username="akun_tetap_ada", password=cls.other_password
@@ -58,8 +59,8 @@ class DeleteAccountTests(TestCase):
         self.assertEqual(self.profile.user_id, self.owner.pk)
         self.assertEqual(self.profile.whatsapp_number, "6281234567890")
         self.assertEqual(self.profile.line_id, "pemilik.line")
-        self.assertEqual(self.profile.default_latitude, Decimal("-6.360000"))
-        self.assertEqual(self.profile.default_longitude, Decimal("106.820000"))
+        self.assertEqual(self.profile.default_location.latitude, Decimal("-6.360000"))
+        self.assertEqual(self.profile.default_location.longitude, Decimal("106.820000"))
         self.assertTrue(self.owner.check_password(self.password))
         if client is not None:
             self.assertEqual(client.session["_auth_user_id"], str(self.owner.pk))

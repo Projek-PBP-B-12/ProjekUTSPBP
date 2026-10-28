@@ -167,3 +167,20 @@ class DashboardTests(TestCase):
         self.assertContains(response, f'action="{reverse("userprofile:logout")}"')
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
         self.assertIn("no-store", response["Cache-Control"])
+
+    def test_inventory_status_change_updates_dashboard_and_map(self):
+        food = self.food(status="OFFERED", days=3)
+        post = self.post(food)
+        before = self.client.get(reverse("landing_page"))
+        self.assertEqual(before.context["shared_count"], 1)
+        self.assertEqual(before.context["attention_count"], 1)
+        response = self.client.post(
+            reverse("FoodItem:change_status", args=[food.pk]), {"status": "CONSUMED"},
+        )
+        self.assertRedirects(response, reverse("FoodItem:list_food_items"))
+        after = self.client.get(reverse("landing_page"))
+        self.assertEqual(after.context["shared_count"], 0)
+        self.assertEqual(after.context["attention_count"], 0)
+        self.assertEqual(self.client.get(reverse("Location:map")).context["pins"], [])
+        post.refresh_from_db()
+        self.assertFalse(post.is_active)

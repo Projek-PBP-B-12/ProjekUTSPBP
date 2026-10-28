@@ -109,3 +109,52 @@
   width: 100%;
   color: var(--color-text-inverse);
 }
+
+.location-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+.location-panel { min-width: 0; padding: 24px; border: 1px solid var(--color-border-default); border-radius: var(--radius-12); background: var(--color-surface-card); }
+.location-panel h2 { margin: 0 0 12px; font-size: 20px; }
+.location-muted, .location-field small, .location-checkbox small { color: var(--color-text-secondary); font-size: 13px; line-height: 1.6; }
+.location-list, .location-results { padding: 0; list-style: none; }
+.location-list { display: grid; gap: 16px; margin: 20px 0; }
+.location-card { border: 1px solid var(--color-border-default); border-radius: var(--radius-8); padding: 16px; overflow-wrap: anywhere; }
+.location-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.location-card h3 { margin: 0; font-size: 17px; }
+.location-badge { padding: 3px 9px; border-radius: 20px; color: var(--color-text-primary); background: var(--color-accent-lime); font-size: 12px; }
+.location-coordinates { color: var(--color-text-secondary); font-size: 13px; }
+.location-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.location-actions form { margin: 0; }
+.location-actions .button { padding: 8px 12px; font-size: 13px; }
+.location-delete { color: #9f322c; }
+.location-empty { padding: 24px 16px; border: 1px dashed var(--color-border-default); border-radius: var(--radius-8); color: var(--color-text-secondary); line-height: 1.6; }
+.location-form { display: grid; gap: 20px; }
+.location-field { display: grid; gap: 6px; min-width: 0; }
+.location-field label, .location-assist label { font-size: 14px; font-weight: 600; }
+.location-field input, .location-search-row input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--color-border-default); border-radius: var(--radius-8); font: inherit; background: white; color: var(--color-text-primary); }
+.location-field input:focus-visible, .location-search-row input:focus-visible, .location-result:focus-visible { outline: 2px solid var(--color-action-primary); outline-offset: 2px; }
+.location-assist { padding: 16px; border-radius: var(--radius-8); background: var(--color-surface-canvas); }
+.location-assist .button { white-space: normal; }
+.location-search-row { display: flex; gap: 8px; margin-top: 8px; }
+.location-coordinate-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.location-checkbox label { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; }
+.location-checkbox input { margin-top: 3px; accent-color: var(--color-action-primary); }
+.location-checkbox small { display: block; margin-top: 6px; }
+.location-result { display: block; width: 100%; border: 1px solid var(--color-border-default); border-radius: var(--radius-8); background: white; color: var(--color-text-primary); padding: 10px; margin-top: 8px; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.location-result:hover { background: var(--color-surface-soft); }
+.location-notice { padding: 12px 16px; border-radius: var(--radius-8); background: var(--color-surface-soft); }
+.location-notice.error, .location-form .errorlist { color: #9f322c; }
+.location-form .errorlist { margin: 0; padding-left: 18px; font-size: 13px; }
+.location-notice.error { background: #fff1ee; }
+.location-notices { margin-bottom: 20px; }
+.map-actions { margin-bottom: 16px; }
+.map-search .button { margin-top: 8px; }
+.map-offers { margin-top: 24px; }
+.map-offers a { color: var(--color-action-primary); }
+.location-panel button:disabled, .map-actions button:disabled { opacity: .55; cursor: not-allowed; }
+
+@media (max-width: 1100px) { .location-layout { grid-template-columns: 1fr; } }
+@media (max-width: 540px) {
+  .location-panel { padding: 18px; }
+  .location-coordinate-fields { grid-template-columns: 1fr; }
+  .location-search-row { flex-direction: column; }
+  .map-canvas { height: 420px; }
+}

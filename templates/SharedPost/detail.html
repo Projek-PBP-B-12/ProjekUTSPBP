@@ -59,6 +59,8 @@
             <p class="detail-notice sp:rounded-xl sp:bg-[#f5ede0] sp:px-3 sp:py-2 sp:text-[#805a27]">Penawaran ini sudah tidak tersedia untuk diambil.</p>
         {% elif is_owner %}
             <a class="button primary" href="{% url 'sharedpost:update' post.pk %}">Edit penawaran</a>
+        {% else %}
+            <a class="button primary" href="{% url 'userprofile:donor_contact' post.food_item.owner_id %}">Hubungi donor</a>
         {% endif %}
     </div>
 </article>

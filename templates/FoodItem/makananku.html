@@ -1,343 +1,181 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/fooditem.css' %}">
-{% endblock %}
-
-{% block title %}Makananku{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/fooditem.css' %}">{% endblock %}
+{% block title %}Makananku · TitikLapar{% endblock %}
 {% block page_title %}Makananku{% endblock %}
-
-{% block page_summary %}Pantau inventori pribadi, diurutkan dari tanggal kedaluarsa terdekat.{% endblock %}
-
+{% block page_summary %}Pantau inventori pribadi, diurutkan dari tanggal kedaluwarsa terdekat.{% endblock %}
 {% block page_action %}<a href="{% url 'FoodItem:add_food_item' %}" class="button primary">＋ Tambah Makanan</a>{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div style="display: flex; margin: 0 0 40px; justify-content: space-between;">
-        <h2 style="margin: 0; color: var(--title-color)">Inventori Pribadi</h2>
-        <p id="food-amount" style="margin: 0; color: var(--faded-color)">- Makanan</p>
+<div class="card inventory-card">
+    <p id="inventory-error" class="inventory-error" role="alert" hidden></p>
+    <div class="inventory-heading">
+        <h2>Inventori Pribadi</h2><p id="food-amount">{{ items|length }} Makanan</p>
     </div>
-
+    <form method="get" class="inventory-filters" role="search">
+        <div><label for="food-search">Cari makanan</label><input id="food-search" type="search" name="q" value="{{ query }}" maxlength="150" placeholder="Misalnya: roti atau apel"></div>
+        <div><label for="food-status">Status</label><select id="food-status" name="status">
+            <option value="">Semua status</option>
+            <option value="STORED"{% if selected_status == 'STORED' %} selected{% endif %}>Tersimpan</option>
+            <option value="OFFERED"{% if selected_status == 'OFFERED' %} selected{% endif %}>Ditawarkan</option>
+            <option value="CONSUMED"{% if selected_status == 'CONSUMED' %} selected{% endif %}>Sudah habis</option>
+        </select></div>
+        <button class="button secondary" type="submit">Tampilkan</button>
+    </form>
+    <div class="inventory-table-scroll" tabindex="0" role="region" aria-label="Daftar inventori pribadi">
     <table class="table">
-        <thead>
-            <tr>
-                <th>MAKANAN</th>
-                <th>DIBELI</th>
-                <th>KEDALUARSA</th>
-                <th></th>
-            </tr>
-        </thead>
+        <thead><tr><th scope="col">MAKANAN</th><th scope="col">DIBELI</th><th scope="col">KEDALUWARSA</th><th scope="col">TINDAKAN</th></tr></thead>
         <tbody>
-            <tr id="table-empty" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Tidak ada makanan.</td></tr>
-            <tr id="table-loading" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Memuat makanan...</td></tr>
-            <tr id="table-error" class="hide"><td colspan="4" style="text-align: center; color: var(--faded-color);">Gagal memuat data makanan.</td></tr>
-
-            <template id="tr-template">
-            <tr id="tr-element">
-                <td style="width: 30%;">
-                    <div class="food-title">-</div>
-                    <div class="food-category">-</div>
-                </td>
-                <td id="purchase-date" style="color: var(--faded-color)">-</td>
+        {% for item in items %}
+            <tr class="food-row">
+                <td><div class="food-title">{{ item.name }}</div><div class="food-category">{{ item.get_category_display }}</div>
+                    <small>{% if item.status == 'OFFERED' %}Ditawarkan{% elif item.status == 'CONSUMED' %}Sudah habis{% else %}Tersimpan{% endif %}</small></td>
+                <td class="inventory-date">{{ item.purchase_date|date:"d M Y" }}</td>
                 <td>
-                    <span id="expiration-badge" class="badge">-</span>
+                    <span class="badge {% if item.status == 'CONSUMED' %}badge-gray{% elif item.is_expired %}badge-red{% elif item.days_until_expiration <= 3 %}badge-orange{% else %}badge-green{% endif %}">
+                    {% if item.status == 'CONSUMED' %}Sudah dikonsumsi{% elif item.is_expired %}Sudah kedaluwarsa{% elif item.days_until_expiration == 0 %}Hari ini{% elif item.days_until_expiration == 1 %}Besok{% else %}{{ item.days_until_expiration }} hari{% endif %}
+                    </span>
+                    <small class="inventory-expiry-date">{{ item.expiration_date|date:"d M Y" }}</small>
                 </td>
-                <td style="width: 17%; white-space: nowrap;">
-                    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-                        <a href="#" id="delete-link" class="detail-link hide">Hapus 🗑︎</a>
-                        <a href="#"
-                            id="detail-link"
-                            class="detail-link"
-                            data-name=""
-                            data-category=""
-                            data-purchase-date=""
-                            data-expiration-date=""
-                            data-status=""
-                            data-expiration-state=""
-                            data-image-url=""
-                            data-change-url=""
-                            data-stored-url=""
-                            data-consumed-url="">
-                            Detail ➞
-                        </a>
-                    </div>
-                </td>
+                <td><div class="inventory-actions">
+                    <button type="button" class="detail-link" data-name="{{ item.name }}" data-category="{{ item.get_category_display }}"
+                        data-purchase-date="{{ item.purchase_date|date:'d M Y' }}" data-expiration-date="{{ item.expiration_date|date:'d M Y' }}"
+                        data-status="{% if item.status == 'OFFERED' %}Ditawarkan{% elif item.status == 'CONSUMED' %}Sudah habis{% else %}Tersimpan{% endif %}"
+                        data-status-code="{{ item.status }}" data-stored-url="{% url 'FoodItem:make_food_item_status_stored' item.pk %}" data-consumed-url="{% url 'FoodItem:make_food_item_status_consumed' item.pk %}"
+                        data-expiration-state="{{ item.expiration_state }}" data-image-url="{{ item.image_url }}"
+                        data-change-url="{% url 'FoodItem:change_food_item' item.pk %}">Detail →</button>
+                    {% if item.active_posts %}
+                        <a class="button primary" href="{% url 'sharedpost:detail' item.active_posts.0.pk %}">Lihat penawaran</a>
+                    {% elif item.status == 'STORED' and not item.is_expired %}
+                        <a class="button primary" href="{% url 'sharedpost:create' %}?food={{ item.pk }}">Bagikan</a>
+                    {% endif %}
+                    <a class="button secondary" href="{% url 'FoodItem:change_food_item' item.pk %}">Ubah</a>
+                    {% if item.status != 'CONSUMED' %}
+                    <form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}<input type="hidden" name="status" value="CONSUMED"><button class="button secondary" type="submit">Tandai habis</button></form>
+                    {% endif %}
+                    {% if item.status != 'STORED' %}
+                    <form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}<input type="hidden" name="status" value="STORED"><button class="button secondary" type="submit">Simpan kembali</button></form>
+                    {% endif %}
+                    <a class="inventory-delete" href="{% url 'FoodItem:delete_food_page' item.pk %}" data-delete-url="{% url 'FoodItem:delete_food_item' item.pk %}" data-food-name="{{ item.name }}">Hapus</a>
+                </div></td>
             </tr>
-            </template>
-
+        {% empty %}
+            <tr><td colspan="4" class="inventory-empty">Tidak ada makanan. Tambahkan makanan atau ubah filter pencarian.</td></tr>
+        {% endfor %}
         </tbody>
     </table>
-
-</div>
-
-<!-- Modal -->
-<div id="food-detail-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div>
-                <h2 id="modal-food-name">Nama Makanan</h2>
-            </div>
-
-            <button id="modal-close" class="modal-x-close" aria-label="Tutup">&times;</button>
-        </div>
-
-        <div class="modal-body">
-            <div class="detail-row">
-                <span>Kategori</span>
-                <strong id="modal-food-category">-</strong>
-            </div>
-
-            <div class="detail-row">
-                <span>Tanggal Beli</span>
-                <strong id="modal-purchase-date">-</strong>
-            </div>
-
-            <div class="detail-row">
-                <span>Tanggal Kedaluwarsa</span>
-                <strong id="modal-expiration-date">-</strong>
-            </div>
-
-            <div class="detail-row">
-                <span>Status</span>
-                <strong id="modal-status">-</strong>
-            </div>
-
-            <div class="detail-row">
-                <span>Status Kedaluarsa</span>
-                <strong id="modal-expiration-state">-</strong>
-            </div>
-
-            <div class="detail-row">
-                <span>Foto</span>
-                <img src="" style="width: 50%;" id="modal-image-url">
-            </div>
-        </div>
-
-        <div class="modal-footer">
-            <div>
-                <a href="#" id="modal-change-url" class="button primary">Ubah</a>
-                <button id="modal-mark-consume-button" id="modal-change-url" class="button primary">Mark As Consumed</button>
-            </div>
-            <button id="modal-close" class="button secondary">Tutup</button>
-        </div>
     </div>
 </div>
 
+<dialog id="food-detail-modal" class="food-detail-dialog" aria-labelledby="modal-food-name">
+    <div class="modal-content">
+        <div class="modal-header"><h2 id="modal-food-name">Detail makanan</h2><button type="button" class="modal-x-close" data-close-food-modal aria-label="Tutup">×</button></div>
+        <div class="modal-body">
+            <div class="detail-row"><span>Kategori</span><strong id="modal-food-category"></strong></div>
+            <div class="detail-row"><span>Tanggal beli</span><strong id="modal-purchase-date"></strong></div>
+            <div class="detail-row"><span>Tanggal kedaluwarsa</span><strong id="modal-expiration-date"></strong></div>
+            <div class="detail-row"><span>Status</span><strong id="modal-status"></strong></div>
+            <div class="detail-row"><span>Status kedaluwarsa</span><strong id="modal-expiration-state"></strong></div>
+            <div id="modal-image-row" class="detail-row" hidden><span>Foto</span><img id="modal-image-url" class="modal-food-image" alt="" referrerpolicy="no-referrer"></div>
+        </div>
+        <p id="modal-food-error" class="inventory-error" role="alert" hidden></p>
+        <div class="modal-footer"><a href="{% url 'FoodItem:list_food_items' %}" id="modal-change-url" class="button primary">Ubah</a><button type="button" id="modal-mark-consume-button" class="button primary">Tandai habis</button><button type="button" data-close-food-modal class="button secondary">Tutup</button></div>
+    </div>
+</dialog>
 <script>
+(function () {
+    "use strict";
     const modal = document.getElementById("food-detail-modal");
+    const statusButton = document.getElementById("modal-mark-consume-button");
+    const modalError = document.getElementById("modal-food-error");
+    const inventoryError = document.getElementById("inventory-error");
+    let selectedFood = null;
+    const states = {CONSUMED: "Sudah habis", EXPIRED: "Sudah kedaluwarsa", EXPIRES_TODAY: "Kedaluwarsa hari ini", FRESH: "Belum kedaluwarsa"};
 
-    const closeButtons = modal.querySelectorAll("#modal-close");
+    async function mutateFood(url) {
+        const token = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        const response = await fetch(url, {
+            method: "POST", credentials: "same-origin",
+            headers: {"X-CSRFToken": token ? token.value : "", "Accept": "application/json"},
+        });
+        const result = await response.json().catch(function () { return {}; });
+        if (!response.ok) throw new Error(result.message || "Perubahan gagal disimpan. Coba lagi atau muat ulang halaman.");
+    }
 
-    document.addEventListener("click", event => {
-        const link = event.target.closest("#detail-link");
+    async function refreshInventory() {
+        const response = await fetch(window.location.href, {credentials: "same-origin", headers: {"Accept": "text/html"}});
+        if (!response.ok || response.redirected) throw new Error("Data berubah, tetapi daftar belum dapat dimuat ulang. Segarkan halaman.");
+        const updated = new DOMParser().parseFromString(await response.text(), "text/html");
+        const table = updated.querySelector(".inventory-table-scroll");
+        const count = updated.getElementById("food-amount");
+        if (!table || !count) throw new Error("Daftar belum dapat dimuat ulang. Segarkan halaman.");
+        document.querySelector(".inventory-table-scroll").replaceWith(table);
+        document.getElementById("food-amount").textContent = count.textContent;
+    }
 
-        if (!link) return;
-
+    document.addEventListener("click", async function (event) {
+        const button = event.target.closest(".detail-link");
+        if (button) {
+            const data = button.dataset;
+            selectedFood = data;
+            modalError.hidden = true;
+            statusButton.disabled = false;
+            statusButton.textContent = data.statusCode === "CONSUMED" ? "Simpan kembali" : "Tandai habis";
+            document.getElementById("modal-food-name").textContent = data.name;
+            document.getElementById("modal-food-category").textContent = data.category;
+            document.getElementById("modal-purchase-date").textContent = data.purchaseDate;
+            document.getElementById("modal-expiration-date").textContent = data.expirationDate;
+            document.getElementById("modal-status").textContent = data.status;
+            document.getElementById("modal-expiration-state").textContent = states[data.expirationState] || data.expirationState;
+            document.getElementById("modal-change-url").href = data.changeUrl;
+            const image = document.getElementById("modal-image-url");
+            document.getElementById("modal-image-row").hidden = !data.imageUrl;
+            if (data.imageUrl) {
+                image.src = data.imageUrl;
+                image.alt = data.name;
+            } else {
+                image.removeAttribute("src");
+                image.alt = "";
+            }
+            modal.showModal();
+            return;
+        }
+        const removeLink = event.target.closest(".inventory-delete");
+        if (!removeLink) return;
         event.preventDefault();
-
-        document.getElementById("modal-food-name").textContent = link.dataset.name;
-        document.getElementById("modal-food-category").textContent = link.dataset.category;
-        document.getElementById("modal-purchase-date").textContent = link.dataset.purchaseDate;
-        document.getElementById("modal-expiration-date").textContent = link.dataset.expirationDate;
-        document.getElementById("modal-status").textContent = link.dataset.status;
-        document.getElementById("modal-expiration-state").textContent = link.dataset.expirationState;
-        document.getElementById("modal-image-url").src = link.dataset.imageUrl;
-        
-        document.getElementById("modal-change-url").href = link.dataset.changeUrl;
-
-        document.getElementById("modal-mark-consume-button").textContent = link.dataset.status != "CONSUMED" ? "Mark As Consumed" : "Unmark As Consumed"
-        document.getElementById("modal-mark-consume-button").onclick = async () => {
-            try {
-                var response;
-
-                if (link.dataset.status != "CONSUMED") {
-                    response = await fetch(link.dataset.consumedUrl, {
-                        method: 'POST',
-                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                    });
-                }
-                else {
-                    response = await fetch(link.dataset.storedUrl, {
-                        method: 'POST',
-                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                    });
-                }
-                const result = await response.json().catch(() => ({}));
-            }
-            catch (error) {
-                console.error('Error mengubah status makanan:', error);
-            }
-            modal.classList.remove("show");
-            fetchFoodItems();
-        }
-
-        modal.classList.add("show");
-    });
-
-    closeButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            modal.classList.remove("show");
-        });
-    });
-
-    modal.addEventListener("click", event => {
-        if (event.target === modal) {
-            modal.classList.remove("show");
-        }
-    });
-
-    document.addEventListener("keydown", event => {
-        if (event.key === "Escape") {
-            modal.classList.remove("show");
-        }
-    })
-</script>
-
-<script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    function formatDate(dateString) {
-        return new Date(dateString + "T00:00:00").toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    }
-
-    function buildElements(item) {
-        const fooditem = item.fields;
-        const fooditemId = item.id;
-
-        const name = fooditem.name;
-        const category = fooditem.category;
-        const purchase_date = fooditem.purchase_date;
-        const expiration_date = fooditem.expiration_date;
-        const status = fooditem.status;
-        const image_url = fooditem.image_url;
-        const days_until_expiration = fooditem.days_until_expiration;
-        const expiration_state = fooditem.expiration_state;
-
-        const trTemplateElement = document.getElementById("tr-template");
-        const clone = trTemplateElement.content.cloneNode(true);
-
-        clone.querySelector(".food-title").textContent = name;
-        clone.querySelector(".food-category").textContent = category;
-        clone.querySelector("#purchase-date").textContent = formatDate(purchase_date);
-
-        clone.querySelector("#expiration-badge").textContent = days_until_expiration + " Hari"
-        clone.querySelector("#expiration-badge").classList.add('badge-green');
-        if (days_until_expiration <= 3) {
-            clone.querySelector("#expiration-badge").classList.remove('badge-green');
-            clone.querySelector("#expiration-badge").classList.add('badge-orange');
-        }
-        if (days_until_expiration == 1) {
-            clone.querySelector("#expiration-badge").textContent = "Besok";
-        }
-        if (days_until_expiration == 0) {
-            clone.querySelector("#expiration-badge").textContent = "Hari Ini";
-        }
-        if (days_until_expiration < 0) {
-            clone.querySelector("#expiration-badge").classList.remove('badge-orange');
-            clone.querySelector("#expiration-badge").classList.add('badge-red');
-            clone.querySelector("#expiration-badge").textContent = "Sudah Kedaluarsa";
-        }
-        if (expiration_state == "CONSUMED") {
-            clone.querySelector("#expiration-badge").classList.remove('badge-green');
-            clone.querySelector("#expiration-badge").classList.remove('badge-orange');
-            clone.querySelector("#expiration-badge").classList.remove('badge-red');
-            clone.querySelector("#expiration-badge").classList.add('badge-gray');
-            clone.querySelector("#expiration-badge").textContent = "Sudah Dikonsumsi";
-        }
-
-        if (expiration_state == "CONSUMED" || expiration_state == "EXPIRED") {
-            clone.querySelector("#delete-link").classList.remove("hide");
-            clone.getElementById("delete-link").onclick = async (event) => {
-                event.preventDefault();
-                try {
-                    const response = await fetch("{% url 'FoodItem:delete_food_item' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId), {
-                        method: 'POST',
-                        headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                    });
-                    const result = await response.json().catch(() => ({}));
-                }
-                catch (error) {
-                    console.error('Error delete makanan: ', error);
-                }
-                fetchFoodItems();
-            }
-        }
-
-        const detailLinkElement = clone.querySelector("#detail-link");
-
-        detailLinkElement.dataset.name = name;
-        detailLinkElement.dataset.category = category;
-        detailLinkElement.dataset.purchaseDate = formatDate(purchase_date);
-        detailLinkElement.dataset.expirationDate = formatDate(expiration_date);
-        detailLinkElement.dataset.status = status;
-        detailLinkElement.dataset.expirationState = expiration_state;
-        detailLinkElement.dataset.imageUrl = image_url;
-
-        detailLinkElement.dataset.changeUrl = "{% url 'FoodItem:change_food_item' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
-        detailLinkElement.dataset.storedUrl = "{% url 'FoodItem:make_food_item_status_stored' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
-        detailLinkElement.dataset.consumedUrl = "{% url 'FoodItem:make_food_item_status_consumed' '6767676767676767676767676767' %}".replace("6767676767676767676767676767", fooditemId);
-
-        trTemplateElement.before(clone);
-    }
-
-    async function fetchFoodItems() {
+        if (removeLink.dataset.busy === "true" || !window.confirm("Hapus " + removeLink.dataset.foodName + " beserta penawarannya? Tindakan ini tidak dapat dibatalkan.")) return;
+        removeLink.dataset.busy = "true";
+        inventoryError.hidden = true;
         try {
-            const url = "{% url 'FoodItem:get_food_items' %}"
-
-            displayPageSection({ showLoading: true })
-            const response = await fetch(url, {
-                headers: { 'Accept': 'application/json' },
-                //signal: abortController.signal,
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch data');
-
-            var FoodItemData = await response.json();
-
-            document.getElementById("food-amount").textContent = FoodItemData.length ? FoodItemData.length + " Makanan" : "- Makanan"
-            if (FoodItemData.length === 0) {
-                document.getElementById("food-amount").textContent = FoodItemData.length + " Makanan";
-                displayPageSection({ showEmpty: true })
-                return;
-            }
-            
-            document.querySelectorAll('#tr-element').forEach(e => e.remove());
-            FoodItemData.forEach(item => {
-                buildElements(item)
-            })
-            displayPageSection({ showElement: true })
+            await mutateFood(removeLink.dataset.deleteUrl);
+            await refreshInventory();
+        } catch (error) {
+            inventoryError.textContent = error.message;
+            inventoryError.hidden = false;
+        } finally {
+            delete removeLink.dataset.busy;
         }
-        catch (error) {
-            if (error.name === 'AbortError') return;
-            console.error('Error loading FoodItems:', error);
-            displayPageSection({ showError: true })
+    });
+    statusButton.addEventListener("click", async function () {
+        if (!selectedFood || statusButton.disabled) return;
+        statusButton.disabled = true;
+        modalError.hidden = true;
+        try {
+            await mutateFood(selectedFood.statusCode === "CONSUMED" ? selectedFood.storedUrl : selectedFood.consumedUrl);
+            modal.close();
+            await refreshInventory();
+        } catch (error) {
+            const message = modal.open ? modalError : inventoryError;
+            message.textContent = error.message;
+            message.hidden = false;
+        } finally {
+            statusButton.disabled = false;
         }
-    }
-    fetchFoodItems();
-
-    function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showElement = false }) {
-        document.getElementById("table-loading").classList.toggle('hide', !showLoading);
-        document.getElementById("table-error").classList.toggle('hide', !showError);
-        document.getElementById("table-empty").classList.toggle('hide', !showEmpty);
-        document.querySelectorAll('#tr-element').forEach(e => e.classList.toggle('hide', !showElement));
-    }
+    });
+    modal.querySelectorAll("[data-close-food-modal]").forEach(function (button) {
+        button.addEventListener("click", function () { modal.close(); });
+    });
+    modal.addEventListener("click", function (event) { if (event.target === modal) modal.close(); });
+})();
 </script>
-
 {% endblock %}

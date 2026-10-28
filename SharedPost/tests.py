@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
-from django.db.models.deletion import ProtectedError
+from django.db.models.deletion import RestrictedError
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -572,7 +572,7 @@ class SharedPostTests(TestCase):
             created_at=timezone.now() - timedelta(days=1)
         )
         self.assertEqual(list(SharedPost.objects.all()), [history, post])
-        with self.assertRaises(ProtectedError):
+        with self.assertRaises(RestrictedError):
             self.location.delete()
         self.food.delete()
         self.assertFalse(SharedPost.objects.exists())

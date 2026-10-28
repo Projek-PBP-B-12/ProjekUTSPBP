@@ -1,4 +1,5 @@
 import re
+from decimal import Decimal, ROUND_HALF_UP
 from urllib.parse import parse_qs, urlsplit
 
 from django.urls import reverse
@@ -30,19 +31,22 @@ def normalize_photo_url(url):
 
 
 def get_map_pins(posts, origin=None):
-    """Bentuk pin dari queryset penawaran yang sudah difilter pemanggil.
+    """Bentuk pin perkiraan dari queryset penawaran yang sudah difilter pemanggil.
 
     origin adalah objek beratribut latitude dan longitude, atau None.
     """
     pins = []
     for post in posts.select_related("food_item", "location"):
         location = post.location
+        # Titik dan jarak publik memakai area yang sama, bukan koordinat rumah lengkap.
+        latitude = location.latitude.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+        longitude = location.longitude.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
         distance = None
         if origin is not None:
             distance = round(
                 distance_km(
                     origin.latitude, origin.longitude,
-                    location.latitude, location.longitude,
+                    latitude, longitude,
                 ),
                 2,
             )
@@ -54,8 +58,8 @@ def get_map_pins(posts, origin=None):
             "description": post.description,
             "photo_url": normalize_photo_url(post.food_item.image_url),
             "area_name": location.area_name,
-            "latitude": str(location.latitude),
-            "longitude": str(location.longitude),
+            "latitude": str(latitude),
+            "longitude": str(longitude),
             "distance_km": distance,
             "detail_url": reverse("sharedpost:detail", args=[post.pk]),
         })

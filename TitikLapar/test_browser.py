@@ -30,7 +30,7 @@ class DashboardBrowserTests(StaticLiveServerTestCase):
         client.force_login(user)
         session = client.cookies[settings.SESSION_COOKIE_NAME].value
         with sync_playwright() as playwright:
-            channel = os.getenv("BROWSER_CHANNEL", "msedge")
+            channel = os.getenv("BROWSER_CHANNEL", "chromium")
             options = {"headless": os.getenv("BROWSER_HEADLESS", "1") != "0"}
             if channel != "chromium":
                 options["channel"] = channel
@@ -82,7 +82,7 @@ class DashboardBrowserTests(StaticLiveServerTestCase):
         client.force_login(user)
         session = client.cookies[settings.SESSION_COOKIE_NAME].value
         with sync_playwright() as playwright:
-            channel = os.getenv("BROWSER_CHANNEL", "msedge")
+            channel = os.getenv("BROWSER_CHANNEL", "chromium")
             options = {"headless": True}
             if channel != "chromium": options["channel"] = channel
             browser = playwright.chromium.launch(**options)

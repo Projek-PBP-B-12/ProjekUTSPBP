@@ -9,6 +9,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
+from Location.models import Location
 from userprofile.models import UserProfile
 
 
@@ -18,13 +19,13 @@ User = get_user_model()
 class ProfileTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.owner = User.objects.create_user(username="pemilik_profil")
+        cls.owner = User.objects.create_user(username="pemilik_profil", email="pemilik@example.com")
         cls.profile = UserProfile.objects.create(
             user=cls.owner,
             whatsapp_number="6281234567890",
             line_id="pemilik.line",
-            default_latitude=Decimal("-6.360000"),
-            default_longitude=Decimal("106.820000"),
+            default_location=Location.objects.create(owner=cls.owner, area_name="Rumah",
+                latitude=Decimal("-6.360000"), longitude=Decimal("106.820000")),
         )
         cls.other = User.objects.create_user(
             username="donor_lain", email="email-pribadi@example.com"
@@ -33,8 +34,8 @@ class ProfileTestCase(TestCase):
             user=cls.other,
             whatsapp_number="6289876543210",
             line_id="donor.line",
-            default_latitude=Decimal("-7.123456"),
-            default_longitude=Decimal("107.654321"),
+            default_location=Location.objects.create(owner=cls.other, area_name="Rumah donor",
+                latitude=Decimal("-7.123456"), longitude=Decimal("107.654321")),
         )
 
     def setUp(self):
@@ -43,11 +44,12 @@ class ProfileTestCase(TestCase):
         self.contact_url = reverse(
             "userprofile:donor_contact", kwargs={"user_id": self.other.pk}
         )
+        self.campus = Location.objects.create(owner=self.owner, area_name="Kampus", latitude=-6.2, longitude=106.8)
         self.payload = {
             "whatsapp_number": "6281122233344",
             "line_id": "kontak.baru",
-            "default_latitude": "-6.200001",
-            "default_longitude": "106.800001",
+            "default_location": self.campus.pk,
+            "email": "email-baru@example.com",
         }
         self.initial_values = self.profile_values(self.profile)
 
@@ -57,8 +59,7 @@ class ProfileTestCase(TestCase):
             profile.user_id,
             profile.whatsapp_number,
             profile.line_id,
-            profile.default_latitude,
-            profile.default_longitude,
+            profile.default_location_id,
         )
 
     def assert_profile_unchanged(self):
@@ -92,8 +93,8 @@ class ProfileEditTests(ProfileTestCase):
         self.assertFalse(form.is_bound)
         self.assertEqual(form.initial["whatsapp_number"], self.profile.whatsapp_number)
         self.assertEqual(form.initial["line_id"], self.profile.line_id)
-        self.assertEqual(form.initial["default_latitude"], self.profile.default_latitude)
-        self.assertEqual(form.initial["default_longitude"], self.profile.default_longitude)
+        self.assertEqual(form.initial["default_location"], self.profile.default_location_id)
+        self.assertEqual(form.initial["email"], self.owner.email)
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
         self.assert_profile_unchanged()
 
@@ -109,8 +110,9 @@ class ProfileEditTests(ProfileTestCase):
         self.assertEqual(self.profile.user_id, self.owner.pk)
         self.assertEqual(self.profile.whatsapp_number, self.payload["whatsapp_number"])
         self.assertEqual(self.profile.line_id, self.payload["line_id"])
-        self.assertEqual(self.profile.default_latitude, Decimal("-6.200001"))
-        self.assertEqual(self.profile.default_longitude, Decimal("106.800001"))
+        self.assertEqual(self.profile.default_location, self.campus)
+        self.owner.refresh_from_db()
+        self.assertEqual(self.owner.email, self.payload["email"])
         self.assertEqual(UserProfile.objects.count(), 2)
         self.assertTrue(
             any(message.level == SUCCESS for message in get_messages(response.wsgi_request))
@@ -150,32 +152,24 @@ class ProfileEditTests(ProfileTestCase):
         self.assertFalse(self.owner.is_superuser)
         self.assertEqual(UserProfile.objects.count(), 2)
 
-    def test_optional_contacts_and_both_coordinates_can_be_cleared(self):
+    def test_optional_contacts_and_default_location_can_be_cleared(self):
         self.client.force_login(self.owner)
 
-        response = self.client.post(self.edit_url, dict.fromkeys(self.payload, ""))
+        response = self.client.post(self.edit_url, dict.fromkeys(self.payload, "") | {"email": self.payload["email"]})
 
         self.assertRedirects(response, self.profile_url)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.whatsapp_number, "")
         self.assertEqual(self.profile.line_id, "")
-        self.assertIsNone(self.profile.default_latitude)
-        self.assertIsNone(self.profile.default_longitude)
+        self.assertIsNone(self.profile.default_location)
+        self.assertTrue(Location.objects.filter(pk=self.campus.pk).exists())
 
-    def test_zero_and_boundary_coordinates_can_be_saved(self):
+    def test_form_choices_include_only_owned_locations(self):
         self.client.force_login(self.owner)
-        for latitude, longitude in (("0", "0"), ("-90", "-180"), ("90", "180")):
-            with self.subTest(latitude=latitude, longitude=longitude):
-                response = self.client.post(
-                    self.edit_url,
-                    self.payload
-                    | {"default_latitude": latitude, "default_longitude": longitude},
-                )
-
-                self.assertRedirects(response, self.profile_url)
-                self.profile.refresh_from_db()
-                self.assertEqual(self.profile.default_latitude, Decimal(latitude))
-                self.assertEqual(self.profile.default_longitude, Decimal(longitude))
+        response = self.client.get(self.edit_url)
+        choices = response.context["form"].fields["default_location"].queryset
+        self.assertEqual(set(choices.values_list("pk", flat=True)), {self.profile.default_location_id, self.campus.pk})
+        self.assertNotContains(response, "Rumah donor")
 
     def test_invalid_whatsapp_numbers_reject_the_entire_update(self):
         self.client.force_login(self.owner)
@@ -206,36 +200,22 @@ class ProfileEditTests(ProfileTestCase):
         self.assertIn("line_id", response.context["form"].errors)
         self.assert_profile_unchanged()
 
-    def test_partial_coordinates_are_rejected_without_saving_contact_changes(self):
+    def test_another_users_location_is_rejected_without_saving_email_or_contacts(self):
         self.client.force_login(self.owner)
-        for missing in ("default_latitude", "default_longitude"):
-            with self.subTest(missing=missing):
-                response = self.client.post(self.edit_url, self.payload | {missing: ""})
+        response = self.client.post(self.edit_url, self.payload | {"default_location": self.other_profile.default_location_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("default_location", response.context["form"].errors)
+        self.assert_profile_unchanged()
+        self.owner.refresh_from_db()
+        self.assertEqual(self.owner.email, "pemilik@example.com")
 
-                self.assertEqual(response.status_code, 200)
-                self.assertTrue(response.context["form"].errors)
-                self.assertNotContains(response, "profile_coordinates_pair")
-                self.assertIn("default_latitude", response.context["form"].errors)
-                self.assertIn("default_longitude", response.context["form"].errors)
-                self.assert_profile_unchanged()
-
-    def test_invalid_coordinate_values_are_rejected_without_database_changes(self):
+    def test_missing_or_invalid_location_id_is_rejected_without_database_changes(self):
         self.client.force_login(self.owner)
-        for field, value in (
-            ("default_latitude", "-90.000001"),
-            ("default_latitude", "90.000001"),
-            ("default_longitude", "-180.000001"),
-            ("default_longitude", "180.000001"),
-            ("default_latitude", "-6.1234567"),
-            ("default_longitude", "bukan-angka"),
-            ("default_latitude", "NaN"),
-            ("default_longitude", "Infinity"),
-        ):
-            with self.subTest(field=field, value=value):
-                response = self.client.post(self.edit_url, self.payload | {field: value})
-
+        for value in ("bukan-angka", "999999999"):
+            with self.subTest(value=value):
+                response = self.client.post(self.edit_url, self.payload | {"default_location": value})
                 self.assertEqual(response.status_code, 200)
-                self.assertIn(field, response.context["form"].errors)
+                self.assertIn("default_location", response.context["form"].errors)
                 self.assert_profile_unchanged()
 
     def test_get_for_legacy_account_does_not_create_a_profile(self):
@@ -253,7 +233,7 @@ class ProfileEditTests(ProfileTestCase):
         self.client.force_login(self.owner)
 
         response = self.client.post(
-            self.edit_url, self.payload | {"default_longitude": ""}
+            self.edit_url, self.payload | {"email": ""}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -348,8 +328,8 @@ class DonorContactTests(ProfileTestCase):
         for private_value in (
             self.other.email,
             self.other.password,
-            str(self.other_profile.default_latitude),
-            str(self.other_profile.default_longitude),
+            str(self.other_profile.default_location.latitude),
+            str(self.other_profile.default_location.longitude),
             "-7,123456",
             "107,654321",
             self.profile.whatsapp_number,
@@ -447,7 +427,7 @@ class DonorContactTests(ProfileTestCase):
 
     def test_saved_contact_changes_and_removal_are_reflected_for_other_users(self):
         self.client.force_login(self.other)
-        response = self.client.post(self.edit_url, self.payload)
+        response = self.client.post(self.edit_url, self.payload | {"default_location": ""})
         self.assertRedirects(response, self.profile_url)
 
         self.client.force_login(self.owner)
@@ -457,7 +437,7 @@ class DonorContactTests(ProfileTestCase):
         self.assertNotContains(response, self.other_profile.whatsapp_number)
 
         self.client.force_login(self.other)
-        self.client.post(self.edit_url, dict.fromkeys(self.payload, ""))
+        self.client.post(self.edit_url, dict.fromkeys(self.payload, "") | {"email": self.payload["email"]})
         self.client.force_login(self.owner)
         response = self.client.get(self.contact_url)
         self.assertContains(response, "Belum diisi")

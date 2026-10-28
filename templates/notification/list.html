@@ -25,6 +25,7 @@
                 <a class="notif-nav-item" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
                 <a class="notif-nav-item" href="{% url 'sharedpost:list' %}">Papan berbagi</a>
                 <a class="notif-nav-item" href="{% url 'Location:map' %}">Peta berbagi</a>
+                <a class="notif-nav-item" href="{% url 'Location:manage' %}">Lokasi tersimpan</a>
                 <a class="notif-nav-item notif-nav-item-active"
                    href="{% url 'notification:show_notification' %}" aria-current="page">Notifikasi</a>
                 <a class="notif-nav-item" href="{% url 'userprofile:profile' %}">Profil</a>
@@ -41,6 +42,16 @@
                     {{ unread_count }} belum dibaca
                 </span>
             </header>
+
+            <p class="notif-email-note">
+                {% if has_email %}
+                    Email pengingat berikutnya ditujukan ke <strong>{{ request.user.email }}</strong>.
+                    <a href="{% url 'userprofile:profile_edit' %}">Ubah email</a>
+                {% else %}
+                    Lengkapi email di profil agar pengingat berikutnya dapat dikirim lewat email.
+                    <a href="{% url 'userprofile:profile_edit' %}">Tambahkan email</a>
+                {% endif %}
+            </p>
 
             <!-- Daftar kartu pengingat -->
             <section aria-label="Daftar pengingat makanan">
@@ -82,7 +93,7 @@
                                         {{ notification.created_at|timezone:"Asia/Jakarta"|date:"d/m/Y, H.i" }}
                                     </time>
                                     {% if notification.food_item %}
-                                        <span class="notif-card-food">{{ notification.food_item.name }}</span>
+                                        <a class="notif-card-food" href="{% url 'FoodItem:change_food_item' notification.food_item_id %}">{{ notification.food_item.name }}</a>
                                     {% endif %}
                                 </footer>
 

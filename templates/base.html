@@ -16,17 +16,21 @@
       <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
       <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
         <a class="sidebar-item{% if request.resolver_match.view_name == 'landing_page' %} sidebar-item-active{% endif %}" href="{% url 'landing_page' %}"{% if request.resolver_match.view_name == 'landing_page' %} aria-current="page"{% endif %}>Beranda</a>
-        <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:makananku' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}">Makananku</a>
+        <a class="sidebar-item{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' %} sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}"{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' %} aria-current="page"{% endif %}>Makananku</a>
         <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'sharedpost' %} sidebar-item-active{% endif %}" href="{% url 'sharedpost:list' %}"{% if request.resolver_match.namespace == 'sharedpost' %} aria-current="page"{% endif %}>Papan berbagi</a>
         <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}">Peta berbagi</a>
+        <a class="sidebar-item{% if request.resolver_match.namespace == 'Location' and request.resolver_match.view_name != 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:manage' %}"{% if request.resolver_match.namespace == 'Location' and request.resolver_match.view_name != 'Location:map' %} aria-current="page"{% endif %}>Lokasi tersimpan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'notification' %} sidebar-item-active{% endif %}" href="{% url 'notification:show_notification' %}"{% if request.resolver_match.namespace == 'notification' %} aria-current="page"{% endif %}>Notifikasi</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'userprofile' %} sidebar-item-active{% endif %}" href="{% url 'userprofile:profile' %}"{% if request.resolver_match.namespace == 'userprofile' %} aria-current="page"{% endif %}>Profil</a>
       </nav>
-      {% block sidebar_footer %}{% endblock %}
+      {% block sidebar_footer %}
+        <form class="sidebar-logout" method="post" action="{% url 'userprofile:logout' %}">{% csrf_token %}<button class="button secondary" type="submit">Keluar</button></form>
+      {% endblock %}
     </aside>
 
     <main class="app-main">
+      {% if messages %}<div class="app-messages" role="status">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
       {% block page_header %}
       <header class="page-header">
         <div>
