@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,19 +21,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(BASE_DIR / ".env")
 
-# Cross-Site Request Forgery
-CSRF_TRUSTED_ORIGINS = []
+PRODUCTION = os.getenv("PRODUCTION", "false").strip().lower() == "true"
+PWS_HOST = "justin-evan-titiklapar.pws.cs.ui.ac.id"
+DEBUG = os.getenv("DEBUG", "false" if PRODUCTION else "true").strip().lower() == "true"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Kunci produksi wajib berasal dari environment, bukan repository.
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if not SECRET_KEY.strip():
+    if PRODUCTION:
+        raise ImproperlyConfigured("Isi SECRET_KEY baru di environment PWS sebelum deployment.")
+    SECRET_KEY = "django-insecure-local-development-only-do-not-use-in-production"
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dd1id1cwy$4p9+v1ik%r&4_#$ndgzqn8#9y^2yb_nk)zmfyrj6'
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv(
+        "ALLOWED_HOSTS", f"localhost,127.0.0.1,{PWS_HOST}",
+    ).split(",") if host.strip()
+]
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS", f"https://{PWS_HOST}",
+    ).split(",") if origin.strip()
+]
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "justin-evan-titiklapar.pws.cs.ui.ac.id"]
+# Lokal tetap mendukung HTTP; cookie produksi hanya dikirim melalui HTTPS.
+SESSION_COOKIE_SECURE = PRODUCTION
+CSRF_COOKIE_SECURE = PRODUCTION
 
 # Application definition
 
@@ -85,8 +98,6 @@ WSGI_APPLICATION = 'TitikLapar.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 
 if PRODUCTION:
     DATABASES = {
@@ -163,7 +174,7 @@ EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
 
 SITE_URL = os.getenv(
     "SITE_URL",
-    "http://127.0.0.1:8000",
+    f"https://{PWS_HOST}" if PRODUCTION else "http://127.0.0.1:8000",
 ).rstrip("/")
 
 
