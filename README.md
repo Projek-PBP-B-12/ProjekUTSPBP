@@ -100,6 +100,44 @@ Notification memiliki peran sebagai kotak masuk atau riwayat peringatan yang men
 
 https://justin-evan-titiklapar.pws.cs.ui.ac.id/
 
+### Konfigurasi deployment
+
+Gunakan [.env.prod.example](.env.prod.example) sebagai daftar variabel yang perlu
+diisi melalui panel environment PWS. File contoh tidak otomatis dibaca aplikasi.
+Sebelum menjalankan versi ini di server:
+
+- Isi `PRODUCTION=True`, `DEBUG=False`, dan kredensial PostgreSQL sesuai PWS.
+- Isi `SECRET_KEY` dengan kunci acak baru yang hanya disimpan di environment server.
+  Aplikasi menolak berjalan dalam mode produksi jika nilainya kosong. Pergantian
+  kunci membuat pengguna perlu login ulang.
+- Pastikan `ALLOWED_HOSTS` berisi nama domain tanpa skema, sedangkan
+  `CSRF_TRUSTED_ORIGINS` dan `SITE_URL` memakai URL lengkap dengan `https://`.
+- Jika email ingin dikirim ke inbox, isi konfigurasi SMTP dan jadwalkan
+  `python manage.py send_food_reminders` setiap hari. Backend console hanya
+  mencetak email ke log.
+
+Untuk membuat kunci baru, jalankan perintah ini di terminal sendiri lalu salin
+hasilnya ke environment PWS, bukan ke repository:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Pada proses deployment, jalankan `python manage.py migrate --noinput` dan
+`python manage.py collectstatic --noinput`. Setelah environment siap, jalankan
+`python manage.py check --deploy` dengan konfigurasi server. Cookie login dan
+CSRF otomatis dibatasi ke HTTPS ketika `PRODUCTION=True`; lokal tetap mendukung
+HTTP dengan `PRODUCTION=False`.
+
+Pengaturan kepercayaan header proxy, redirect HTTPS, dan HSTS perlu disesuaikan
+dengan proxy PWS. Pengaturan tersebut tidak diaktifkan otomatis. Pemeriksaan
+deployment masih dapat memberi peringatan redirect HTTPS/HSTS, sehingga
+penanggung jawab server perlu memverifikasi pengaturan HTTPS di proxy.
+
+Workflow GitHub saat ini melakukan deployment saat ada push ke `pws-branch`.
+Merge ke `main` saja belum memperbarui aplikasi yang tayang. Setelah deployment,
+periksa login dan pengiriman form melalui domain HTTPS PWS.
+
 ## Tautan Figma
 
 https://www.figma.com/design/r3aIEwY6EmWnxDocq8Rrl3/Projek-PBP-B12?node-id=0-1&t=RJOL7DroOzRv7Kqf-1
