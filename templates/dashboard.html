@@ -6,32 +6,11 @@
 
 {% block extra_head %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=20261029-2">
 {% endblock %}
 
 {% block page_title %}Selamat Datang, {{ display_name }}{% endblock %}
 {% block page_summary %}Satu tempat untuk melihat makananmu dan hal penting hari ini.{% endblock %}
-
-{% block body_top %}
-<header class="dashboard-mobile-header">
-    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
-    <button class="dashboard-menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        <span>Menu</span>
-    </button>
-</header>
-<button class="dashboard-menu-backdrop" type="button" aria-label="Tutup menu" hidden></button>
-{% endblock %}
-
-{% block sidebar_controls %}
-    <button class="dashboard-menu-close" type="button" aria-label="Tutup menu">×</button>
-{% endblock %}
-
-{% block sidebar_footer %}
-<div class="dashboard-account">
-    {% include "userprofile/includes/logout_form.html" %}
-</div>
-{% endblock %}
 
 {% block content %}
 <section class="quick-notification db:min-h-[150px] db:rounded-xl db:bg-[#e6ecd9] db:p-5" aria-labelledby="quick-notification-title">
@@ -138,9 +117,4 @@
         {% endif %}
     </section>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-    {{ block.super }}
-    <script src="{% static 'js/dashboard-ui.js' %}" defer></script>
 {% endblock %}

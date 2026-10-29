@@ -36,5 +36,25 @@ Naikkan parameter versi CSS di `templates/base.html` ketika hasil `app.css` beru
   `--tw-font-weight` pada tombol bersama karena utility modul lain membacanya.
 - `static/css/app.css` adalah hasil build. Jangan mengeditnya langsung.
 
-Migrasi layout bersama tidak mengubah stylesheet halaman yang berdiri sendiri,
-seperti landing page dan notifikasi.
+Halaman notifikasi juga mewarisi `base.html`. CSS notifikasi mengatur kontennya,
+sedangkan sidebar dan tombol Keluar memakai komponen bersama. Dashboard memakai
+footer sidebar yang sama: tombol Keluar berjarak 24px setelah menu navigasi.
+Kelas `sidebar-logout-button` menjaga tampilannya dari override tombol setiap modul.
+Halaman profil, edit profil, kontak donor, dan hapus akun juga memakai layout ini
+melalui `userprofile/base.html`. CSS profil mengatur konten akun tanpa memuat reset
+landing page atau menggandakan navigasi. Landing page, login, dan registrasi tetap
+memakai layoutnya sendiri.
+
+## Menu mobile bersama
+
+Pada lebar maksimal 800px, semua halaman yang mewarisi `base.html` memakai header
+dan tombol Menu yang sama. Styling berasal dari `app.tailwind.css`, sedangkan
+`static/js/app-menu.js` mengatur buka/tutup, backdrop, Escape, fokus keyboard,
+penguncian konten di belakang menu, dan perubahan ukuran layar. Script bersama
+dimuat di luar blok `extra_js`, sehingga tetap tersedia pada modul yang mengganti
+blok tersebut. Dashboard dan SharedPost tidak lagi membuat menu sendiri.
+
+Jika JavaScript tidak tersedia, navigasi mobile tetap ditampilkan tanpa drawer.
+Saat menu terbuka pada mobile, fokus tetap di dalam menu; menutupnya mengembalikan
+fokus ke tombol Menu. Pada desktop, sidebar kembali terlihat dan konten dapat
+digunakan seperti biasa.

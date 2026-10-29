@@ -6,24 +6,12 @@
 
 {% block extra_head %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/sharedpost.css' %}?v=20261029-2">
-{% endblock %}
-
-{% block body_top %}
-<header class="mobile-header">
-    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
-    <button class="menu-toggle" aria-controls="sidebar" aria-expanded="false" type="button">☰ <span>Menu</span></button>
-</header>
-<button class="sidebar-backdrop" aria-label="Tutup menu" hidden></button>
-{% endblock %}
-
-{% block sidebar_controls %}
-    <button class="menu-close" type="button" aria-label="Tutup menu">×</button>
+    <link rel="stylesheet" href="{% static 'css/sharedpost.css' %}?v=20261029-3">
 {% endblock %}
 
 {% block extra_js %}
     {{ block.super }}
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
     <script src="{% static 'js/sharedpost-optimistic.js' %}?v=20261029-2" defer></script>
-    <script src="{% static 'js/sharedpost-ui.js' %}?v=20261029-2" defer></script>
+    <script src="{% static 'js/sharedpost-ui.js' %}?v=20261029-3" defer></script>
 {% endblock %}

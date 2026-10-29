@@ -62,6 +62,21 @@ a { @apply app:text-inherit app:no-underline; }
 
 .sidebar-nav { @apply app:grid app:gap-[8px] app:mt-[44px]; }
 
+.app-mobile-header, .app-menu-close { @apply app:hidden; }
+.app-sidebar-backdrop[hidden] { @apply app:hidden; }
+.app-menu-toggle, .app-menu-close {
+  @apply app:items-center app:justify-center app:gap-[8px] app:p-0 app:cursor-pointer;
+  border: 0;
+  background: transparent;
+  color: var(--color-action-primary);
+  font: 400 13px/21px var(--font-body);
+}
+.app-menu-toggle { @apply app:inline-flex; }
+.app-menu-toggle:focus-visible, .app-menu-close:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 3px;
+}
+
 .sidebar-item {
   @apply app:flex app:items-center app:h-[40px] app:px-[13px] app:rounded-[var(--radius-8)] app:text-[var(--color-text-secondary)] app:whitespace-nowrap;
   font: 600 13px/18px var(--font-body);
@@ -138,10 +153,31 @@ a { @apply app:text-inherit app:no-underline; }
   .sidebar-item { @apply app:shrink-0; }
   .app-main { @apply app:py-[24px] app:px-[20px]; }
   .page-header { @apply app:flex-col; }
+
+  .app-menu-ready .app-mobile-header {
+    @apply app:flex app:items-center app:justify-between app:py-[16px] app:px-[20px];
+    border-bottom: 1px solid var(--color-border-default);
+    background: var(--color-surface-card);
+  }
+
+  .app-menu-ready .sidebar {
+    @apply app:fixed app:inset-y-0 app:left-0 app:z-[10001] app:w-[min(280px,85vw)] app:h-dvh app:py-[32px] app:px-[20px] app:overflow-y-auto app:invisible;
+    border: 0;
+    border-right: 1px solid var(--color-border-default);
+    transform: translateX(-100%);
+    transition: transform .2s ease, visibility .2s;
+    overscroll-behavior: contain;
+  }
+  .app-menu-ready .sidebar-nav { @apply app:grid app:overflow-x-visible; }
+  .app-menu-ready .app-menu-close { @apply app:inline-flex app:absolute app:right-[12px] app:top-[20px]; }
+  .app-menu-open .sidebar { @apply app:visible; transform: translateX(0); }
+  .app-menu-open { @apply app:overflow-hidden; }
+  .app-sidebar-backdrop:not([hidden]) { @apply app:fixed app:inset-0 app:z-[10000]; background: #203b3266; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .button { @apply app:transition-none; }
+  .app-menu-ready .sidebar { transition: none; }
 }
 
 .card {
@@ -183,6 +219,21 @@ input, select {
 }
 
 .sidebar-logout { @apply app:mt-[24px]; }
+
+/* Komponen sidebar tersendiri agar style tombol modul tidak mengubahnya. */
+.sidebar-logout-button {
+  @apply app:inline-flex app:items-center app:justify-center app:min-h-[40px] app:py-[9px] app:px-[19px] app:rounded-[7px] app:cursor-pointer;
+  border: 1px solid #bbcfc5;
+  background: var(--color-surface-card);
+  color: var(--color-action-primary);
+  font: 400 13px/18px var(--font-body);
+}
+
+.sidebar-logout-button:hover { background: var(--color-surface-soft); }
+.sidebar .sidebar-logout-button:focus-visible {
+  outline: 2px solid var(--color-action-primary);
+  outline-offset: 2px;
+}
 
 .app-messages {
   @apply app:py-[4px] app:px-[18px] app:mb-[24px] app:rounded-[8px];

@@ -5,13 +5,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}TitikLapar{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20261029-1">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20261029-3">
   {% block extra_head %}{% endblock %}
 </head>
 <body class="app-body {% block body_class %}{% endblock %}">
+  <header class="app-mobile-header">
+    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot" aria-hidden="true"></span><span>TitikLapar</span></a>
+    <button class="app-menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>Menu</span>
+    </button>
+  </header>
+  <div class="app-sidebar-backdrop" aria-hidden="true" hidden></div>
   {% block body_top %}{% endblock %}
   <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="Menu aplikasi">
+      <button class="app-menu-close" type="button" aria-label="Tutup menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
       {% block sidebar_controls %}{% endblock %}
       <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
       <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
@@ -25,7 +36,7 @@
         <a class="sidebar-item{% if request.resolver_match.namespace == 'userprofile' %} sidebar-item-active{% endif %}" href="{% url 'userprofile:profile' %}"{% if request.resolver_match.namespace == 'userprofile' %} aria-current="page"{% endif %}>Profil</a>
       </nav>
       {% block sidebar_footer %}
-        <form class="sidebar-logout" method="post" action="{% url 'userprofile:logout' %}">{% csrf_token %}<button class="button secondary" type="submit">Keluar</button></form>
+        <form class="sidebar-logout" method="post" action="{% url 'userprofile:logout' %}">{% csrf_token %}<button class="sidebar-logout-button" type="submit">Keluar</button></form>
       {% endblock %}
     </aside>
 
@@ -43,6 +54,7 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+  <script src="{% static 'js/app-menu.js' %}?v=20261029-1" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

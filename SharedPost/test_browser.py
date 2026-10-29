@@ -409,12 +409,12 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
 
     def test_mobile_menu_and_form_fit_screen(self):
         with self.open_board(mobile=True) as (page, navigations):
-            menu = page.locator('.menu-toggle')
+            menu = page.locator('.app-menu-toggle')
             expect(menu).to_be_visible()
             menu.click()
             expect(menu).to_have_attribute("aria-expanded", "true")
             self.assertGreaterEqual(page.locator("#sidebar").bounding_box()["x"], 0)
-            page.locator(".menu-close").click()
+            page.locator(".app-menu-close").click()
             expect(menu).to_have_attribute("aria-expanded", "false")
             panel = self.fill_create(page)
             expect(panel).to_be_visible()

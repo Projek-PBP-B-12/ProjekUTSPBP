@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body_class %}profile-page{% endblock %}
+
+{% block extra_head %}
+  {{ block.super }}
+  <meta name="theme-color" content="#176e72">
+  {% block profile_form_styles %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}?v=20261029-1">
+{% endblock %}
+
+{% block page_header %}{% endblock %}
