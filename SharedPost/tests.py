@@ -392,6 +392,7 @@ class SharedPostTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.post(reverse("sharedpost:delete", args=[post.pk]), {"q": "Beji", "category": "GRAIN", "mine": "1"}, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-SharedPost-Action"], "delete")
         self.assertTemplateUsed(response, "SharedPost/partials/post_list.html")
         self.assertNotContains(response, "<!doctype")
         self.assertNotContains(response, "Roti gandum")
@@ -416,6 +417,7 @@ class SharedPostTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.post(reverse("sharedpost:complete", args=[post.pk]), HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["X-SharedPost-Action"], "complete")
         self.assertTemplateUsed(response, "SharedPost/partials/post_list.html")
         self.assertNotContains(response, "Roti gandum")
         post.refresh_from_db()
@@ -534,7 +536,7 @@ class SharedPostTests(TestCase):
         for filters, expected in cases:
             with self.subTest(filters=filters):
                 response = self.client.get(reverse("sharedpost:list"), filters, HTTP_HX_REQUEST="true")
-                self.assertEqual(set(response.context["posts"].values_list("pk", flat=True)), expected)
+                self.assertEqual({post.pk for post in response.context["posts"]}, expected)
         for active, status, expiry in [(False, "OFFERED", timezone.localdate()), (True, "CONSUMED", timezone.localdate()), (True, "OFFERED", timezone.localdate()-timedelta(days=1))]:
             with self.subTest(active=active, status=status, expiry=expiry):
                 post.is_active=active; post.save()

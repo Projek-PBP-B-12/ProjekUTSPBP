@@ -7,18 +7,43 @@
 {% endblock %}
 
 {% block content %}
-
-<p class="page-quote sp:my-7 sp:text-xl sp:text-muted sp:font-heading">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
+<p class="page-quote sp:my-7 sp:text-lg sp:text-muted sp:font-heading">Yang berlebih di kosmu, mungkin dibutuhkan di sebelah.</p>
 <div id="post-form" aria-live="polite"></div>
-<form id="board-filters" class="filters sp:flex sp:flex-wrap sp:items-center sp:gap-3" method="get" action="{% url 'sharedpost:list' %}" hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
-<label class="search-field sp:flex sp:flex-1 sp:basis-full sp:min-w-0 sp:items-center sp:gap-2.5 sp:rounded-lg sp:border sp:border-solid sp:border-line sp:bg-white sp:px-3.5 sp:min-[481px]:basis-auto sp:min-[481px]:min-w-[220px]">{% include "SharedPost/partials/icon.html" with icon="search" size="18" %}<input class="sp:m-0 sp:h-auto sp:w-full sp:min-w-0 sp:border-0 sp:bg-transparent sp:px-0 sp:py-3 sp:font-normal sp:text-ink" type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Cari makanan atau lokasi..." aria-label="Cari makanan atau lokasi"></label>
-<label class="filter-select sp:flex sp:w-full sp:items-center sp:justify-between sp:gap-2.5 sp:rounded-full sp:border sp:border-solid sp:border-[#ceddd1] sp:bg-[#edf5ec] sp:px-3 sp:py-[5px] sp:text-xs sp:text-brand sp:min-[481px]:w-auto"><span>Kategori</span><select class="sp:h-auto sp:w-auto sp:max-w-[160px] sp:border-0 sp:bg-transparent sp:p-1.5 sp:text-inherit" name="category"><option value="">Semua kategori</option>
-    {% for value, label in categories %}
-        <option value="{{ value }}"{% if value == selected_category %} selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-</select></label>
-<fieldset class="scope-tabs sp:m-0 sp:flex sp:basis-full sp:gap-6 sp:border-0 sp:border-b sp:border-solid sp:border-line sp:px-0 sp:pt-2"><legend class="sr-only sp:sr-only">Pemilik penawaran</legend><label><input type="radio" name="mine" value="0" {% if request.GET.mine != '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua Penawaran</span></label><label><input type="radio" name="mine" value="1" {% if request.GET.mine == '1' %}checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label></fieldset>
+<form id="board-filters" class="board-filters" method="get" action="{% url 'sharedpost:list' %}"
+      hx-get="{% url 'sharedpost:list' %}" hx-target="#post-list" hx-swap="innerHTML" hx-sync="#post-list:replace"
+      hx-trigger="submit, input changed delay:350ms from:input[type=search], change from:select">
+    <input type="hidden" name="page" id="board-page" value="{{ page_number }}">
+    <div class="filter-toolbar">
+        <label class="search-field">
+            {% include "SharedPost/partials/icon.html" with icon="search" size="18" %}
+            <input type="search" name="q" value="{{ query }}" placeholder="Cari makanan atau lokasi..." aria-label="Cari makanan atau lokasi">
+        </label>
+        <label class="filter-control radius-control"{% if not origin %} title="Pilih lokasi bawaan di Lokasi tersimpan untuk menggunakan radius"{% endif %}>
+            {% include "SharedPost/partials/icon.html" with icon="pin" size="15" %}
+            <span class="sp:sr-only">Radius pencarian</span>
+            <select name="radius" aria-label="Radius pencarian"{% if not origin %} disabled{% endif %}>
+                {% for radius in radius_options %}
+                <option value="{{ radius }}"{% if radius == selected_radius %} selected{% endif %}>{% if radius %}Radius {{ radius }} km{% else %}Semua area{% endif %}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+    <fieldset class="category-chips">
+        <legend class="sp:sr-only">Kategori makanan</legend>
+        <label><input type="radio" name="category" value=""{% if not selected_category %} checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua</span></label>
+        {% for value, label in categories %}
+        <label><input type="radio" name="category" value="{{ value }}"{% if value == selected_category %} checked{% endif %} onchange="this.form.requestSubmit()"><span>{{ label }}</span></label>
+        {% endfor %}
+    </fieldset>
+    <p class="location-note">
+        {% if origin %}Perkiraan jarak dari <strong>{{ origin.area_name }}</strong>.{% else %}<a href="{% url 'Location:manage' %}">Atur lokasi bawaan</a> untuk melihat jarak dan menyaring radius.{% endif %}
+    </p>
+    <fieldset class="scope-tabs">
+        <legend class="sp:sr-only">Pemilik penawaran</legend>
+        <label><input type="radio" name="mine" value="0"{% if not mine %} checked{% endif %} onchange="this.form.requestSubmit()"><span>Semua Penawaran <span id="all-offers-count" class="tab-count">{{ all_count }}</span></span></label>
+        <label><input type="radio" name="mine" value="1"{% if mine %} checked{% endif %} onchange="this.form.requestSubmit()"><span>Penawaran Saya</span></label>
+    </fieldset>
 </form>
-<div id="board-feedback" class="feedback" role="status" aria-live="polite"></div>
+<div id="board-feedback" class="feedback" role="status" aria-live="polite" tabindex="-1"></div>
 <div id="post-list" aria-live="polite" hx-get="{% url 'sharedpost:list' %}" hx-include="#board-filters" hx-trigger="postCreated from:body, postUpdated from:body" hx-swap="innerHTML">{% include "SharedPost/partials/post_list.html" %}</div>
 {% endblock %}

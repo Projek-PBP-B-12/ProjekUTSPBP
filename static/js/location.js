@@ -1,6 +1,7 @@
 (function () {
   const pins = JSON.parse(document.getElementById('pins-data').textContent);
   const center = JSON.parse(document.getElementById('map-center-data').textContent);
+  const selectedPostId = JSON.parse(document.getElementById('selected-post-data').textContent);
   const hint = document.getElementById('map-search-hint');
   if (typeof L === 'undefined') {
     hint.textContent = 'Peta belum dapat dimuat. Kamu tetap bisa membuka penawaran melalui daftar di bawah.';
@@ -13,12 +14,22 @@
 
   const initialCenter = [Number(center.latitude), Number(center.longitude)];
   const map = L.map('map').setView(initialCenter, 14);
+  map.zoomControl.setPosition('bottomright');
 
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     referrerPolicy: 'strict-origin-when-cross-origin',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
+
+  let activePopup = null;
+  map.on('popupopen', function (event) { activePopup = event.popup; });
+  map.on('popupclose', function () { activePopup = null; });
+  map.on('resize', function () {
+    // Ukuran daftar berubah mengikuti layar. Hitung ulang posisi popup agar
+    // judul dan tombol tetap berada di dalam peta setelah layar diputar/diubah.
+    if (activePopup) activePopup.update();
+  });
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -34,8 +45,9 @@
 
   // Teks dari data dipasang lewat textContent, bukan innerHTML,
   // supaya judul/deskripsi buatan pengguna nanti tidak bisa menyisipkan HTML.
-  function buildPopup(pin) {
-    const root = el('div');
+  function buildOffer(pin) {
+    const root = el('article', 'map-popup-offer');
+    if (pin.id === selectedPostId) root.classList.add('map-popup-offer-selected');
 
     const photo = pin.photo_url ? el('img', 'map-popup-photo') : el('div', 'map-popup-photo');
     if (pin.photo_url) {
@@ -53,22 +65,68 @@
 
     const claim = el('a', 'button button-primary map-popup-claim', 'Lihat penawaran');
     claim.href = pin.detail_url || '#';
+    claim.setAttribute('aria-label', 'Lihat penawaran ' + pin.title);
     root.appendChild(claim);
 
     return root;
   }
 
-  pins.forEach(function (pin, index) {
+  function buildPopup(group) {
+    const root = el('div');
+    if (group.length > 1) {
+      root.appendChild(el('h2', 'map-popup-heading', group.length + ' penawaran di area ini'));
+      root.appendChild(el('p', 'map-popup-help', 'Gulir untuk melihat semua makanan.'));
+    }
+    const list = el('div', 'map-popup-offers');
+    list.tabIndex = 0;
+    list.setAttribute('role', 'region');
+    list.setAttribute('aria-label', 'Daftar penawaran di titik ini');
+    // Penawaran yang dibuka dari halaman detail selalu terlihat paling atas.
+    const selected = group.find(function (pin) { return pin.id === selectedPostId; });
+    const ordered = selected ? [selected].concat(group.filter(function (pin) { return pin !== selected; })) : group;
+    ordered.forEach(function (pin) { list.appendChild(buildOffer(pin)); });
+    root.appendChild(list);
+    return root;
+  }
+
+  // Koordinat publik sudah dibulatkan oleh server. Kelompokkan titik yang sama
+  // agar tidak ada marker yang menutupi penawaran lain di area tersebut.
+  const groups = new Map();
+  pins.forEach(function (pin) {
+    const key = Number(pin.latitude) + ',' + Number(pin.longitude);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(pin);
+  });
+
+  let selectedMarker = null;
+  let selectedTitle = '';
+  groups.forEach(function (group) {
+    const pin = group[0];
+    const selected = group.find(function (offer) { return offer.id === selectedPostId; });
+    const label = group.length + ' penawaran di area ' + pin.area_name;
     const icon = L.divIcon({
-      className: 'map-pin',
-      html: String(index + 1),
+      className: selected ? 'map-pin map-pin-selected' : 'map-pin',
+      html: String(group.length),
       iconSize: [36, 36],
     });
 
-    L.marker([Number(pin.latitude), Number(pin.longitude)], { icon: icon, title: pin.title })
+    const marker = L.marker([Number(pin.latitude), Number(pin.longitude)], {
+      icon: icon, title: label, alt: label, zIndexOffset: selected ? 1000 : 0,
+    })
       .addTo(map)
-      .bindPopup(buildPopup(pin), { className: 'map-popup', minWidth: 280, maxWidth: 280 });
+      .bindPopup(buildPopup(group), { className: 'map-popup', minWidth: 240, maxWidth: 280 });
+    marker.getElement().setAttribute('aria-label', label);
+    if (selected) {
+      selectedMarker = marker;
+      selectedTitle = selected.title;
+    }
   });
+
+  if (selectedMarker) {
+    map.setView(selectedMarker.getLatLng(), 16, { animate: false });
+    selectedMarker.openPopup();
+    hint.textContent = 'Menampilkan area penawaran ' + selectedTitle + '. Titik pengambilan disepakati dengan donor.';
+  }
 
   document.getElementById('map-reset-center').addEventListener('click', function () {
     map.closePopup();

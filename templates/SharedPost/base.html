@@ -6,7 +6,7 @@
 
 {% block extra_head %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/sharedpost.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sharedpost.css' %}?v=20261029-2">
 {% endblock %}
 
 {% block body_top %}
@@ -24,5 +24,6 @@
 {% block extra_js %}
     {{ block.super }}
     <script src="{% static 'js/htmx.min.js' %}" defer></script>
-    <script src="{% static 'js/sharedpost-ui.js' %}" defer></script>
+    <script src="{% static 'js/sharedpost-optimistic.js' %}?v=20261029-2" defer></script>
+    <script src="{% static 'js/sharedpost-ui.js' %}?v=20261029-2" defer></script>
 {% endblock %}
