@@ -22,10 +22,15 @@
             <h2 class="post-title"><a href="{% url 'sharedpost:detail' post.pk %}">{{ post.food_item.name }}</a></h2>
             <p class="card-description" title="{{ post.description }}">{{ post.description }}</p>
             <div class="card-footer sp:mt-3 sp:flex sp:items-center sp:justify-between sp:gap-3">
-                <span class="area" title="{% if origin %}Perkiraan jarak dari {{ origin.area_name }} · {% endif %}{{ post.location.area_name }}">
-                    {% include "SharedPost/partials/icon.html" with icon="pin" size="15" %}
-                    <span>{{ post.distance_label }}{% if post.is_origin %} (lokasi saya){% endif %}</span>
-                </span>
+                <div class="card-location">
+                    <span class="area" title="{% if origin %}Perkiraan jarak dari {{ origin.area_name }} · {% endif %}{{ post.location.area_name }}">
+                        {% include "SharedPost/partials/icon.html" with icon="pin" size="15" %}
+                        <span>{{ post.distance_label }}{% if post.is_origin %} (lokasi saya){% endif %}</span>
+                    </span>
+                    {% if post.location.owner_id == post.food_item.owner_id %}
+                    <a class="card-map-link" href="{% url 'Location:map' %}?post={{ post.pk }}" aria-label="Lihat lokasi {{ post.food_item.name }} di peta">Lihat peta</a>
+                    {% endif %}
+                </div>
                 {% if post.food_item.owner_id != request.user.id %}
                 <a class="button primary claim-link" href="{% url 'sharedpost:detail' post.pk %}" aria-label="Klaim {{ post.food_item.name }}">Klaim</a>
                 {% endif %}
