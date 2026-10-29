@@ -95,7 +95,9 @@
 .sharedpost-page .card-meta { @apply sp:flex-wrap; }
 .sharedpost-page .expiry { @apply sp:shrink-0 sp:text-[11px] sp:font-medium sp:text-brand; }
 .sharedpost-page .owned .expiry { @apply sp:rounded-full sp:bg-[#fff0dc] sp:px-2 sp:py-0.5 sp:text-[#805a27]; }
-.sharedpost-page .card-footer { @apply sp:min-h-8; }
+.sharedpost-page .card-footer { @apply sp:min-h-8 sp:flex-wrap; }
+.sharedpost-page .card-location { @apply sp:flex sp:min-w-0 sp:flex-1 sp:flex-wrap sp:items-center sp:gap-x-2 sp:gap-y-1; }
+.sharedpost-page .card-map-link { @apply sp:inline-flex sp:min-h-8 sp:shrink-0 sp:items-center sp:rounded-md sp:px-1 sp:text-xs sp:font-medium sp:text-brand sp:underline sp:underline-offset-2; }
 .sharedpost-page .area { @apply sp:inline-flex sp:min-w-0 sp:items-center sp:gap-1 sp:text-xs sp:text-brand; }
 .sharedpost-page .area span { @apply sp:wrap-anywhere; }
 .sharedpost-page .button.claim-link { @apply sp:min-h-8 sp:shrink-0 sp:rounded-full sp:px-3.5 sp:py-1.5 sp:text-xs; }

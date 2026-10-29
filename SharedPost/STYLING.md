@@ -32,6 +32,8 @@ Respons sukses HTMX untuk kedua aksi menyertakan header `X-SharedPost-Action` da
 
 Detail penawaran aktif menyediakan kartu Lokasi umum. Lihat lokasi membuka `Location:map?post=<id>` untuk menyorot pin perkiraan dan membuka popup penawaran tersebut. Tautan lama ke penawaran yang sudah tidak tersedia menampilkan pemberitahuan pada halaman peta.
 
+Kartu penawaran sendiri dan milik donor juga menyediakan tautan Lihat peta di sebelah jarak atau nama area. Tautan membuka pin yang sama, dapat digunakan dengan keyboard, dan menyesuaikan baris saat kartu menyempit. Tautan hanya ditampilkan jika lokasi pengambilan milik donor, sesuai aturan pin peta.
+
 Template SharedPost dan peta menyertakan parameter versi pada aset CSS/JS yang berubah agar browser meminta aset baru. Naikkan versinya ketika memperbarui berkas tersebut; hasil build CSS tetap harus ikut commit dan deployment.
 
 ## Build lokal
