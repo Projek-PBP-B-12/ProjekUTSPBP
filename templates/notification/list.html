@@ -1,38 +1,20 @@
+{% extends "base.html" %}
 {% load static tz %}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }} | TitikLapar</title>
+
+{% block title %}{{ page_title }} | TitikLapar{% endblock %}
+{% block body_class %}notification-page{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Lora:wght@400&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/notification.css' %}">
-    <script src="{% static 'js/notification.js' %}" defer></script>
-</head>
+    <link rel="stylesheet" href="{% static 'css/notification.css' %}?v=20261029-1">
+{% endblock %}
 
-<body class="notification-page">
-    <div class="notif-shell">
-        <aside class="notif-sidebar">
-            <a class="notif-brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, halaman utama">
-                <span class="notif-brand-dot" aria-hidden="true"></span>
-                <span>TitikLapar</span>
-            </a>
-            <nav class="notif-navigation" aria-label="Navigasi aplikasi">
-                <a class="notif-nav-item" href="{% url 'landing_page' %}">Beranda</a>
-                <a class="notif-nav-item" href="{% url 'FoodItem:makananku' %}">Makananku</a>
-                <a class="notif-nav-item" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
-                <a class="notif-nav-item" href="{% url 'sharedpost:list' %}">Papan berbagi</a>
-                <a class="notif-nav-item" href="{% url 'Location:map' %}">Peta berbagi</a>
-                <a class="notif-nav-item" href="{% url 'Location:manage' %}">Lokasi tersimpan</a>
-                <a class="notif-nav-item notif-nav-item-active"
-                   href="{% url 'notification:show_notification' %}" aria-current="page">Notifikasi</a>
-                <a class="notif-nav-item" href="{% url 'userprofile:profile' %}">Profil</a>
-            </nav>
-        </aside>
+{% block page_header %}{% endblock %}
 
-        <main class="notif-main">
+{% block content %}
             <header class="notif-header">
                 <div class="notif-heading">
                     <h1 class="notif-page-title">{{ page_title }}</h1>
@@ -124,7 +106,9 @@
                     Membuka pesan tidak mengubah status makanan.
                 </p>
             </section>
-        </main>
-    </div>
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/notification.js' %}" defer></script>
+{% endblock %}

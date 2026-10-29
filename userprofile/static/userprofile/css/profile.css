@@ -1,16 +1,34 @@
-.profile-nav { padding-inline: 0; }
-.profile-app-links { display: flex; flex-wrap: wrap; gap: 12px 22px; padding-block: 18px; color: var(--teal); font-size: 13px; }
-.profile-app-links a { text-underline-offset: 4px; }
-.profile-app-links a:hover, .profile-app-links a:focus-visible { text-decoration: underline; }
-.edit-form select { width: 100%; padding: 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
+/* Halaman akun mewarisi base.html; gaya konten tidak mengubah sidebar bersama. */
+.edit-form select { width: 100%; height: auto; min-height: 46px; padding: 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--ink); font: inherit; }
 
-.profile-main {
+.profile-page .app-main {
   background: radial-gradient(ellipse at 5% 95%, #dce9e4, transparent 50%), #f8f8f0;
 }
 
-.profile-layout { max-width: 1100px; padding-block: 52px 64px; }
+.profile-main {
+  --ink: #273934;
+  --muted: #61736e;
+  --teal: #176e72;
+  --border: #d5ded6;
+  min-width: 0;
+  color: var(--ink);
+  font: 400 16px/normal Arial, Helvetica, sans-serif;
+}
 
-.profile-heading h1 { font-size: clamp(44px, 5vw, 60px); }
+.profile-layout { width: 100%; max-width: 1100px; margin-inline: auto; padding-bottom: 16px; }
+
+.profile-heading h1 { margin: 0; font: 400 clamp(44px, 5vw, 60px)/.99 Georgia, 'Times New Roman', serif; letter-spacing: -2px; }
+.profile-heading .eyebrow { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin: 0 0 24px; padding: 8px 14px; border-radius: 999px; color: var(--teal); background: #e3f1ef; font-size: 12px; font-weight: 700; letter-spacing: .6px; }
+.profile-heading .eyebrow span { width: 5px; height: 5px; flex-shrink: 0; border-radius: 50%; background: var(--teal); }
+
+.profile-main .button { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 44px; padding: 12px 30px; border: 1px solid transparent; border-radius: 7px; font: 700 13px/normal Arial, Helvetica, sans-serif; text-align: center; cursor: pointer; transition: background-color .2s, transform .2s; }
+.profile-main .button:hover { transform: translateY(-2px); }
+.profile-main .button-primary { background: var(--teal); color: #fff; }
+.profile-main .button-primary:hover { background: #125b5e; filter: none; }
+.profile-main .button-outline { background: #fff; color: var(--teal); border-color: var(--border); }
+.profile-main .button-outline:hover { background: #f0f6f4; }
+.profile-main a:focus-visible, .profile-main button:focus-visible { outline: 3px solid #789b23; outline-offset: 5px; }
+.profile-main .form-field input { height: auto; }
 
 .profile-heading > p:last-child {
   max-width: 540px;
@@ -26,6 +44,8 @@
   align-items: start;
   gap: 28px;
 }
+
+.profile-columns > *, .profile-details { min-width: 0; }
 
 .identity-card, .detail-card {
   padding: 30px;
@@ -110,7 +130,6 @@
 
 .profile-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
 .profile-text-link { display: inline-block; margin-top: 20px; color: var(--teal); font-size: 13px; text-decoration: underline; text-underline-offset: 4px; line-height: 1.6; }
-.profile-details .site-messages p { margin: 0; }
 .edit-form { min-width: 0; }
 .edit-guide .profile-privacy { border-top: 1px solid #cdd7bd; padding-top: 22px; }
 .guide-item { display: flex; gap: 14px; margin-block: 28px; }
@@ -128,25 +147,33 @@
 .account-settings h2 { font-size: 24px; }
 .button-danger { color: #fff; background: #9c382b; }
 .button-danger:hover { background: #7d281e; }
-.button-danger-outline { color: #913326; border-color: #d5a69b; background: #fff; }
+.profile-main .button-danger-outline { color: #913326; border-color: #d5a69b; background: #fff; }
 .button-danger-outline:hover { background: #fff4ef; }
 .deletion-summary { background: #f7eae3; border-color: #e4cfc7; }
 .deletion-effects { padding-left: 20px; margin-block: 24px; font-size: 14px; line-height: 1.7; }
 .deletion-effects li + li { margin-top: 14px; }
 .deletion-summary .profile-privacy { padding-top: 20px; border-top: 1px solid #e4cfc7; }
 .confirmation-field { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; margin-top: 24px; font-size: 13px; line-height: 1.7; }
-.confirmation-field input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: #9c382b; }
+.confirmation-field input { width: 18px; height: 18px; padding: 0; margin: 2px 0 0; accent-color: #9c382b; }
+.confirmation-field label { margin: 0; font: inherit; }
 .confirmation-field input:focus-visible { outline: 3px solid #789b23; outline-offset: 3px; }
 .deletion-actions { margin-top: 28px; }
 
-@media (max-width: 800px) {
-  .profile-nav { min-height: 80px; }
-  .profile-layout { max-width: 560px; padding-block: 32px 40px; }
+@media (max-width: 1100px) {
   .profile-columns { grid-template-columns: 1fr; gap: 20px; }
+}
+
+@media (max-width: 800px) {
+  .profile-layout { max-width: 560px; padding-bottom: 16px; }
   .identity-card, .detail-card { padding: 24px; }
   .profile-avatar { width: 56px; height: 56px; font-size: 28px; margin-bottom: 20px; }
 }
 
 @media (max-width: 420px) {
+  .profile-heading h1 { letter-spacing: -1.3px; }
   .profile-values > div { grid-template-columns: 1fr; gap: 5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-main .button { transition: none; }
 }

@@ -1,27 +1,9 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#176e72">
-  <title>Kontak berbagi — TitikLapar</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="stylesheet" href="{% static 'userprofile/css/profile.css' %}">
-</head>
-<body>
-  <header class="site-header">
-    <nav class="navbar container profile-nav" aria-label="Navigasi utama">
-      <a class="brand" href="{% url 'landing_page' %}" aria-label="TitikLapar, beranda"><span class="brand-dot"></span><span>TitikLapar</span></a>
-      <div class="nav-actions">
-        <a class="button button-outline" href="{% url 'userprofile:profile' %}">Profilku</a>
-        {% include 'userprofile/includes/logout_form.html' %}
-      </div>
-    </nav>
-  </header>
-  {% include 'userprofile/includes/account_navigation.html' %}
-  <main class="profile-main">
-    <div class="profile-layout container">
+{% extends "userprofile/base.html" %}
+{% block title %}Kontak berbagi — TitikLapar{% endblock %}
+
+{% block content %}
+  <div class="profile-main">
+    <div class="profile-layout">
       <header class="profile-heading">
         <p class="eyebrow"><span></span>DARI TETANGGA, UNTUK TETANGGA</p>
         <h1>Mulai percakapan.</h1>
@@ -50,6 +32,5 @@
         </div>
       </div>
     </div>
-  </main>
-</body>
-</html>
+  </div>
+{% endblock %}

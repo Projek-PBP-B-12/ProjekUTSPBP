@@ -25,18 +25,6 @@
   document.addEventListener('click', event => {
     if (event.target.closest('.load-more')) firstNewCard = document.querySelectorAll('.post-card').length;
   });
-  const toggle = document.querySelector('.menu-toggle');
-  const backdrop = document.querySelector('.sidebar-backdrop');
-  function setMenu(open) {
-    document.body.classList.toggle('menu-open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    backdrop.hidden = !open;
-    if (open) document.querySelector('.menu-close').focus();
-  }
-  toggle.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
-  document.querySelector('.menu-close').addEventListener('click', () => { setMenu(false); toggle.focus(); });
-  backdrop.addEventListener('click', () => setMenu(false));
-  document.addEventListener('keydown', event => { if (event.key === 'Escape') { setMenu(false); } });
   document.addEventListener('click', event => { if (event.target.closest('[data-close-form]')) document.querySelector('#post-form').replaceChildren(); });
   document.body.addEventListener('htmx:afterSwap', event => {
     checkPhotos(event.detail.target);

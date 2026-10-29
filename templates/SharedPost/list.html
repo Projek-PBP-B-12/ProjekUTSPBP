@@ -27,6 +27,14 @@
                 {% endfor %}
             </select>
         </label>
+        <label class="filter-control"{% if not origin %} title="Pilih lokasi bawaan di Lokasi tersimpan untuk mengurutkan dari yang terdekat"{% endif %}>
+            {% include "SharedPost/partials/icon.html" with icon="sort" size="15" %}
+            <span class="sp:sr-only">Urutkan penawaran</span>
+            <select name="sort" aria-label="Urutkan penawaran">
+                <option value="nearest"{% if selected_sort == 'nearest' %} selected{% endif %}{% if not origin %} disabled{% endif %}>Terdekat</option>
+                <option value="newest"{% if selected_sort == 'newest' %} selected{% endif %}>Terbaru</option>
+            </select>
+        </label>
     </div>
     <fieldset class="category-chips">
         <legend class="sp:sr-only">Kategori makanan</legend>
@@ -36,7 +44,7 @@
         {% endfor %}
     </fieldset>
     <p class="location-note">
-        {% if origin %}Perkiraan jarak dari <strong>{{ origin.area_name }}</strong>.{% else %}<a href="{% url 'Location:manage' %}">Atur lokasi bawaan</a> untuk melihat jarak dan menyaring radius.{% endif %}
+        {% if origin %}Perkiraan jarak dari <strong>{{ origin.area_name }}</strong>.{% else %}<a href="{% url 'Location:manage' %}">Atur lokasi bawaan</a> untuk melihat jarak, menyaring radius, dan mengurutkan dari yang terdekat.{% endif %}
     </p>
     <fieldset class="scope-tabs">
         <legend class="sp:sr-only">Pemilik penawaran</legend>

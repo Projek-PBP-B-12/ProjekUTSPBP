@@ -5,27 +5,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}TitikLapar{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}?v=20261029-3">
   {% block extra_head %}{% endblock %}
 </head>
 <body class="app-body {% block body_class %}{% endblock %}">
+  <header class="app-mobile-header">
+    <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot" aria-hidden="true"></span><span>TitikLapar</span></a>
+    <button class="app-menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Buka menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>Menu</span>
+    </button>
+  </header>
+  <div class="app-sidebar-backdrop" aria-hidden="true" hidden></div>
   {% block body_top %}{% endblock %}
   <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="Menu aplikasi">
+      <button class="app-menu-close" type="button" aria-label="Tutup menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
       {% block sidebar_controls %}{% endblock %}
       <a class="sidebar-brand" href="{% url 'landing_page' %}"><span class="brand-dot"></span><span>TitikLapar</span></a>
       <nav class="sidebar-nav" aria-label="Navigasi aplikasi">
         <a class="sidebar-item{% if request.resolver_match.view_name == 'landing_page' %} sidebar-item-active{% endif %}" href="{% url 'landing_page' %}"{% if request.resolver_match.view_name == 'landing_page' %} aria-current="page"{% endif %}>Beranda</a>
-        <a class="sidebar-item{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' %} sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}"{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' %} aria-current="page"{% endif %}>Makananku</a>
-        <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}">Tambah makanan</a>
+        <a class="sidebar-item{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' or request.resolver_match.view_name == 'FoodItem:change_food_item' or request.resolver_match.view_name == 'FoodItem:delete_food_page' %} sidebar-item-active{% endif %}" href="{% url 'FoodItem:makananku' %}"{% if request.resolver_match.view_name == 'FoodItem:makananku' or request.resolver_match.view_name == 'FoodItem:list_food_items' or request.resolver_match.view_name == 'FoodItem:change_food_item' or request.resolver_match.view_name == 'FoodItem:delete_food_page' %} aria-current="page"{% endif %}>Makananku</a>
+        <a class="sidebar-item {% if request.resolver_match.view_name == 'FoodItem:add_food_item' %}sidebar-item-active{% endif %}" href="{% url 'FoodItem:add_food_item' %}"{% if request.resolver_match.view_name == 'FoodItem:add_food_item' %} aria-current="page"{% endif %}>Tambah makanan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'sharedpost' %} sidebar-item-active{% endif %}" href="{% url 'sharedpost:list' %}"{% if request.resolver_match.namespace == 'sharedpost' %} aria-current="page"{% endif %}>Papan berbagi</a>
-        <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}">Peta berbagi</a>
+        <a class="sidebar-item{% if request.resolver_match.view_name == 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:map' %}"{% if request.resolver_match.view_name == 'Location:map' %} aria-current="page"{% endif %}>Peta berbagi</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'Location' and request.resolver_match.view_name != 'Location:map' %} sidebar-item-active{% endif %}" href="{% url 'Location:manage' %}"{% if request.resolver_match.namespace == 'Location' and request.resolver_match.view_name != 'Location:map' %} aria-current="page"{% endif %}>Lokasi tersimpan</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'notification' %} sidebar-item-active{% endif %}" href="{% url 'notification:show_notification' %}"{% if request.resolver_match.namespace == 'notification' %} aria-current="page"{% endif %}>Notifikasi</a>
         <a class="sidebar-item{% if request.resolver_match.namespace == 'userprofile' %} sidebar-item-active{% endif %}" href="{% url 'userprofile:profile' %}"{% if request.resolver_match.namespace == 'userprofile' %} aria-current="page"{% endif %}>Profil</a>
       </nav>
       {% block sidebar_footer %}
-        <form class="sidebar-logout" method="post" action="{% url 'userprofile:logout' %}">{% csrf_token %}<button class="button secondary" type="submit">Keluar</button></form>
+        <form class="sidebar-logout" method="post" action="{% url 'userprofile:logout' %}">{% csrf_token %}<button class="sidebar-logout-button" type="submit">Keluar</button></form>
       {% endblock %}
     </aside>
 
@@ -43,6 +54,7 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+  <script src="{% static 'js/app-menu.js' %}?v=20261029-1" defer></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

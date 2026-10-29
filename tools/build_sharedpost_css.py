@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--compiler", type=Path, default=WINDOWS_CLI)
     parser.add_argument("--watch", action="store_true")
-    parser.add_argument("--page", choices=("sharedpost", "dashboard"), default="sharedpost")
+    parser.add_argument("--page", choices=("app", "sharedpost", "dashboard"), default="sharedpost")
     args = parser.parse_args()
     compiler = args.compiler.resolve()
     if not compiler.is_file():

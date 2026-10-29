@@ -139,18 +139,6 @@
 .sharedpost-page .detail-location .button { @apply sp:min-h-9 sp:text-xs; }
 .sharedpost-page .htmx-request { cursor: progress; }
 
-.sharedpost-page .mobile-header, .sharedpost-page .menu-close { @apply sp:hidden; }
-@media (max-width: 800px) {
-    .sharedpost-page .mobile-header { @apply sp:flex sp:items-center sp:justify-between sp:border-0 sp:border-b sp:border-solid sp:border-line sp:bg-white sp:px-5 sp:py-4; }
-    .sharedpost-page .menu-toggle, .sharedpost-page .menu-close { @apply sp:border-0 sp:bg-transparent sp:text-[22px] sp:text-brand sp:cursor-pointer; }
-    .sharedpost-page .menu-toggle span { @apply sp:text-[13px]; }
-    .sharedpost-page .sidebar { @apply sp:fixed sp:inset-y-0 sp:left-0 sp:z-30 sp:w-[min(280px,85vw)] sp:h-dvh sp:overflow-y-auto sp:border-0 sp:border-r sp:border-solid sp:border-line sp:px-5 sp:py-8 sp:-translate-x-full sp:invisible sp:transition-[transform,visibility] sp:duration-200; }
-    .sharedpost-page.menu-open .sidebar { @apply sp:translate-x-0 sp:visible; }
-    .sharedpost-page.menu-open { @apply sp:overflow-hidden; }
-    .sharedpost-page .sidebar-nav { @apply sp:grid sp:overflow-x-visible; }
-    .sharedpost-page .menu-close { @apply sp:block sp:absolute sp:right-3 sp:top-[22px]; }
-    .sharedpost-page .sidebar-backdrop:not([hidden]) { @apply sp:fixed sp:inset-0 sp:z-25 sp:border-0 sp:bg-[#203b3266]; }
-}
 @media (prefers-reduced-motion: reduce) {
     .sharedpost-page *, .sharedpost-page *::before, .sharedpost-page *::after { transition: none !important; scroll-behavior: auto !important; }
 }

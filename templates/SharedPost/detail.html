@@ -21,8 +21,8 @@
     <div class="food-placeholder detail-photo category-{{ post.food_item.category|lower }} sp:relative sp:flex sp:items-center sp:justify-center sp:overflow-hidden sp:h-[clamp(220px,40vw,340px)] sp:min-[1001px]:h-auto sp:min-[1001px]:min-h-[420px]">
         <span class="placeholder-symbol sp:-rotate-12 sp:text-[92px] sp:leading-none sp:opacity-60" aria-hidden="true">◒</span>
         <span class="placeholder-label sp:absolute sp:right-4 sp:bottom-3 sp:text-[11px] sp:tracking-[2px] sp:uppercase sp:opacity-70">{{ post.food_item.get_category_display }}</span>
-        {% if post.food_item.image_url %}
-            <img class="food-photo sp:absolute sp:inset-0 sp:h-full sp:w-full sp:object-cover" src="{{ post.food_item.image_url }}"
+        {% if photo_url %}
+            <img class="food-photo sp:absolute sp:inset-0 sp:h-full sp:w-full sp:object-cover" src="{{ photo_url }}"
                  alt="{{ post.food_item.name }}" decoding="async" referrerpolicy="no-referrer">
         {% endif %}
         {% if is_owner %}<span class="owner-badge">● Penawaran saya</span>{% endif %}

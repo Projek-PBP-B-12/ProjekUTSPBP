@@ -77,11 +77,6 @@ def get_map_pins(posts, origin=None):
     return pins
 
 
-CATEGORY_LABELS = {
-    "GRAIN": "Roti & biji-bijian", "VEGETABLE": "Sayuran", "BEVERAGE": "Minuman",
-    "FRUIT": "Buah", "MEAT": "Daging", "SEAFOOD": "Seafood", "DAIRY": "Susu & olahannya",
-    "SNACK": "Camilan", "OTHER": "Lainnya",
-}
 RADIUS_OPTIONS = ("", "1", "2", "5", "10")
 OFFERS_PER_PAGE = 6
 
@@ -93,13 +88,8 @@ def format_distance(kilometers):
 
 
 def get_board_context(posts, user, filters):
-    """Filter jarak memakai koordinat perkiraan, lalu tampilkan bertahap per enam kartu."""
-    choices = list(FoodItem._meta.get_field("category").choices)
-    rank = {value: index for index, value in enumerate(CATEGORY_LABELS)}
-    categories = [
-        (value, CATEGORY_LABELS.get(value, label))
-        for value, label in sorted(choices, key=lambda choice: rank.get(choice[0], len(rank)))
-    ]
+    """Filter dan urutkan penawaran sebelum menampilkan bertahap per enam kartu."""
+    categories = list(FoodItem._meta.get_field("category").choices)
     labels = dict(categories)
     category = filters.get("category", "")
     if category not in labels:
@@ -110,6 +100,9 @@ def get_board_context(posts, user, filters):
     radius = filters.get("radius", "2" if origin else "")
     if radius not in RADIUS_OPTIONS or not origin:
         radius = ""
+    sort = filters.get("sort", "nearest" if origin else "newest")
+    if sort not in ("nearest", "newest") or (sort == "nearest" and not origin):
+        sort = "newest"
 
     if query:
         posts = posts.filter(Q(food_item__name__icontains=query) | Q(location__area_name__icontains=query))
@@ -127,7 +120,7 @@ def get_board_context(posts, user, filters):
                 continue
         post.distance_label = format_distance(post.distance_km) if origin else post.location.area_name
         post.is_origin = bool(origin and origin.pk == post.location_id and post.food_item.owner_id == user.pk)
-        post.category_label = labels.get(post.food_item.category, post.food_item.get_category_display())
+        post.category_label = post.food_item.get_category_display()
         post.photo_url = normalize_photo_url(post.food_item.image_url)
         offers.append(post)
 
@@ -135,6 +128,9 @@ def get_board_context(posts, user, filters):
     mine = filters.get("mine") == "1"
     if mine:
         offers = [post for post in offers if post.food_item.owner_id == user.pk]
+    if sort == "nearest":
+        # Sort stabil mempertahankan urutan -created_at, -pk saat jaraknya sama.
+        offers.sort(key=lambda post: post.distance_km)
     page_value = filters.get("page", "1")
     if not (page_value.isascii() and page_value.isdigit() and len(page_value) <= 6 and int(page_value) > 0):
         page_value = "1"
@@ -142,13 +138,13 @@ def get_board_context(posts, user, filters):
     shown = offers[:page.number * OFFERS_PER_PAGE]
     parameters = {
         "q": query, "category": category, "mine": "1" if mine else "0",
-        "radius": radius, "page": page.number + 1,
+        "radius": radius, "sort": sort, "page": page.number + 1,
     }
     return {
         "posts": shown, "total_count": len(offers), "all_count": all_count,
         "visible_count": len(shown), "page_number": page.number, "has_more": page.has_next(),
         "next_url": reverse("sharedpost:list") + "?" + urlencode(parameters),
         "categories": categories, "selected_category": category, "query": query, "mine": mine,
-        "origin": origin, "selected_radius": radius,
+        "origin": origin, "selected_radius": radius, "selected_sort": sort,
         "radius_options": RADIUS_OPTIONS,
     }

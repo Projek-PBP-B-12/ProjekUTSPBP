@@ -7,6 +7,7 @@ from django.db.models.deletion import RestrictedError
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 
 from FoodItem.models import FoodItem
 from Location.models import Location
@@ -504,6 +505,30 @@ class SharedPostTests(TestCase):
         self.assertContains(listing, url)
         self.assertNotContains(listing, "Hapus</button>")
         self.assertNotContains(listing, "Tandai Sudah Diambil")
+
+    def test_detail_photo_normalizes_drive_links_and_keeps_original_database_url(self):
+        post = self.make_post()
+        self.client.force_login(self.owner)
+        for original, expected in [
+            ("https://drive.google.com/file/d/abc_123-XYZ/view?usp=sharing", "https://drive.google.com/thumbnail?id=abc_123-XYZ&sz=w1000"),
+            ("https://drive.google.com/open?id=abc_123-XYZ", "https://drive.google.com/thumbnail?id=abc_123-XYZ&sz=w1000"),
+            ("https://drive.google.com/uc?export=view&id=abc_123-XYZ", "https://drive.google.com/thumbnail?id=abc_123-XYZ&sz=w1000"),
+            ("https://example.com/roti.jpg", "https://example.com/roti.jpg"),
+            ("", None),
+        ]:
+            with self.subTest(image_url=original):
+                self.food.image_url = original
+                self.food.save(update_fields=["image_url"])
+                response = self.client.get(reverse("sharedpost:detail", args=[post.pk]))
+                self.assertEqual(response.status_code, 200)
+                if expected:
+                    self.assertContains(response, f'src="{escape(expected)}"')
+                    if original != expected:
+                        self.assertNotContains(response, f'src="{escape(original)}"')
+                else:
+                    self.assertNotContains(response, 'class="food-photo ')
+                self.food.refresh_from_db()
+                self.assertEqual(self.food.image_url, original)
 
     def test_unavailable_detail_is_visible_only_to_owner(self):
         post = self.make_post()

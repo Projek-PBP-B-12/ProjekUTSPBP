@@ -61,8 +61,8 @@ python manage.py test SharedPost.test_browser
 - Rate limiting diuji dengan batas rendah di database sementara: respons 429 memulihkan optimistic UI, mempertahankan input tambah/edit, menyampaikan waktu tunggu, dan tetap mengizinkan pembacaan daftar. Pengaturan batas rendah hanya berlaku pada tes terkait.
 - Pesan validasi server muncul tanpa menyimpan penawaran yang tidak valid; form bisa dibatalkan.
 - Pencarian, kategori, tab penawaran sendiri, dan hasil kosong.
-- Chip kategori menggunakan nilai kategori FoodItem; pilihan dan badge jumlah diperbarui tanpa reload.
-- Radius dari lokasi bawaan dan jarak perkiraan pada kartu. Daftar selalu menampilkan penawaran terbaru lebih dulu; parameter sorting lama diabaikan dan tidak diteruskan pada tautan pagination.
+- Chip kategori menggunakan nilai, label bahasa Inggris, dan urutan dari model FoodItem. Label kategori kartu tetap sesuai model setelah filter HTMX; pilihan dan badge jumlah diperbarui tanpa reload.
+- Radius dari lokasi bawaan dan jarak perkiraan pada kartu. Sorting Terdekat/Terbaru diuji bersama pagination dan perubahan filter tanpa reload; pengurutan jarak yang sama memakai waktu publikasi lalu ID sebagai penentu. Tanpa lokasi bawaan, Terdekat dinonaktifkan dan server memakai Terbaru. Parameter sorting yang tidak didukung dinormalisasi ke Terbaru.
 - Tombol Lihat lebih banyak menambah enam kartu per tahap, mempertahankan filter, dan tidak menghasilkan duplikasi. Mengganti filter mereset halaman; menghapus penawaran tetap mempertahankan filter.
 - Tombol Klaim membuka detail penawaran, lalu Hubungi donor membuka halaman kontak internal.
 - Detail penawaran menyediakan Lihat lokasi menuju pin yang sesuai. Tes browser menggunakan stub API Leaflet untuk memeriksa pemusatan dan popup tanpa ketergantungan CDN; pemuatan peta/tile sungguhan tetap diperiksa terpisah.
