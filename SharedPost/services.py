@@ -93,7 +93,7 @@ def format_distance(kilometers):
 
 
 def get_board_context(posts, user, filters):
-    """Filter jarak memakai koordinat perkiraan, lalu tampilkan bertahap per enam kartu."""
+    """Filter dan urutkan penawaran sebelum menampilkan bertahap per enam kartu."""
     choices = list(FoodItem._meta.get_field("category").choices)
     rank = {value: index for index, value in enumerate(CATEGORY_LABELS)}
     categories = [
@@ -110,6 +110,9 @@ def get_board_context(posts, user, filters):
     radius = filters.get("radius", "2" if origin else "")
     if radius not in RADIUS_OPTIONS or not origin:
         radius = ""
+    sort = filters.get("sort", "nearest" if origin else "newest")
+    if sort not in ("nearest", "newest") or (sort == "nearest" and not origin):
+        sort = "newest"
 
     if query:
         posts = posts.filter(Q(food_item__name__icontains=query) | Q(location__area_name__icontains=query))
@@ -135,6 +138,9 @@ def get_board_context(posts, user, filters):
     mine = filters.get("mine") == "1"
     if mine:
         offers = [post for post in offers if post.food_item.owner_id == user.pk]
+    if sort == "nearest":
+        # Sort stabil mempertahankan urutan -created_at, -pk saat jaraknya sama.
+        offers.sort(key=lambda post: post.distance_km)
     page_value = filters.get("page", "1")
     if not (page_value.isascii() and page_value.isdigit() and len(page_value) <= 6 and int(page_value) > 0):
         page_value = "1"
@@ -142,13 +148,13 @@ def get_board_context(posts, user, filters):
     shown = offers[:page.number * OFFERS_PER_PAGE]
     parameters = {
         "q": query, "category": category, "mine": "1" if mine else "0",
-        "radius": radius, "page": page.number + 1,
+        "radius": radius, "sort": sort, "page": page.number + 1,
     }
     return {
         "posts": shown, "total_count": len(offers), "all_count": all_count,
         "visible_count": len(shown), "page_number": page.number, "has_more": page.has_next(),
         "next_url": reverse("sharedpost:list") + "?" + urlencode(parameters),
         "categories": categories, "selected_category": category, "query": query, "mine": mine,
-        "origin": origin, "selected_radius": radius,
+        "origin": origin, "selected_radius": radius, "selected_sort": sort,
         "radius_options": RADIUS_OPTIONS,
     }

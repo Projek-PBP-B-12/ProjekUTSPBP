@@ -14,7 +14,9 @@ Preflight tidak diimpor. Utility dan variabel Tailwind memakai prefix `sp`, seda
 
 Kategori ditampilkan sebagai chip dengan nilai pilihan FoodItem dan label Indonesia. Foto kartu memakai rasio 2:1. Tombol Klaim membuka detail penawaran, tempat pengguna dapat melanjutkan ke Hubungi donor; menekan Klaim tidak mengubah status makanan.
 
-Radius (1, 2, 5, 10 km atau Semua area) memakai lokasi bawaan milik akun di Lokasi tersimpan. Jika lokasi belum dipilih, radius dinonaktifkan, kartu menampilkan nama area, dan halaman menyediakan tautan pengaturan lokasi. Jarak menggunakan titik perkiraan yang sama dengan pin peta. Dengan lokasi bawaan, pilihan awal adalah radius 2 km. Daftar selalu menampilkan penawaran terbaru lebih dulu, dengan ID sebagai penentu urutan saat waktu publikasi sama. Tidak ada pilihan sorting pada antarmuka.
+Radius (1, 2, 5, 10 km atau Semua area) memakai lokasi bawaan milik akun di Lokasi tersimpan. Jika lokasi belum dipilih, radius dinonaktifkan, kartu menampilkan nama area, dan halaman menyediakan tautan pengaturan lokasi. Jarak menggunakan titik perkiraan yang sama dengan pin peta. Dengan lokasi bawaan, pilihan awal adalah radius 2 km.
+
+Sorting menyediakan Terdekat dan Terbaru. Dengan lokasi bawaan milik akun sendiri, pilihan awal adalah Terdekat; jika belum ada, Terdekat dinonaktifkan dan daftar memakai Terbaru. Terdekat memakai jarak perkiraan yang sama dengan kartu/peta. Jika jaraknya sama, penawaran terbaru didahulukan; jika waktu publikasinya juga sama, ID terbesar didahulukan. Parameter sorting yang tidak didukung dinormalisasi ke Terbaru. Pengurutan diterapkan pada seluruh hasil sebelum pagination, sehingga Lihat lebih banyak tetap mempertahankan urutan yang dipilih. Mengubah sorting kembali ke halaman pertama melalui HTMX. Hapus dan Tandai Sudah Diambil juga mempertahankan pilihan sorting.
 
 Daftar awal berisi maksimal enam penawaran. Lihat lebih banyak meminta halaman berikutnya melalui HTMX dan mengganti daftar dengan hasil kumulatif. Tautannya menyimpan seluruh filter. Nomor halaman dan badge jumlah disinkronkan lewat out-of-band swap; filter baru kembali ke halaman pertama. Tautan pagination menonaktifkan pewarisan `hx-include`, karena seluruh parameter sudah berada di URL.
 
@@ -67,6 +69,19 @@ python tools/build_sharedpost_css.py --page dashboard
 ```
 
 Tambahkan `--watch` untuk build otomatis. CSS beranda hanya dimuat ketika pengguna membuka Beranda dalam keadaan login.
+
+## Build layout bersama
+
+`base.html` kelompok memakai Tailwind melalui `@apply` pada nama kelas bersama yang
+sudah ada. Edit `assets/css/app.tailwind.css`, lalu bangun `static/css/app.css`:
+
+```powershell
+python tools/build_sharedpost_css.py --page app
+```
+
+Preflight tidak diimpor. Ukuran, warna, selector, breakpoint, dan urutan aturan
+dipertahankan agar tampilan modul tetap sama. Lihat
+[panduan CSS bersama](../assets/css/README.md) untuk ketentuan kompatibilitasnya.
 
 ## Commit dan deployment
 

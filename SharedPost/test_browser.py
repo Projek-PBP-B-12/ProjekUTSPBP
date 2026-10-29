@@ -448,9 +448,11 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
         with self.open_board(expected_count=6) as (page, navigations):
             expect(page.locator("#all-offers-count")).to_have_text("7")
             expect(page.get_by_role("combobox", name="Radius pencarian")).to_have_value("2")
-            expect(page.get_by_role("combobox", name="Urutkan penawaran")).to_have_count(0)
-            expect(page.locator(".post-title").first).to_have_text("Roti untuk besok")
-            expect(page.locator(".post-card .area").first).to_contain_text("778 m")
+            sort = page.get_by_role("combobox", name="Urutkan penawaran")
+            expect(sort).to_have_value("nearest")
+            expect(sort.locator("option")).to_have_text(["Terdekat", "Terbaru"])
+            expect(page.locator(".post-title").first).to_have_text("Roti gandum, masih utuh")
+            expect(page.locator(".post-card .area").first).to_contain_text("111 m")
             expect(page.locator(".claim-link")).to_have_count(5)
             for width, columns in [(1440, 3), (900, 2), (481, 2), (390, 1), (320, 1)]:
                 page.set_viewport_size({"width": width, "height": 1000})
@@ -465,9 +467,19 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
             page.get_by_role("link", name="Lihat lebih banyak penawaran", exact=True).click()
             expect(page.locator(".post-card")).to_have_count(7)
             expect(page.locator("#board-page")).to_have_value("2")
+            expect(sort).to_have_value("nearest")
+            expect(page.locator(".post-title").first).to_have_text("Roti gandum, masih utuh")
+            expect(page.locator(".post-title").last).to_have_text("Roti untuk besok")
             expect(page.get_by_role("link", name="Lihat lebih banyak penawaran", exact=True)).to_have_count(0)
             self.assertEqual(page.locator("#board-page").count(), 1)
             self.assertEqual(page.locator("#all-offers-count").count(), 1)
+
+            sort.select_option("newest")
+            expect(page.locator("#board-page")).to_have_value("1")
+            expect(page.locator(".post-card")).to_have_count(6)
+            expect(page.locator(".post-title").first).to_have_text("Roti untuk besok")
+            sort.select_option("nearest")
+            expect(page.locator(".post-title").first).to_have_text("Roti gandum, masih utuh")
 
             page.get_by_role("radio", name="Minuman", exact=True).check()
             expect(page.locator(".post-card")).to_have_count(1)
@@ -478,6 +490,8 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
 
             page.get_by_role("combobox", name="Radius pencarian").select_option("")
             expect(page.locator("#all-offers-count")).to_have_text("8")
+            expect(page.locator(".post-title").first).to_have_text("Roti gandum, masih utuh")
+            sort.select_option("newest")
             expect(page.locator(".post-title").first).to_have_text("Roti di luar radius")
             page.get_by_role("combobox", name="Radius pencarian").select_option("1")
             expect(page.locator("#all-offers-count")).to_have_text("7")
@@ -493,6 +507,7 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
             expect(page.locator("#all-offers-count")).to_have_text("6")
             expect(page.locator("#board-page")).to_have_value("1")
             expect(page.get_by_role("combobox", name="Radius pencarian")).to_have_value("1")
+            expect(sort).to_have_value("newest")
             self.assert_no_reload(page, navigations)
 
             page.get_by_role("link", name="Klaim Roti gandum, masih utuh", exact=True).click()
@@ -500,6 +515,21 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
             page.get_by_role("link", name="Hubungi donor", exact=True).click()
             expect(page).to_have_url(self.live_server_url + reverse("userprofile:donor_contact", args=[self.visitor.pk]))
         self.assertFalse(SharedPost.objects.filter(pk=own_post.pk).exists())
+
+    def test_nearest_is_disabled_without_origin_while_newest_remains_usable(self):
+        with self.open_board(mobile=True) as (page, navigations):
+            sort = page.get_by_role("combobox", name="Urutkan penawaran")
+            expect(sort).to_be_enabled()
+            expect(sort).to_have_value("newest")
+            expect(sort.locator('option[value="nearest"]')).to_have_js_property("disabled", True)
+            expect(sort.locator('option[value="newest"]')).to_have_js_property("disabled", False)
+            expect(sort.locator("option")).to_have_text(["Terdekat", "Terbaru"])
+            expect(page.locator(".post-title").first).to_have_text("Apel merah")
+            page.get_by_role("searchbox", name="Cari makanan atau lokasi").fill("Susu")
+            expect(page.locator(".post-card")).to_have_count(1)
+            expect(sort).to_have_value("newest")
+            self.assertTrue(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
+            self.assert_no_reload(page, navigations)
 
     def stub_map_provider(self, page):
         # Stub only the external Leaflet API, so the integration is independent of CDN/tile availability.
