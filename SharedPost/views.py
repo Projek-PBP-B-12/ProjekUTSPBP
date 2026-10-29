@@ -13,7 +13,7 @@ from FoodItem.models import FoodItem
 from Location.models import Location
 from .forms import SharedPostForm
 from .models import SharedPost
-from .services import get_board_context
+from .services import get_board_context, normalize_photo_url
 from .decorators import limit_sharedpost_writes
 
 
@@ -45,6 +45,7 @@ def shared_post_detail(request, pk):
         "SharedPost/detail.html",
         {
             "post": post,
+            "photo_url": normalize_photo_url(post.food_item.image_url),
             "is_owner": is_owner,
             "is_available": is_available,
             "map_url": (

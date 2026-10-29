@@ -77,11 +77,6 @@ def get_map_pins(posts, origin=None):
     return pins
 
 
-CATEGORY_LABELS = {
-    "GRAIN": "Roti & biji-bijian", "VEGETABLE": "Sayuran", "BEVERAGE": "Minuman",
-    "FRUIT": "Buah", "MEAT": "Daging", "SEAFOOD": "Seafood", "DAIRY": "Susu & olahannya",
-    "SNACK": "Camilan", "OTHER": "Lainnya",
-}
 RADIUS_OPTIONS = ("", "1", "2", "5", "10")
 OFFERS_PER_PAGE = 6
 
@@ -94,12 +89,7 @@ def format_distance(kilometers):
 
 def get_board_context(posts, user, filters):
     """Filter dan urutkan penawaran sebelum menampilkan bertahap per enam kartu."""
-    choices = list(FoodItem._meta.get_field("category").choices)
-    rank = {value: index for index, value in enumerate(CATEGORY_LABELS)}
-    categories = [
-        (value, CATEGORY_LABELS.get(value, label))
-        for value, label in sorted(choices, key=lambda choice: rank.get(choice[0], len(rank)))
-    ]
+    categories = list(FoodItem._meta.get_field("category").choices)
     labels = dict(categories)
     category = filters.get("category", "")
     if category not in labels:
@@ -130,7 +120,7 @@ def get_board_context(posts, user, filters):
                 continue
         post.distance_label = format_distance(post.distance_km) if origin else post.location.area_name
         post.is_origin = bool(origin and origin.pk == post.location_id and post.food_item.owner_id == user.pk)
-        post.category_label = labels.get(post.food_item.category, post.food_item.get_category_display())
+        post.category_label = post.food_item.get_category_display()
         post.photo_url = normalize_photo_url(post.food_item.image_url)
         offers.append(post)
 

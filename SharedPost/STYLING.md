@@ -12,7 +12,7 @@ Preflight tidak diimpor. Utility dan variabel Tailwind memakai prefix `sp`, seda
 
 ## Filter dan kartu Papan Berbagi
 
-Kategori ditampilkan sebagai chip dengan nilai pilihan FoodItem dan label Indonesia. Foto kartu memakai rasio 2:1. Tombol Klaim membuka detail penawaran, tempat pengguna dapat melanjutkan ke Hubungi donor; menekan Klaim tidak mengubah status makanan.
+Kategori ditampilkan sebagai chip dengan nilai, label bahasa Inggris, dan urutan yang mengikuti pilihan kategori model FoodItem. Badge kategori dan label gambar pengganti memakai label model yang sama seperti halaman detail dan Makananku. Foto kartu memakai rasio 2:1. Tombol Klaim membuka detail penawaran, tempat pengguna dapat melanjutkan ke Hubungi donor; menekan Klaim tidak mengubah status makanan.
 
 Radius (1, 2, 5, 10 km atau Semua area) memakai lokasi bawaan milik akun di Lokasi tersimpan. Jika lokasi belum dipilih, radius dinonaktifkan, kartu menampilkan nama area, dan halaman menyediakan tautan pengaturan lokasi. Jarak menggunakan titik perkiraan yang sama dengan pin peta. Dengan lokasi bawaan, pilihan awal adalah radius 2 km.
 

@@ -141,9 +141,27 @@ class OfferBoardTests(TestCase):
         self.assertEqual(response.context["all_count"], 2)
         self.assertEqual(response.context["total_count"], 1)
         self.assertEqual(
-            {value for value, label in response.context["categories"]},
-            {value for value, label in FoodItem._meta.get_field("category").choices},
+            response.context["categories"],
+            list(FoodItem._meta.get_field("category").choices),
         )
+
+    def test_category_labels_follow_model_in_filters_and_cards_after_htmx_filtering(self):
+        choices = list(FoodItem._meta.get_field("category").choices)
+        offers = {value: self.offer(category=value) for value, label in choices}
+        for value, label in choices:
+            for headers in [{}, {"HTTP_HX_REQUEST": "true"}]:
+                with self.subTest(category=value, htmx=bool(headers)):
+                    response = self.client.get(self.url, {"category": value}, **headers)
+                    self.assertEqual(self.ids(response), [offers[value].pk])
+                    self.assertEqual(response.context["posts"][0].category_label, label)
+                    self.assertContains(response, f'<span class="category-pill">{label}</span>', html=True)
+                    if not headers:
+                        self.assertContains(
+                            response,
+                            f'<label><input type="radio" name="category" value="{value}" checked '
+                            f'onchange="this.form.requestSubmit()"><span>{label}</span></label>',
+                            html=True,
+                        )
 
     def test_load_more_grows_six_at_a_time_without_duplicates(self):
         offers = [self.offer(f"Roti {index}") for index in range(14)]

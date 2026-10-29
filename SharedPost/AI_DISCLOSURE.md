@@ -50,7 +50,7 @@ Selama mencoba SharedPost, saya menemukan beberapa masalah pada hasil draf awal 
 | Tombol kembali tampak kurang proporsional. | Saya mengatur ulang komposisi ikon, teks, dan margin pada tautan kembali di template HTML. |
 | Gambar makanan dari tautan berbagi Google Drive tidak muncul. | Saya menambahkan logika normalisasi URL Drive di file `services.py` dan membuat penanganan fallback (`onerror`) di JavaScript untuk kasus gagal muat. |
 | Foto pada kartu mengecil dan ikon lokasi kurang jelas. | Saya menerapkan aturan rasio aspek 2:1 pada class gambar, mengganti ikon menjadi format SVG, dan merapikan tata letak grid pada kartu. |
-| Pilihan kategori tidak sesuai dengan kategori FoodItem. | Saya mengubah logika query di backend agar nilai kategori dinamis mengikuti data model FoodItem dan menyesuaikan labelnya ke bahasa Indonesia. |
+| Pilihan kategori tidak sesuai dengan kategori FoodItem. | Saya mengubah logika query di backend agar nilai kategori dinamis mengikuti data model FoodItem |
 | Tampilan filter belum sesuai referensi desain. | Saya merombak layout filter radius dan kategori, menghubungkan logika radius dengan lokasi bawaan pengguna, dan menyesuaikan navigasi tombol Klaim. |
 | Filter pernah tampil memanjang dengan radio besar dan ikon terpisah. | Saya melakukan debugging pada cache CSS, memperbaiki versi aset di template, dan membangun ulang file CSS agar tampilannya kembali rapi. |
 | Detail makanan belum menyediakan tombol menuju lokasi. | Saya memodifikasi view context dan menambahkan elemen tombol tautan di template detail untuk mengarah ke lokasi penawaran. |
