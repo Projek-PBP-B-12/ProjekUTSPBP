@@ -74,6 +74,9 @@ class OfferMapLinkTests(TestCase):
         SharedPost.objects.filter(pk=self.post.pk).update(location=foreign)
         detail = self.client.get(reverse("sharedpost:detail", args=[self.post.pk]))
         self.assertIsNone(detail.context["map_url"])
+        for headers in [{}, {"HTTP_HX_REQUEST": "true"}]:
+            board = self.client.get(reverse("sharedpost:list"), **headers)
+            self.assertNotContains(board, f'href="{reverse("Location:map")}?post={self.post.pk}"')
         response = self.client.get(reverse("Location:map"), {"post": self.post.pk})
         self.assertIsNone(response.context["selected_post_id"])
         self.assertEqual(response.context["pins"], [])

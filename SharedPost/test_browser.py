@@ -390,7 +390,7 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
 
     def test_responsive_grid_uses_tailwind_breakpoints(self):
         with self.open_board() as (page, navigations):
-            for width, columns in [(1440, 3), (900, 2), (390, 1)]:
+            for width, columns in [(1440, 3), (900, 2), (801, 2), (481, 2), (390, 1), (320, 1)]:
                 with self.subTest(width=width):
                     page.set_viewport_size({"width": width, "height": 1000})
                     grid = page.locator(".post-grid")
@@ -401,6 +401,9 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
                     photo = page.locator('.post-card .food-placeholder').first.bounding_box()
                     self.assertAlmostEqual(photo['height'] / photo['width'], 1 / 2, places=2)
                     expect(page.locator('.post-card .area svg').first).to_be_visible()
+                    expect(page.locator('.post-card .card-map-link')).to_have_count(2)
+                    for link in page.locator('.card-map-link').all():
+                        expect(link).to_be_visible()
                     screenshot_dir = os.getenv("BROWSER_SCREENSHOT_DIR")
                     if screenshot_dir:
                         output = Path(screenshot_dir)
@@ -602,6 +605,21 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
             expect(page.locator(".map-popup-title")).to_have_text("Susu kedelai")
             expect(page.locator("#map-search-hint")).to_contain_text("Menampilkan area penawaran Susu kedelai")
             self.assertEqual(page.evaluate("window.mapTest.views.at(-1)"), {"point": [-6.36, 106.83], "zoom": 16})
+
+            # Kartu sendiri maupun milik donor membuka pin yang sesuai setelah filter HTMX.
+            for name in ["Susu kedelai", "Apel merah"]:
+                page.goto(self.live_server_url + reverse("sharedpost:list"))
+                page.set_viewport_size({"width": 390, "height": 900})
+                page.get_by_role("searchbox", name="Cari makanan atau lokasi").fill(name)
+                expect(page.locator(".post-card")).to_have_count(1)
+                link = page.get_by_role("link", name=f"Lihat lokasi {name} di peta", exact=True)
+                target = link.get_attribute("href")
+                link.focus()
+                expect(link).to_be_focused()
+                link.press("Enter")
+                expect(page).to_have_url(self.live_server_url + target)
+                expect(page.locator(".map-pin-selected")).to_have_count(1)
+                expect(page.locator(".map-popup-title")).to_have_text(name)
 
     def test_overlapping_map_offers_remain_accessible_in_one_scrollable_popup(self):
         # Distinct private points can round to the same public point, too.
