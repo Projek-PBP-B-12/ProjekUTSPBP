@@ -65,14 +65,18 @@
             shareLink.textContent = data.shareLabel;
             if (data.shareUrl) shareLink.href = data.shareUrl;
             else shareLink.removeAttribute("href");
-            const image = document.getElementById("modal-image-url");
-            document.getElementById("modal-image-row").hidden = !data.imageUrl;
-            if (data.imageUrl) {
-                image.src = data.imageUrl;
-                image.alt = data.name;
-            } else {
-                image.removeAttribute("src");
-                image.alt = "";
+            const photoRow = document.getElementById("modal-photo-row");
+            const photoLink = document.getElementById("modal-photo-link");
+            photoRow.hidden = true;
+            photoLink.removeAttribute("href");
+            try {
+                const photoUrl = new URL(data.imageUrl);
+                if (photoUrl.protocol === "https:" || photoUrl.protocol === "http:") {
+                    photoLink.href = photoUrl.href;
+                    photoRow.hidden = false;
+                }
+            } catch (_) {
+                // Leave the photo link hidden when the URL is empty or invalid.
             }
             modal.showModal();
             return;

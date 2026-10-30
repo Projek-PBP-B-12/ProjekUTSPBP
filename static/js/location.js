@@ -49,10 +49,20 @@
     const root = el('article', 'map-popup-offer');
     if (pin.id === selectedPostId) root.classList.add('map-popup-offer-selected');
 
-    const photo = pin.photo_url ? el('img', 'map-popup-photo') : el('div', 'map-popup-photo');
+    const photo = el('div', 'map-popup-photo');
+    const photoFallback = el('span', 'map-popup-photo-placeholder', 'Foto tidak tersedia');
+    photo.appendChild(photoFallback);
     if (pin.photo_url) {
-      photo.src = pin.photo_url;
-      photo.alt = pin.title;
+      const image = el('img', 'map-popup-image');
+      image.alt = pin.title;
+      image.referrerPolicy = 'no-referrer';
+      image.addEventListener('load', function () { photoFallback.hidden = true; });
+      image.addEventListener('error', function () {
+        image.remove();
+        photoFallback.hidden = false;
+      }, {once: true});
+      photo.appendChild(image);
+      image.src = pin.photo_url;
     }
     root.appendChild(photo);
 

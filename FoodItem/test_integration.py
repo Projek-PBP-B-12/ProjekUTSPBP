@@ -87,6 +87,25 @@ class InventoryIntegrationTests(TestCase):
         self.assertContains(response, "Expiration date cannot be before purchase date.")
         self.assertEqual(FoodItem.objects.count(), 2)
 
+    def test_photo_url_validation_preserves_existing_food_on_invalid_edit(self):
+        for route in (reverse("FoodItem:add_food_item"), reverse("FoodItem:change_food_item", args=[self.food.pk])):
+            for url in ("ftp://example.com/photo.jpg", "javascript:alert(1)", "data:image/png;base64,abc"):
+                with self.subTest(route=route, url=url):
+                    response = self.client.post(route, self.food_data(name="Tidak boleh tersimpan", image_url=url))
+                    self.assertEqual(response.status_code, 200)
+                    self.assertIn("image_url", response.context["form"].errors)
+        self.food.refresh_from_db()
+        self.assertEqual(self.food.name, "Roti gandum")
+        self.assertEqual(FoodItem.objects.count(), 2)
+
+    def test_public_drive_links_and_direct_photo_urls_can_be_saved(self):
+        for url in ("https://drive.google.com/file/d/photo-123/view?usp=sharing", "https://example.com/photo?id=123&signature=abc", ""):
+            with self.subTest(url=url):
+                response = self.client.post(reverse("FoodItem:change_food_item", args=[self.food.pk]), self.food_data(image_url=url))
+                self.assertEqual(response.status_code, 302)
+                self.food.refresh_from_db()
+                self.assertEqual(self.food.image_url, url)
+
     def test_other_user_cannot_edit_delete_or_change_status(self):
         self.client.force_login(self.other)
         self.assertEqual(self.client.post(reverse("FoodItem:change_food_item", args=[self.food.pk]), self.food_data(name="forged")).status_code, 403)

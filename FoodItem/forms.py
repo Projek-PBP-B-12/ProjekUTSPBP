@@ -1,5 +1,7 @@
 from django.forms import ModelForm, TextInput, Textarea, URLInput, NumberInput, DateInput
+from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
+from urllib.parse import urlsplit
 
 from .models import *
 
@@ -25,6 +27,7 @@ class FoodItemForm(ModelForm):
         help_texts = {
             "purchase_date": "Jika kosong, akan digunakan tanggal hari ini.",
             "expiration_date": "Jika kosong, akan digunakan tanggal hari ini.",
+            "image_url": "Gunakan tautan gambar HTTP/HTTPS atau tautan berbagi Google Drive yang dapat diakses publik. Tautan halaman web biasa tidak dapat ditampilkan sebagai foto.",
         }
 
         widgets = {
@@ -37,6 +40,12 @@ class FoodItemForm(ModelForm):
 
     def clean_category(self):
         return strip_tags(self.cleaned_data["category"]).strip()
+
+    def clean_image_url(self):
+        url = self.cleaned_data.get("image_url", "").strip()
+        if url and urlsplit(url).scheme not in ("http", "https"):
+            raise ValidationError("Gunakan URL foto dengan awalan http:// atau https://.")
+        return url
 
     def clean_purchase_date(self):
         return self.cleaned_data.get("purchase_date") or timezone.localdate()

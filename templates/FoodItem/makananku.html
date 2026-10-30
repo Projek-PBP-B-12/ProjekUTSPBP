@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/fooditem.css' %}?v=20261030-2">{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/fooditem.css' %}?v=20261030-4">{% endblock %}
 {% block body_class %}inventory-page{% endblock %}
 {% block title %}Makananku · TitikLapar{% endblock %}
 {% block page_title %}Makananku{% endblock %}
@@ -93,7 +93,7 @@
             <div class="detail-row"><span>Tanggal kedaluwarsa</span><strong id="modal-expiration-date"></strong></div>
             <div class="detail-row"><span>Status</span><strong id="modal-status"></strong></div>
             <div class="detail-row"><span>Status kedaluwarsa</span><strong id="modal-expiration-state"></strong></div>
-            <div id="modal-image-row" class="detail-row" hidden><span>Foto</span><img id="modal-image-url" class="modal-food-image" alt="" referrerpolicy="no-referrer"></div>
+            <div id="modal-photo-row" class="detail-row" hidden><span>Foto</span><a id="modal-photo-link" class="modal-photo-link" target="_blank" rel="noopener noreferrer">Buka foto <span aria-hidden="true">↗</span><span class="inventory-sr-only"> (tab baru)</span></a></div>
         </div>
         <p id="modal-food-error" class="inventory-error" role="alert" hidden></p>
         <div class="modal-primary-actions">
@@ -115,5 +115,5 @@
 
 {% block extra_js %}
 {{ block.super }}
-<script src="{% static 'js/fooditem-ui.js' %}?v=20261030-2" defer></script>
+<script src="{% static 'js/fooditem-ui.js' %}?v=20261030-4" defer></script>
 {% endblock %}

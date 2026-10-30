@@ -74,7 +74,7 @@
 .inventory-page .detail-row { @apply fi:flex fi:items-start fi:justify-between fi:gap-4 fi:border-0 fi:border-b fi:border-solid fi:pb-3 fi:text-sm; border-color: var(--color-border-default); }
 .inventory-page .detail-row span { color: var(--color-text-secondary); }
 .inventory-page .detail-row strong { @apply fi:min-w-0 fi:text-right fi:font-medium fi:wrap-anywhere; }
-.inventory-page .modal-food-image { @apply fi:max-h-[200px] fi:max-w-[50%] fi:rounded-lg fi:object-contain; }
+.inventory-page .modal-photo-link { @apply fi:inline-flex fi:min-h-11 fi:items-center fi:gap-1 fi:font-medium fi:underline fi:underline-offset-4; color: var(--color-action-primary); }
 .inventory-page .modal-primary-actions { @apply fi:mt-6 fi:flex fi:gap-3; }
 .inventory-page .modal-primary-actions .button { @apply fi:min-w-0 fi:flex-1; }
 .inventory-page .modal-footer { @apply fi:mt-5 fi:flex fi:items-center fi:justify-between fi:gap-3 fi:border-0 fi:border-t fi:border-solid fi:pt-5; border-color: var(--color-border-default); }
