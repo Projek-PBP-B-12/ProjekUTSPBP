@@ -1,0 +1,123 @@
+/* Makananku: python tools/build_sharedpost_css.py --page fooditem */
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(fi);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(fi) source(none);
+@source "../../templates/FoodItem";
+
+.inventory-page .inventory-card {
+    @apply fi:relative fi:min-w-0 fi:rounded-3xl fi:border-0 fi:bg-white fi:p-8;
+}
+.inventory-page .page-action .button { @apply fi:min-h-11 fi:px-7 fi:text-xs; }
+.inventory-page .inventory-heading { @apply fi:mb-6 fi:flex fi:items-center fi:justify-between fi:gap-4; }
+.inventory-page .inventory-heading h2 { margin: 0; font: 400 26px/34px var(--font-heading); }
+.inventory-page .inventory-heading-tools { @apply fi:flex fi:shrink-0 fi:items-center fi:gap-3; }
+.inventory-page #food-amount {
+    @apply fi:m-0 fi:rounded-full fi:px-3 fi:py-1.5 fi:text-xs fi:font-medium fi:whitespace-nowrap;
+    color: var(--color-action-primary);
+    background: var(--color-surface-soft);
+}
+.inventory-page .inventory-filter-toggle {
+    @apply fi:inline-flex fi:size-8 fi:items-center fi:justify-center fi:rounded-full fi:border-0 fi:bg-transparent fi:p-0 fi:cursor-pointer;
+    color: var(--color-action-primary);
+}
+.inventory-page .inventory-filter-toggle:hover { background: var(--color-surface-soft); }
+.inventory-page .inventory-filters { @apply fi:mb-7 fi:flex fi:flex-wrap fi:items-end fi:gap-3 fi:rounded-xl fi:p-4; background: var(--color-surface-canvas); }
+.inventory-page .inventory-filters > div:first-child { @apply fi:min-w-0 fi:flex-1 fi:basis-[220px]; }
+.inventory-page .inventory-filters > div:nth-child(2) { @apply fi:basis-[150px]; }
+.inventory-page .inventory-filters .button { @apply fi:min-h-10; }
+.inventory-page .inventory-reset { @apply fi:py-2.5 fi:text-xs fi:underline fi:underline-offset-2; color: var(--color-action-primary); }
+.inventory-page .inventory-table-scroll { @apply fi:max-w-full; }
+.inventory-page .table { @apply fi:w-full fi:table-fixed fi:border-collapse fi:text-left; }
+.inventory-page .inventory-name-col { width: 38%; }
+.inventory-page .inventory-date-col { width: 15%; }
+.inventory-page .inventory-expiry-col { width: 23%; }
+.inventory-page .inventory-actions-col { width: 24%; }
+.inventory-page .table th {
+    @apply fi:pb-4 fi:pr-5 fi:text-[11px] fi:font-normal fi:uppercase;
+    color: var(--color-text-secondary);
+}
+.inventory-page .table td { @apply fi:py-6 fi:pr-5 fi:align-middle; border-bottom: 1px solid var(--color-border-default); }
+.inventory-page .table th:last-child, .inventory-page .table td:last-child { @apply fi:pr-0; }
+.inventory-page .table th:last-child { @apply fi:text-right; }
+.inventory-page .table tbody tr:last-child td { @apply fi:border-0; }
+.inventory-page .food-title { @apply fi:m-0 fi:min-w-0 fi:wrap-anywhere; font: 400 20px/28px var(--font-heading); }
+.inventory-page .detail-link {
+    @apply fi:inline-flex fi:min-h-10 fi:items-center fi:gap-1.5 fi:cursor-pointer fi:rounded-md fi:border-0 fi:bg-transparent fi:px-2 fi:py-1.5;
+    color: var(--color-action-primary);
+    font: 500 13px/20px var(--font-body);
+}
+.inventory-page .detail-link:hover { color: var(--color-action-primary); text-decoration: underline; text-underline-offset: 4px; }
+.inventory-page .food-category { @apply fi:mt-1 fi:text-xs fi:leading-[18px]; color: var(--color-text-secondary); }
+.inventory-page .inventory-date { @apply fi:text-xs fi:whitespace-nowrap; color: var(--color-text-secondary); }
+.inventory-page .badge { @apply fi:inline-flex fi:min-h-7 fi:min-w-[156px] fi:items-center fi:justify-center fi:rounded-full fi:px-3 fi:py-1 fi:text-xs fi:font-medium; }
+.inventory-page .badge-green { color: #3d513b; background: var(--color-surface-soft); }
+.inventory-page .badge-orange { color: #805a27; background: #fff0dc; }
+.inventory-page .badge-red { color: #9b3434; background: #fbe8e6; }
+.inventory-page .badge-gray { color: var(--color-text-secondary); background: #edf0eb; }
+.inventory-page .inventory-actions { @apply fi:flex fi:flex-wrap fi:items-center fi:justify-end fi:gap-2; }
+.inventory-page .inventory-edit { @apply fi:inline-flex fi:min-h-9 fi:items-center fi:px-1 fi:text-xs; color: var(--color-action-primary); }
+.inventory-page .inventory-edit:hover, .inventory-page .inventory-delete:hover { text-decoration: underline; text-underline-offset: 3px; }
+.inventory-page .inventory-fallback-actions { @apply fi:mt-3 fi:flex fi:flex-wrap fi:items-center fi:gap-3; }
+.inventory-page .inventory-empty { @apply fi:text-center fi:text-sm; color: var(--color-text-secondary); }
+.inventory-page .inventory-sr-only { @apply fi:sr-only; }
+.inventory-page .inventory-error { @apply fi:rounded-lg fi:p-3 fi:text-sm; color: #9b3434; background: #fff0ed; }
+.inventory-page .food-detail-dialog {
+    @apply fi:w-[min(580px,calc(100%-32px))] fi:max-w-full fi:max-h-[calc(100dvh-32px)] fi:overflow-y-auto fi:rounded-3xl fi:border-0 fi:bg-white fi:p-0 fi:shadow-xl;
+    color: var(--color-text-primary);
+}
+.inventory-page .food-detail-dialog::backdrop { background: #20302b80; }
+.inventory-page .modal-content { @apply fi:p-7; }
+.inventory-page .modal-header { @apply fi:mb-6 fi:flex fi:items-start fi:justify-between fi:gap-4; }
+.inventory-page .modal-header h2 { @apply fi:m-0 fi:min-w-0 fi:wrap-anywhere; font: 400 26px/34px var(--font-heading); }
+.inventory-page .modal-x-close { @apply fi:inline-flex fi:size-8 fi:shrink-0 fi:cursor-pointer fi:items-center fi:justify-center fi:rounded-full fi:border-0 fi:bg-transparent fi:p-0 fi:text-[28px]; color: var(--color-text-secondary); }
+.inventory-page .modal-body { @apply fi:grid fi:gap-4; }
+.inventory-page .detail-row { @apply fi:flex fi:items-start fi:justify-between fi:gap-4 fi:border-0 fi:border-b fi:border-solid fi:pb-3 fi:text-sm; border-color: var(--color-border-default); }
+.inventory-page .detail-row span { color: var(--color-text-secondary); }
+.inventory-page .detail-row strong { @apply fi:min-w-0 fi:text-right fi:font-medium fi:wrap-anywhere; }
+.inventory-page .modal-food-image { @apply fi:max-h-[200px] fi:max-w-[50%] fi:rounded-lg fi:object-contain; }
+.inventory-page .modal-primary-actions { @apply fi:mt-6 fi:flex fi:gap-3; }
+.inventory-page .modal-primary-actions .button { @apply fi:min-w-0 fi:flex-1; }
+.inventory-page .modal-footer { @apply fi:mt-5 fi:flex fi:items-center fi:justify-between fi:gap-3 fi:border-0 fi:border-t fi:border-solid fi:pt-5; border-color: var(--color-border-default); }
+.inventory-page .modal-management-actions { @apply fi:flex fi:gap-2; }
+.inventory-page .modal-footer .button, .inventory-page .modal-primary-actions .button { @apply fi:min-h-11 fi:gap-1.5 fi:px-3 fi:py-2.5 fi:text-[13px] fi:font-medium; }
+.inventory-page .inventory-delete { @apply fi:inline-flex fi:min-h-10 fi:items-center fi:px-2 fi:text-[13px]; color: #9b3434; }
+.inventory-page .inventory-row-delete { @apply fi:gap-1.5 fi:font-medium; color: var(--color-action-primary); }
+.inventory-page .modal-footer .modal-delete-button { color: #9b3434; background: #fff5f2; border: 1px solid #ebc9c0; }
+.inventory-page .modal-footer .modal-delete-button:hover { background: #fbe8e6; }
+.inventory-page :focus-visible { outline: 2px solid var(--color-action-primary); outline-offset: 3px; }
+.inventory-page [hidden] { display: none !important; }
+
+@media (min-width: 1400px) {
+    .inventory-page .inventory-name-col { width: 40%; }
+    .inventory-page .inventory-actions-col { width: 22%; }
+}
+@media (max-width: 1150px) {
+    .inventory-page .table, .inventory-page .table tbody { @apply fi:block; }
+    .inventory-page .table colgroup { display: none; }
+    .inventory-page .table thead { @apply fi:sr-only; }
+    .inventory-page .table .food-row { @apply fi:grid fi:grid-cols-2 fi:gap-4 fi:py-6; border-bottom: 1px solid var(--color-border-default); }
+    .inventory-page .table .food-row:last-child { @apply fi:border-0 fi:pb-0; }
+    .inventory-page .table .food-row td { @apply fi:block fi:min-w-0 fi:border-0 fi:p-0; }
+    .inventory-page .inventory-food-cell, .inventory-page .inventory-action-cell { @apply fi:col-span-full; }
+    .inventory-page .inventory-actions { @apply fi:justify-start; }
+    .inventory-page .inventory-date::before, .inventory-page .inventory-expiry::before { content: attr(data-label); display: block; margin-bottom: 8px; font: 400 11px/16px var(--font-body); color: var(--color-text-secondary); }
+    .inventory-page .badge { @apply fi:min-w-0 fi:max-w-full fi:text-center; }
+    .inventory-page .table .inventory-empty { @apply fi:block fi:p-6; }
+}
+@media (max-width: 600px) {
+    .inventory-page .inventory-card { @apply fi:rounded-3xl fi:p-5; }
+    .inventory-page .inventory-heading { @apply fi:mb-4 fi:gap-2; }
+    .inventory-page .inventory-heading h2 { font-size: 21px; line-height: 28px; }
+    .inventory-page .inventory-heading-tools { @apply fi:gap-1; }
+    .inventory-page #food-amount { @apply fi:px-2 fi:text-[11px]; }
+    .inventory-page .inventory-filter-toggle { @apply fi:size-7; }
+    .inventory-page .inventory-filters { @apply fi:p-3; }
+    .inventory-page .inventory-filters > div:nth-child(2) { @apply fi:flex-1 fi:basis-full; }
+    .inventory-page .food-title { font-size: 19px; line-height: 26px; }
+    .inventory-page .badge { @apply fi:px-2 fi:text-[11px]; }
+    .inventory-page .modal-content { @apply fi:p-5; }
+    .inventory-page .modal-primary-actions { @apply fi:flex-col fi:gap-2; }
+    .inventory-page .modal-footer { @apply fi:grid fi:grid-cols-3 fi:gap-2; }
+    .inventory-page .modal-management-actions { display: contents; }
+    .inventory-page .modal-footer .button { @apply fi:px-2 fi:text-xs; }
+}
