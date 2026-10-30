@@ -29,9 +29,9 @@ User berperan sebagai fondasi identitas dan pusat komunikasi antar pengguna di d
 
 ### FoodItem
 
-FoodItem bertindak sebagai mesin operasional utama dari fitur pelacak inventori pribadi. Entitas ini bertanggung jawab menyimpan seluruh data operasional makanan yang dimasukkan pengguna, mulai dari nama, kategori, tanggal pembelian, hingga tanggal kedaluwarsa. Model ini menjadi acuan mutlak bagi sistem penjadwal di latar belakang untuk menghitung sisa hari kelayakan konsumsi, serta memiliki penanda status yang secara tegas membedakan apakah suatu makanan masih tersimpan secara privat, sudah habis dikonsumsi, atau sedang ditawarkan ke publik.
+FoodItem mengelola inventori makanan pribadi milik pengguna. Data yang disimpan meliputi nama, kategori, tanggal pembelian, tanggal kedaluwarsa, dan URL foto opsional. Sistem menghitung sisa hari menuju kedaluwarsa untuk menampilkan penanda pada inventori dan menjadi acuan pengingat Notification. Status makanan membedakan makanan yang tersimpan (`STORED`), sedang ditawarkan melalui SharedPost (`OFFERED`), atau sudah habis (`CONSUMED`). Tanggal pembelian dan kedaluwarsa bersifat opsional; jika dikosongkan, nilainya menggunakan tanggal hari ini.
 
-**Aktivitas pengguna**: mencatat belanjaan, memantau sisa hari sebelum kedaluwarsa, dan memilih untuk mengonsumsi atau membagikan makanannya.
+**Aktivitas pengguna**: mencatat makanan, mencari dan menyaring inventori, melihat detail serta sisa hari sebelum kedaluwarsa, menandai makanan sudah habis, atau membagikannya melalui SharedPost.
 
 - **Create**: Menambah makanan (nama otomatis terisi dari Open Food Facts; tanggal kedaluwarsa diestimasi jika tidak diketahui)
 - **Read**: Melihat daftar inventori pribadi
