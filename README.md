@@ -10,7 +10,7 @@
 
 ## Latar Belakang Aplikasi
 
-Hal ini berawal dari concern kita terhadap masyarakat terutama mahasiswa yang tinggal di kos dan sering menyimpan makanan di kulkas bersama. Dikarenakan makanan yang disimpan mahasiswa tergolong banyak dan lamanya waktu penyimpanan yang tidak terdata, terkadang lupa bahwa makanan tersebut sudah kedaluwarsa. Maka dari itu solusi dari kami adalah TitikLapar. TitikLapar, Website ini adalah Personal Food Tracker & Papan Pengumuman Spasial yang dirancang untuk menekan angka food waste. Pengguna dapat mencatat makanan yang mereka beli melalui antarmuka yang simpel dengan memasukkan nama barang dan tanggal pembelian. Jika pengguna tidak mengetahui tanggal kedaluwarsa secara pasti, sistem akan secara otomatis mengestimasi expired date berdasarkan basis data ketahanan pangan bawaan. Ketika sebuah item makanan mendekati masa kedaluwarsa (misalnya H-3), sistem akan mengirimkan notification sebagai pengingat. Di titik ini, pengguna diberikan opsi praktis: mengonsumsinya segera, atau membagikannya secara gratis melalui Papan Berbagi terintegrasi. Di dalam forum ini, makanan yang hampir kedaluwarsa namun masih layak konsumsi dapat diklaim oleh pengguna lain di sekitar mereka, menciptakan ekosistem sirkular yang saling menguntungkan dan ramah lingkungan.
+Hal ini berawal dari concern kita terhadap masyarakat terutama mahasiswa yang tinggal di kos dan sering menyimpan makanan di kulkas bersama. Dikarenakan makanan yang disimpan mahasiswa tergolong banyak dan lamanya waktu penyimpanan yang tidak terdata, terkadang lupa bahwa makanan tersebut sudah kedaluwarsa. Maka dari itu solusi dari kami adalah TitikLapar. TitikLapar, Website ini adalah Personal Food Tracker & Papan Pengumuman Spasial yang dirancang untuk menekan angka food waste. Pengguna dapat mencatat makanan yang mereka beli melalui antarmuka yang simpel dengan memasukkan nama barang dan tanggal pembelian. Pengguna mengisi tanggal kedaluwarsa, lalu sistem menghitung sisa hari berdasarkan tanggal tersebut. Tanggal pembelian dan kedaluwarsa yang tidak diisi menggunakan tanggal hari ini sebagai nilai bawaan. Ketika sebuah item makanan mendekati masa kedaluwarsa (misalnya H-3), sistem akan mengirimkan notification sebagai pengingat. Di titik ini, pengguna diberikan opsi praktis: mengonsumsinya segera, atau membagikannya secara gratis melalui Papan Berbagi terintegrasi. Di dalam forum ini, makanan yang hampir kedaluwarsa namun masih layak konsumsi dapat diklaim oleh pengguna lain di sekitar mereka, menciptakan ekosistem sirkular yang saling menguntungkan dan ramah lingkungan.
 
 ## Daftar Modul
 
@@ -33,10 +33,10 @@ FoodItem mengelola inventori makanan pribadi milik pengguna. Data yang disimpan 
 
 **Aktivitas pengguna**: mencatat makanan, mencari dan menyaring inventori, melihat detail serta sisa hari sebelum kedaluwarsa, menandai makanan sudah habis, atau membagikannya melalui SharedPost.
 
-- **Create**: Menambah makanan (nama otomatis terisi dari Open Food Facts; tanggal kedaluwarsa diestimasi jika tidak diketahui)
-- **Read**: Melihat daftar inventori pribadi
-- **Update**: Mengedit data makanan
-- **Delete**: Menghapus item dari inventori
+- **Create**: Memasukkan nama dan kategori makanan, tanggal pembelian/kedaluwarsa, serta URL foto opsional melalui formulir.
+- **Read**: Melihat daftar dan detail makanan milik sendiri, mencari berdasarkan nama, menyaring berdasarkan status, serta melihat penanda kedaluwarsa.
+- **Update**: Mengedit informasi makanan, menandai sudah habis, atau menyimpan kembali. Publikasi melalui SharedPost mengubah status makanan menjadi ditawarkan.
+- **Delete**: Menghapus makanan milik sendiri beserta penawaran SharedPost yang terkait.
 
 (Penanggung jawab modul : Zidni)
 
