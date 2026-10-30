@@ -85,8 +85,6 @@ Notification memiliki peran sebagai kotak masuk atau riwayat peringatan yang men
    Dokumentasi: https://leafletjs.com/reference.html
 2. _Nominatim API:_ Layanan geocoding bawaan dari OpenStreetMap. Digunakan untuk mengubah teks alamat yang diinput pengguna menjadi koordinat spasial (Latitude/Longitude) agar bisa dirender ke dalam peta.
    Dokumentasi: https://nominatim.org/release-docs/latest/api/Overview/
-3. _Open Food Facts API:_ Basis data produk makanan global. Digunakan pada modul input inventori agar sistem bisa melakukan pengisian otomatis nama dan standar ketahanan makanan saat pengguna mengetikkan nama barang.
-   Dokumentasi: https://openfoodfacts.github.io/openfoodfacts-server/api/
 
 ## Peran Pengguna
 
