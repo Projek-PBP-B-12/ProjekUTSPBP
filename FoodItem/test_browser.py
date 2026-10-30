@@ -60,7 +60,11 @@ class InventoryBrowserTests(StaticLiveServerTestCase):
                 browser.close()
 
     def test_mobile_table_modal_search_and_explicit_pickup(self):
+        photo_url = self.live_server_url + "/test-photo"
+        self.food.image_url = photo_url
+        self.food.save(update_fields=["image_url"])
         with self.open_inventory(mobile=True) as page:
+            page.context.route("**/test-photo", lambda route: route.fulfill(content_type="text/plain", body="Foto percobaan"))
             expect(page.locator(".food-row")).to_have_count(2)
             self.assertLessEqual(page.evaluate("document.documentElement.scrollWidth"), 390)
             row = page.locator(".food-row").filter(has_text="Roti contoh")
@@ -69,10 +73,23 @@ class InventoryBrowserTests(StaticLiveServerTestCase):
             modal = page.get_by_role("dialog", name="Roti contoh")
             expect(modal).to_be_visible()
             expect(modal.locator("#modal-status")).to_have_text("Tersimpan")
-            expect(modal.locator("#modal-image-row")).to_be_hidden()
+            expect(modal.locator("img")).to_have_count(0)
+            photo_link = modal.get_by_role("link", name="Buka foto")
+            expect(photo_link).to_have_attribute("href", photo_url)
+            with page.expect_popup() as opened_photo:
+                photo_link.click()
+            photo_page = opened_photo.value
+            photo_page.wait_for_load_state()
+            self.assertEqual(photo_page.url, photo_url)
+            expect(modal).to_be_visible()
+            photo_page.close()
             page.keyboard.press("Escape")
             expect(modal).to_be_hidden()
             expect(detail).to_be_focused()
+            page.get_by_role("button", name="Detail Apel contoh", exact=True).click()
+            expect(page.locator("#modal-photo-row")).to_be_hidden()
+            self.assertIsNone(page.locator("#modal-photo-link").get_attribute("href"))
+            page.keyboard.press("Escape")
             page.get_by_role("button", name="Cari dan filter makanan", exact=True).click()
             page.get_by_label("Cari makanan", exact=True).fill("Roti")
             page.get_by_role("button", name="Tampilkan", exact=True).click()
