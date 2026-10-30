@@ -4,8 +4,6 @@ Panduan ini menjelaskan implementasi aplikasi yang tersedia pada 30 Oktober 2026
 
 - [Ringkasan proyek dan pembagian modul](../README.md)
 - [Aplikasi di PWS](https://justin-evan-titiklapar.pws.cs.ui.ac.id/)
-- [Panduan pengujian SharedPost](../SharedPost/TESTING.md)
-- [Keamanan SharedPost](../SharedPost/SECURITY.md)
 - [Panduan build CSS](../assets/css/README.md)
 
 ## 1. Instalasi lokal
@@ -243,4 +241,4 @@ Kepercayaan header reverse proxy, redirect HTTPS, dan HSTS perlu disesuaikan den
 
 ## 10. Dokumentasi penggunaan AI
 
-Dokumentasi penggunaan AI untuk SharedPost tersedia pada [AI_DISCLOSURE.md](../SharedPost/AI_DISCLOSURE.md). Catat bantuan AI, peninjauan pengguna, perbaikan, dan batas verifikasi sesuai proses yang benar-benar dilakukan. Panduan integrasi ini mendeskripsikan perilaku kode; pembagian kontribusi setiap anggota tetap didokumentasikan oleh penanggung jawab modul masing-masing.
+Dokumentasi penggunaan AI untuk masing-masing modul tersedia pada folder masing-masing modul. Catat bantuan AI, peninjauan pengguna, perbaikan, dan batas verifikasi sesuai proses yang benar-benar dilakukan. Panduan integrasi ini mendeskripsikan perilaku kode; pembagian kontribusi setiap anggota tetap didokumentasikan oleh penanggung jawab modul masing-masing.
