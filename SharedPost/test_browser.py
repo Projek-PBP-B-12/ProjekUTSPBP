@@ -586,6 +586,45 @@ class SharedPostBrowserTests(StaticLiveServerTestCase):
         page.route("**/leaflet.min.js", lambda route: route.fulfill(body=leaflet, content_type="application/javascript"))
         page.route("**/leaflet.min.css", lambda route: route.fulfill(body="", content_type="text/css"))
 
+    def test_unavailable_photos_fall_back_without_breaking_offer_links(self):
+        photo_url = self.live_server_url + settings.STATIC_URL + "images/landing/food.png"
+        self.offered_food.image_url = photo_url
+        self.offered_food.save(update_fields=["image_url"])
+        with self.open_board(user=self.visitor, mobile=True) as (page, navigations):
+            self.stub_map_provider(page)
+
+            def serve_photo(route):
+                if case == "offline":
+                    route.abort()
+                elif case == "valid":
+                    route.continue_()
+                else:
+                    route.fulfill(status=403 if case == "private" else 404 if case == "missing" else 200,
+                                  content_type="text/html", body="<html>Halaman, bukan foto</html>")
+
+            page.route(photo_url, serve_photo)
+            for case in ("missing", "private", "html", "offline", "valid"):
+                with self.subTest(case=case):
+                    page.goto(self.live_server_url + reverse("sharedpost:detail", args=[self.post.pk]))
+                    detail_photo = page.locator("img.food-photo")
+                    if case == "valid":
+                        page.wait_for_function("document.querySelector('img.food-photo').naturalWidth > 0")
+                        expect(detail_photo).to_be_visible()
+                    else:
+                        expect(detail_photo).to_be_hidden()
+                    page.get_by_role("link", name="Lihat lokasi Susu kedelai di peta", exact=True).click()
+                    fallback = page.locator(".map-popup-photo-placeholder")
+                    if case == "valid":
+                        page.wait_for_function("document.querySelector('.map-popup-image').naturalWidth > 0")
+                        expect(fallback).to_be_hidden()
+                        expect(page.locator(".map-popup-image")).to_be_visible()
+                    else:
+                        expect(page.locator(".map-popup-image")).to_have_count(0)
+                        expect(fallback).to_be_visible()
+                        expect(fallback).to_have_text("Foto tidak tersedia")
+                    expect(page.get_by_role("link", name="Lihat penawaran Susu kedelai", exact=True)).to_be_visible()
+                    self.assertTrue(page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"))
+
     def test_detail_location_opens_the_selected_offer_on_map(self):
         with self.open_board(user=self.visitor) as (page, navigations):
             self.stub_map_provider(page)

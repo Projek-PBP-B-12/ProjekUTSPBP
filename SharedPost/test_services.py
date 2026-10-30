@@ -37,10 +37,14 @@ class PhotoURLTests(SimpleTestCase):
             "https://notdrive.google.com/file/d/abc/view",
             "https://example.com/?url=drive.google.com/file/d/abc/view",
             "https://drive.google.com/uc?id=abc%2Fdef",
-            "https://[invalid",
         ]:
             with self.subTest(url=url):
                 self.assertEqual(normalize_photo_url(url), url)
+
+    def test_invalid_and_unsupported_photo_urls_are_ignored(self):
+        for url in ("https://[invalid", "ftp://example.com/photo.jpg", "javascript:alert(1)", "data:image/png;base64,abc", "/photo.jpg"):
+            with self.subTest(url=url):
+                self.assertIsNone(normalize_photo_url(url))
 
 
 class MapPinTests(TestCase):

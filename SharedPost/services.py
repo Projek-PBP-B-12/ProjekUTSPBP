@@ -19,9 +19,12 @@ def normalize_photo_url(url):
     try:
         parsed = urlsplit(url)
     except ValueError:
-        return url
+        return None
 
-    if parsed.hostname != "drive.google.com" or parsed.scheme not in ("http", "https"):
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        return None
+
+    if parsed.hostname != "drive.google.com":
         return url
 
     match = re.match(r"^/file/d/([\w-]+)(?:/|$)", parsed.path)
