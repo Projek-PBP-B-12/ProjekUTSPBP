@@ -15,7 +15,12 @@ Pilihan build lainnya tetap tersedia:
 ```powershell
 python tools/build_sharedpost_css.py --page sharedpost
 python tools/build_sharedpost_css.py --page dashboard
+python tools/build_sharedpost_css.py --page fooditem
 ```
+
+Halaman Makananku memakai `assets/css/fooditem.tailwind.css` dengan prefix `fi`
+dan selector `.inventory-page`. Hasil build-nya adalah `static/css/fooditem.css`.
+Sidebar tetap memakai layout bersama; styling inventori tidak mengubah modul lain.
 
 Commit sumber CSS dan hasil build. Deployment cukup memakai hasil CSS yang sudah
 dikompilasi; tidak membutuhkan npm atau compiler Tailwind saat aplikasi berjalan.

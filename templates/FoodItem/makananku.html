@@ -1,18 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/fooditem.css' %}">{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/fooditem.css' %}?v=20261030-2">{% endblock %}
+{% block body_class %}inventory-page{% endblock %}
 {% block title %}Makananku · TitikLapar{% endblock %}
 {% block page_title %}Makananku{% endblock %}
 {% block page_summary %}Pantau inventori pribadi, diurutkan dari tanggal kedaluwarsa terdekat.{% endblock %}
-{% block page_action %}<a href="{% url 'FoodItem:add_food_item' %}" class="button primary">＋ Tambah Makanan</a>{% endblock %}
+{% block page_action %}<a href="{% url 'FoodItem:add_food_item' %}" class="button primary">+ Tambah makanan</a>{% endblock %}
 
 {% block content %}
-<div class="card inventory-card">
+<section class="card inventory-card" aria-labelledby="inventory-title">
     <p id="inventory-error" class="inventory-error" role="alert" hidden></p>
     <div class="inventory-heading">
-        <h2>Inventori Pribadi</h2><p id="food-amount">{{ items|length }} Makanan</p>
+        <h2 id="inventory-title">Inventori pribadi</h2>
+        <div class="inventory-heading-tools">
+            <button type="button" class="inventory-filter-toggle" aria-label="Cari dan filter makanan" title="Cari dan filter makanan" aria-controls="inventory-filters" aria-expanded="true" hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+            </button>
+            <p id="food-amount">{{ items|length }} makanan</p>
+        </div>
     </div>
-    <form method="get" class="inventory-filters" role="search">
+    <form id="inventory-filters" method="get" class="inventory-filters" role="search" aria-label="Cari dan filter inventori" data-active="{% if query or selected_status %}true{% else %}false{% endif %}">
         <div><label for="food-search">Cari makanan</label><input id="food-search" type="search" name="q" value="{{ query }}" maxlength="150" placeholder="Misalnya: roti atau apel"></div>
         <div><label for="food-status">Status</label><select id="food-status" name="status">
             <option value="">Semua status</option>
@@ -21,43 +28,53 @@
             <option value="CONSUMED"{% if selected_status == 'CONSUMED' %} selected{% endif %}>Sudah habis</option>
         </select></div>
         <button class="button secondary" type="submit">Tampilkan</button>
+        {% if query or selected_status %}<a class="inventory-reset" href="{% url 'FoodItem:makananku' %}">Reset filter</a>{% endif %}
     </form>
     <div class="inventory-table-scroll" tabindex="0" role="region" aria-label="Daftar inventori pribadi">
-    <table class="table">
-        <thead><tr><th scope="col">MAKANAN</th><th scope="col">DIBELI</th><th scope="col">KEDALUWARSA</th><th scope="col">TINDAKAN</th></tr></thead>
+    <table class="table" aria-label="Inventori makanan pribadi">
+        <colgroup><col class="inventory-name-col"><col class="inventory-date-col"><col class="inventory-expiry-col"><col class="inventory-actions-col"></colgroup>
+        <thead><tr><th scope="col">Makanan</th><th scope="col">Dibeli</th><th scope="col">Kedaluwarsa</th><th scope="col">Aksi</th></tr></thead>
         <tbody>
         {% for item in items %}
             <tr class="food-row">
-                <td><div class="food-title">{{ item.name }}</div><div class="food-category">{{ item.get_category_display }}</div>
-                    <small>{% if item.status == 'OFFERED' %}Ditawarkan{% elif item.status == 'CONSUMED' %}Sudah habis{% else %}Tersimpan{% endif %}</small></td>
-                <td class="inventory-date">{{ item.purchase_date|date:"d M Y" }}</td>
-                <td>
-                    <span class="badge {% if item.status == 'CONSUMED' %}badge-gray{% elif item.is_expired %}badge-red{% elif item.days_until_expiration <= 3 %}badge-orange{% else %}badge-green{% endif %}">
-                    {% if item.status == 'CONSUMED' %}Sudah dikonsumsi{% elif item.is_expired %}Sudah kedaluwarsa{% elif item.days_until_expiration == 0 %}Hari ini{% elif item.days_until_expiration == 1 %}Besok{% else %}{{ item.days_until_expiration }} hari{% endif %}
-                    </span>
-                    <small class="inventory-expiry-date">{{ item.expiration_date|date:"d M Y" }}</small>
+                <td class="inventory-food-cell"><div class="food-title">{{ item.name }}</div><div class="food-category">{{ item.get_category_display }}</div>
+                    <span class="inventory-sr-only">{% if item.status == 'OFFERED' %}Ditawarkan{% elif item.status == 'CONSUMED' %}Sudah habis{% else %}Tersimpan{% endif %}</span>
                 </td>
-                <td><div class="inventory-actions">
-                    <button type="button" class="detail-link" data-name="{{ item.name }}" data-category="{{ item.get_category_display }}"
+                <td class="inventory-date" data-label="Dibeli">{{ item.purchase_date|date:"d M Y" }}</td>
+                <td class="inventory-expiry" data-label="Kedaluwarsa">
+                    <span class="badge {% if item.status == 'CONSUMED' %}badge-gray{% elif item.is_expired %}badge-red{% elif item.days_until_expiration <= 3 %}badge-orange{% else %}badge-green{% endif %}" title="{{ item.expiration_date|date:'d M Y' }}">
+                    {% if item.status == 'CONSUMED' %}Sudah dikonsumsi{% elif item.is_expired %}Sudah kedaluwarsa{% elif item.days_until_expiration == 0 %}Hari ini{% elif item.days_until_expiration == 1 %}Besok{% else %}{{ item.days_until_expiration }} hari lagi{% endif %}
+                    </span>
+                    <span class="inventory-sr-only">{{ item.expiration_date|date:"d M Y" }}</span>
+                </td>
+                <td class="inventory-action-cell"><div class="inventory-actions">
+                    {% if item.is_expired %}
+                    <a class="inventory-delete inventory-row-delete" href="{% url 'FoodItem:delete_food_page' item.pk %}" data-delete-url="{% url 'FoodItem:delete_food_item' item.pk %}" data-food-name="{{ item.name }}">Hapus {% include "SharedPost/partials/icon.html" with icon="trash" size="14" %}</a>
+                    {% endif %}
+                    <button type="button" class="detail-link" aria-label="Detail {{ item.name }}" data-name="{{ item.name }}" data-category="{{ item.get_category_display }}"
                         data-purchase-date="{{ item.purchase_date|date:'d M Y' }}" data-expiration-date="{{ item.expiration_date|date:'d M Y' }}"
                         data-status="{% if item.status == 'OFFERED' %}Ditawarkan{% elif item.status == 'CONSUMED' %}Sudah habis{% else %}Tersimpan{% endif %}"
                         data-status-code="{{ item.status }}" data-stored-url="{% url 'FoodItem:make_food_item_status_stored' item.pk %}" data-consumed-url="{% url 'FoodItem:make_food_item_status_consumed' item.pk %}"
                         data-expiration-state="{{ item.expiration_state }}" data-image-url="{{ item.image_url }}"
-                        data-change-url="{% url 'FoodItem:change_food_item' item.pk %}">Detail →</button>
+                        data-change-url="{% url 'FoodItem:change_food_item' item.pk %}"
+                        data-delete-url="{% url 'FoodItem:delete_food_item' item.pk %}" data-delete-page-url="{% url 'FoodItem:delete_food_page' item.pk %}"
+                        data-share-url="{% if item.active_posts %}{% url 'sharedpost:detail' item.active_posts.0.pk %}{% elif item.status == 'STORED' and not item.is_expired %}{% url 'sharedpost:create' %}?food={{ item.pk }}{% endif %}"
+                        data-share-label="{% if item.active_posts %}Lihat penawaran{% else %}Bagikan{% endif %}">Detail <span aria-hidden="true">→</span></button>
+                </div>
+                <noscript><div class="inventory-fallback-actions">
+                    <form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}
+                        {% if item.status == 'CONSUMED' %}<input type="hidden" name="status" value="STORED"><button class="button secondary" type="submit">Simpan kembali</button>
+                        {% else %}<input type="hidden" name="status" value="CONSUMED"><button class="button secondary" type="submit">Konsumsi</button>{% endif %}
+                    </form>
                     {% if item.active_posts %}
-                        <a class="button primary" href="{% url 'sharedpost:detail' item.active_posts.0.pk %}">Lihat penawaran</a>
+                        <a class="button secondary" href="{% url 'sharedpost:detail' item.active_posts.0.pk %}" aria-label="Lihat penawaran">Penawaran</a>
                     {% elif item.status == 'STORED' and not item.is_expired %}
-                        <a class="button primary" href="{% url 'sharedpost:create' %}?food={{ item.pk }}">Bagikan</a>
+                        <a class="button secondary" href="{% url 'sharedpost:create' %}?food={{ item.pk }}">Bagikan</a>
                     {% endif %}
-                    <a class="button secondary" href="{% url 'FoodItem:change_food_item' item.pk %}">Ubah</a>
-                    {% if item.status != 'CONSUMED' %}
-                    <form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}<input type="hidden" name="status" value="CONSUMED"><button class="button secondary" type="submit">Tandai habis</button></form>
-                    {% endif %}
-                    {% if item.status != 'STORED' %}
-                    <form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}<input type="hidden" name="status" value="STORED"><button class="button secondary" type="submit">Simpan kembali</button></form>
-                    {% endif %}
-                    <a class="inventory-delete" href="{% url 'FoodItem:delete_food_page' item.pk %}" data-delete-url="{% url 'FoodItem:delete_food_item' item.pk %}" data-food-name="{{ item.name }}">Hapus</a>
-                </div></td>
+                    <a class="inventory-edit" href="{% url 'FoodItem:change_food_item' item.pk %}">Edit</a>
+                    {% if item.status == 'OFFERED' %}<form method="post" action="{% url 'FoodItem:change_status' item.pk %}">{% csrf_token %}<input type="hidden" name="status" value="STORED"><button class="button secondary" type="submit">Simpan kembali</button></form>{% endif %}
+                    {% if not item.is_expired %}<a class="inventory-delete" href="{% url 'FoodItem:delete_food_page' item.pk %}">Hapus</a>{% endif %}
+                </div></noscript></td>
             </tr>
         {% empty %}
             <tr><td colspan="4" class="inventory-empty">Tidak ada makanan. Tambahkan makanan atau ubah filter pencarian.</td></tr>
@@ -65,7 +82,7 @@
         </tbody>
     </table>
     </div>
-</div>
+</section>
 
 <dialog id="food-detail-modal" class="food-detail-dialog" aria-labelledby="modal-food-name">
     <div class="modal-content">
@@ -79,103 +96,24 @@
             <div id="modal-image-row" class="detail-row" hidden><span>Foto</span><img id="modal-image-url" class="modal-food-image" alt="" referrerpolicy="no-referrer"></div>
         </div>
         <p id="modal-food-error" class="inventory-error" role="alert" hidden></p>
-        <div class="modal-footer"><a href="{% url 'FoodItem:list_food_items' %}" id="modal-change-url" class="button primary">Ubah</a><button type="button" id="modal-mark-consume-button" class="button primary">Tandai habis</button><button type="button" data-close-food-modal class="button secondary">Tutup</button></div>
+        <div class="modal-primary-actions">
+            <button type="button" id="modal-mark-consume-button" class="button primary">Tandai habis</button>
+            <a href="{% url 'FoodItem:list_food_items' %}" id="modal-share-url" class="button secondary" hidden>Bagikan</a>
+            <button type="button" id="modal-store-button" class="button secondary" hidden>Simpan kembali</button>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-management-actions">
+                <a href="{% url 'FoodItem:list_food_items' %}" id="modal-change-url" class="button secondary">{% include "SharedPost/partials/icon.html" with icon="edit" size="16" %}Edit</a>
+                <a href="{% url 'FoodItem:list_food_items' %}" id="modal-delete-url" class="button inventory-delete modal-delete-button">{% include "SharedPost/partials/icon.html" with icon="trash" size="16" %}Hapus</a>
+            </div>
+            <button type="button" data-close-food-modal class="button secondary">Tutup</button>
+        </div>
     </div>
 </dialog>
-<script>
-(function () {
-    "use strict";
-    const modal = document.getElementById("food-detail-modal");
-    const statusButton = document.getElementById("modal-mark-consume-button");
-    const modalError = document.getElementById("modal-food-error");
-    const inventoryError = document.getElementById("inventory-error");
-    let selectedFood = null;
-    const states = {CONSUMED: "Sudah habis", EXPIRED: "Sudah kedaluwarsa", EXPIRES_TODAY: "Kedaluwarsa hari ini", FRESH: "Belum kedaluwarsa"};
 
-    async function mutateFood(url) {
-        const token = document.querySelector('input[name="csrfmiddlewaretoken"]');
-        const response = await fetch(url, {
-            method: "POST", credentials: "same-origin",
-            headers: {"X-CSRFToken": token ? token.value : "", "Accept": "application/json"},
-        });
-        const result = await response.json().catch(function () { return {}; });
-        if (!response.ok) throw new Error(result.message || "Perubahan gagal disimpan. Coba lagi atau muat ulang halaman.");
-    }
+{% endblock %}
 
-    async function refreshInventory() {
-        const response = await fetch(window.location.href, {credentials: "same-origin", headers: {"Accept": "text/html"}});
-        if (!response.ok || response.redirected) throw new Error("Data berubah, tetapi daftar belum dapat dimuat ulang. Segarkan halaman.");
-        const updated = new DOMParser().parseFromString(await response.text(), "text/html");
-        const table = updated.querySelector(".inventory-table-scroll");
-        const count = updated.getElementById("food-amount");
-        if (!table || !count) throw new Error("Daftar belum dapat dimuat ulang. Segarkan halaman.");
-        document.querySelector(".inventory-table-scroll").replaceWith(table);
-        document.getElementById("food-amount").textContent = count.textContent;
-    }
-
-    document.addEventListener("click", async function (event) {
-        const button = event.target.closest(".detail-link");
-        if (button) {
-            const data = button.dataset;
-            selectedFood = data;
-            modalError.hidden = true;
-            statusButton.disabled = false;
-            statusButton.textContent = data.statusCode === "CONSUMED" ? "Simpan kembali" : "Tandai habis";
-            document.getElementById("modal-food-name").textContent = data.name;
-            document.getElementById("modal-food-category").textContent = data.category;
-            document.getElementById("modal-purchase-date").textContent = data.purchaseDate;
-            document.getElementById("modal-expiration-date").textContent = data.expirationDate;
-            document.getElementById("modal-status").textContent = data.status;
-            document.getElementById("modal-expiration-state").textContent = states[data.expirationState] || data.expirationState;
-            document.getElementById("modal-change-url").href = data.changeUrl;
-            const image = document.getElementById("modal-image-url");
-            document.getElementById("modal-image-row").hidden = !data.imageUrl;
-            if (data.imageUrl) {
-                image.src = data.imageUrl;
-                image.alt = data.name;
-            } else {
-                image.removeAttribute("src");
-                image.alt = "";
-            }
-            modal.showModal();
-            return;
-        }
-        const removeLink = event.target.closest(".inventory-delete");
-        if (!removeLink) return;
-        event.preventDefault();
-        if (removeLink.dataset.busy === "true" || !window.confirm("Hapus " + removeLink.dataset.foodName + " beserta penawarannya? Tindakan ini tidak dapat dibatalkan.")) return;
-        removeLink.dataset.busy = "true";
-        inventoryError.hidden = true;
-        try {
-            await mutateFood(removeLink.dataset.deleteUrl);
-            await refreshInventory();
-        } catch (error) {
-            inventoryError.textContent = error.message;
-            inventoryError.hidden = false;
-        } finally {
-            delete removeLink.dataset.busy;
-        }
-    });
-    statusButton.addEventListener("click", async function () {
-        if (!selectedFood || statusButton.disabled) return;
-        statusButton.disabled = true;
-        modalError.hidden = true;
-        try {
-            await mutateFood(selectedFood.statusCode === "CONSUMED" ? selectedFood.storedUrl : selectedFood.consumedUrl);
-            modal.close();
-            await refreshInventory();
-        } catch (error) {
-            const message = modal.open ? modalError : inventoryError;
-            message.textContent = error.message;
-            message.hidden = false;
-        } finally {
-            statusButton.disabled = false;
-        }
-    });
-    modal.querySelectorAll("[data-close-food-modal]").forEach(function (button) {
-        button.addEventListener("click", function () { modal.close(); });
-    });
-    modal.addEventListener("click", function (event) { if (event.target === modal) modal.close(); });
-})();
-</script>
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/fooditem-ui.js' %}?v=20261030-2" defer></script>
 {% endblock %}
