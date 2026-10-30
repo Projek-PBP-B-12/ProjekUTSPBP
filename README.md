@@ -68,14 +68,14 @@ Modul spasial ini secara khusus dirancang untuk berkomunikasi dengan Nominatim A
 
 ### Notification
 
-Notification memiliki peran sebagai kotak masuk atau riwayat peringatan yang menjembatani sistem otomatisasi di belakang layar dengan pengguna akhir. Peran utamanya adalah menerima dan menyimpan rekaman pesan peringatan yang dihasilkan oleh sistem ketika ada makanan yang mendekati batas waktu kedaluwarsa. Entitas ini merekam tenggat waktu pembuatan pesan dan status keterbacaan, sehingga aplikasi dapat menampilkan atau menyembunyikan indikator visual berwarna pada antarmuka sesuai dengan interaksi pengguna terhadap peringatan tersebut.
+Notification menyimpan riwayat pengingat makanan milik pengguna pada H-7, H-3, dan H-1 sebelum tanggal kedaluwarsa untuk makanan yang masih tersimpan atau ditawarkan. Setiap notifikasi mencatat pesan, waktu pembuatan, tanggal kedaluwarsa acuan, status baca, serta status pemrosesan email. Pengguna dapat melihat daftar notifikasi dan menandainya sebagai sudah dibaca. Pengiriman ke inbox menggunakan email pada akun dan memerlukan konfigurasi SMTP; pemrosesan pengingat harian memerlukan scheduler server.
 
-**Aktivitas pengguna**: menerima pengingat makanan yang mendekati kedaluwarsa, membukanya, lalu memutuskan untuk mengonsumsi atau mendonasikan makanan tersebut.
+**Aktivitas pengguna**: melihat pengingat makanan milik sendiri, membuka tautan ke makanan yang masih tersedia, menandai notifikasi sebagai sudah dibaca, dan memperbarui email pengingat melalui profil.
 
-- **Create**: Dibuat otomatis oleh sistem saat makanan mendekati kedaluwarsa (misal H-3)
-- **Read**: Melihat kotak masuk notifikasi dan indikator belum dibaca
-- **Update**: Menandai notifikasi sebagai sudah dibaca
-- **Delete**: Menghapus notifikasi dari kotak masuk.
+- **Create**: Sistem membuat pengingat saat sisa waktu makanan tepat 7, 3, atau 1 hari sebelum kedaluwarsa.
+- **Read**: Melihat daftar notifikasi milik sendiri dan jumlah pesan yang belum dibaca.
+- **Update**: Menandai notifikasi sebagai sudah dibaca.
+- **Delete**: Notifikasi otomatis ikut terhapus saat akun penerima dihapus (`CASCADE`). Belum tersedia penghapusan per notifikasi atau berdasarkan umur pesan. Jika makanan dihapus, riwayat notifikasi tetap tersimpan dan referensi makanannya dikosongkan (`SET_NULL`).
 
 (Penanggung jawab modul : Agra)
 
