@@ -1,6 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from FoodItem.api import FoodItemViewSet
 from Location.api import LocationViewSet
 from SharedPost.api import SharedPostViewSet
 from userprofile.api import (DonorContactView, LoginView, LogoutView,
@@ -8,6 +9,7 @@ from userprofile.api import (DonorContactView, LoginView, LogoutView,
 from notification.api import NotificationViewSet
 
 router = DefaultRouter()
+router.register('foods', FoodItemViewSet, basename='food')
 router.register('locations', LocationViewSet, basename='location')
 router.register('posts', SharedPostViewSet, basename='post')
 router.register('notifications', NotificationViewSet, basename='notification')
