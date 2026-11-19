@@ -1,5 +1,13 @@
 # Projek UTS PBP - B Kelompok 12
 
+## API untuk aplikasi mobile
+
+Endpoint Django REST Framework tersedia di `/api/` untuk kelima modul.
+Daftar method/URL, autentikasi token, contoh JSON, cara menjalankan, dan pengujian
+tersedia di [dokumentasi API](docs/api.md).
+Hasil pemeriksaan kesesuaian alur web/API dan batas pengujian dicatat di
+[pemeriksaan alur](docs/api-audit.md).
+
 ## Nama Anggota
 
 1. GHULAM MUHAMMAD IHSAN : 2506656766
